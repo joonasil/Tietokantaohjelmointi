@@ -24,6 +24,7 @@ CREATE TABLE tyosopimus (
 	tyyppi SOPIMUSLAJI,
 	osamaksu INT,
 	pvm DATE,
+	selite VARCHAR (50),
 	FOREIGN KEY (kohdeID) REFERENCES tyokohde(kohdeID)
 );
 
