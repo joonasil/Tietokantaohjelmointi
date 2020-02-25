@@ -1,0 +1,2 @@
+# Tietokantaohjelmointi
+Tietokantaohjelmoinnin harjoitustyö.
