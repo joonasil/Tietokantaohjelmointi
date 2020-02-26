@@ -37,6 +37,7 @@ INSERT INTO tyosuoritus VALUES (DEFAULT, 4, 'suunnittelu', '2020-01-15', 2, 10);
 INSERT INTO tyosuoritus VALUES (DEFAULT, 4, 'matkakorvaus', '2020-01-15', 1, 0);
 INSERT INTO tyosuoritus VALUES (DEFAULT, 4, 'asennustyo', '2020-01-15', 6, 10);
 
+-- Jätetään alkuun myyntihinnat tyhjiksi ja päivitetään myöhemmin
 INSERT INTO tarvike VALUES (DEFAULT, 'Jatkopistorasia 2-osainen rinnakkain IP44', 4.99, null, 'kpl', 52, 24);
 INSERT INTO tarvike VALUES (DEFAULT, 'Pistotulppa IP20', 1.99, null, 'kpl', 19, 24);
 INSERT INTO tarvike VALUES (DEFAULT, 'Mekaaninen termostaatti', 31.2, null, 'kpl', 9, 24);
@@ -45,6 +46,7 @@ INSERT INTO tarvike VALUES (DEFAULT, 'Automaattisulake 10A 380V', 7.5, null, 'kp
 INSERT INTO tarvike VALUES (DEFAULT, 'Sähköasennukset hölmöille -kirja 2014 WSOY', 35.5, null, 'kpl', 4, 10);
 INSERT INTO tarvike VALUES (DEFAULT, 'Automaattisulake 12A 240V', 5.5, null, 'kpl', 12, 24);
 
+-- Asetetaan kaikille tuotteille myyntihinnaksi sisäänostohinta * 1.5
 UPDATE tarvike SET myyntihinta = 1.5 * sisaanostohinta;
 
 INSERT INTO tarvikeluettelo VALUES (2, 1, 4, 7);

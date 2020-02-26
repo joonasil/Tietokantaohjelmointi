@@ -1,6 +1,7 @@
 CREATE SCHEMA tikoht;
 SET SCHEMA 'tikoht';
 
+-- Uudet tietotyypit sopimuslajille ja yksiköille
 CREATE TYPE sopimuslaji AS ENUM ('urakka', 'tunti');
 CREATE TYPE yksikot AS ENUM ('kpl', 'kg', 'm', 'cm', 'g', 'l', 'kela');
 
@@ -35,6 +36,7 @@ CREATE TABLE tyotarjous (
 	FOREIGN KEY (sopimusID) REFERENCES tyosopimus(sopimusID)
 );
 
+-- Laskussa tarkistus, ettei laskun eräpäivä ole myöhemmin kuin laskun pvm
 CREATE TABLE lasku (
 	laskuID SERIAL PRIMARY KEY,
 	sopimusID INT,
