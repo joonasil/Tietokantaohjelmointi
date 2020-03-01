@@ -23,9 +23,14 @@ CREATE TABLE tyosopimus (
 	sopimusID SERIAL PRIMARY KEY,
 	kohdeID INT,
 	tyyppi SOPIMUSLAJI,
+	tyonHinta NUMERIC,
+	tarvikkeidenHinta NUMERIC,
 	osamaksu INT,
 	pvm DATE,
 	selite VARCHAR (50),
+	CONSTRAINT jos_urakkatyo_hinnat_NOTNULL
+		CHECK ( (tyyppi = 'tunti' AND tyonHinta IS NULL AND tarvikkeidenHinta IS NULL )
+			OR (tyyppi = 'urakka' AND tyonHinta IS NOT NULL AND tarvikkeidenHinta IS NOT NULL )),
 	FOREIGN KEY (kohdeID) REFERENCES tyokohde(kohdeID)
 );
 
