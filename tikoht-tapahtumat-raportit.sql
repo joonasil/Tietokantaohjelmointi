@@ -24,7 +24,6 @@ FROM lasku
 WHERE erapaiva < '2020-03-01' AND maksettupvm IS NULL;
 
 -- Haetaan rekursiivisesti kaikki laskua edeltävät laskut
-
 WITH RECURSIVE el(laskuid, edeltavaLasku, monesko) AS (
 		SELECT l.laskuid, l.edeltavaLasku, 1
 		FROM lasku l
