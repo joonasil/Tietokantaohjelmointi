@@ -22,15 +22,20 @@ CREATE TABLE tyokohde (
 CREATE TABLE tyosopimus (
 	sopimusID SERIAL PRIMARY KEY,
 	kohdeID INT,
-	tyyppi SOPIMUSLAJI,
+	tyyppi SOPIMUSLAJI NOT NULL,
 	tyonHinta NUMERIC,
 	tarvikkeidenHinta NUMERIC,
-	osamaksu INT,
+	-- laskujen määrä -> arvo 1 = ei osamaksua, arvo 4 = maksetaan 4 osassa
+	osamaksu INT NOT NULL,
 	pvm DATE,
 	selite VARCHAR (50),
 	CONSTRAINT jos_urakkatyo_hinnat_NOTNULL
-		CHECK ( (tyyppi = 'tunti' AND tyonHinta IS NULL AND tarvikkeidenHinta IS NULL )
-			OR (tyyppi = 'urakka' AND tyonHinta IS NOT NULL AND tarvikkeidenHinta IS NOT NULL )),
+		-- tuntisopimuksessa tarvikeHinta ja tyonHinta tyhjät
+		CHECK ( (tyyppi = 'tunti' AND tyonHinta IS NULL 
+			AND tarvikkeidenHinta IS NULL )
+			-- urakkasopimuksessa tarvikkeiden ja työn hinnat merkattu
+			OR (tyyppi = 'urakka' AND tyonHinta IS NOT NULL 
+			AND tarvikkeidenHinta IS NOT NULL )),
 	FOREIGN KEY (kohdeID) REFERENCES tyokohde(kohdeID)
 );
 
@@ -89,9 +94,3 @@ CREATE TABLE tarvikeluettelo (
 	FOREIGN KEY (suoritusID) REFERENCES tyosuoritus(suoritusID),
 	FOREIGN KEY (tarvikeID) REFERENCES tarvike(tarvikeID)
 );
-	
-	
-
-
-	
-	

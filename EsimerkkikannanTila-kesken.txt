@@ -1,0 +1,30 @@
+Esimerkkikannan tila:
+
+------------------- ASIAKAS ------------------------------------
+ asiakasid |      nimi      |       osoite
+-----------+----------------+--------------------
+         1 | Essi Esimerkki | Tiekatu 1
+         2 | Ville Vakio    | Kotitie 10
+         3 | Antti Asiakas  | PinniC nurkkapöytä
+         4 | Otto Oletus    | Puistokatu 14 A 36
+(4 rows)
+
+------------------- TYOKOHDE -----------------------------------
+ kohdeid | omistajaid | kohdetyyppi  |          osoite
+---------+------------+--------------+--------------------------
+       1 |          1 | Omakotitalo  | Tiekatu 1
+       2 |          1 | Kesämökki    | Pikkuvehnänpeltokatu 108
+       3 |          3 | Kylmävarasto | Katukatu 6
+       4 |          3 | Omakotitalo  | Varastotie 9 A17
+(4 rows)
+
+
+ sopimusid | kohdeid | tyyppi | tyonhinta | tarvikkeidenhinta | osamaksu |    pvm     |                      selite
+-----------+---------+--------+-----------+-------------------+----------+------------+--------------------------------------------------
+         1 |       1 | tunti  |           |                   |        1 | 2019-10-31 | Terassin sähköpistokkeet
+         2 |       1 | urakka |    700.00 |            249.95 |        2 | 2019-10-15 | Kellarin lämmitys
+         3 |       3 | tunti  |           |                   |        1 | 2020-01-20 | Ulkosaunan sähköistys
+         4 |       4 | tunti  |           |                   |        4 | 2019-10-31 | Autotallin sähköjen uudelleenveto
+         5 |       2 | tunti  |           |                   |          |            | Tarjous Villelle mökin kaapeloinnista
+         6 |       3 | urakka |   1200.00 |            400.00 |          |            | Urakkatarjous  kylmävaraston jäähdytyslaitteista
+(6 rows)

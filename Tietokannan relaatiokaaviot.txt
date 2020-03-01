@@ -1,0 +1,11 @@
+Tietokannan relaatiokaaviot
+
+ASIAKAS (asiakasID, nimi, osoite)
+TYOKOHDE (kohdeID, omistajaID, kohdetyyppi, osoite)
+TYOSOPIMUS (sopimusID, kohdeID, tyyppi, tyonHinta, tarvikkeidenHinta, osamaksu, pvm, selite)
+TYOTARJOUS (sopimusID, pvm, hyvaksytty)
+LASKU (laskuID, sopimusID, pvm, erapaiva, maksettuPVM, edeltavaLasku)
+TUNTITYOHINNASTO (tyyppi, hinta, alv)
+TYOSUORITUS (suoritusID, sopimusID, tyolaji, pvm, tuntiLkm, aleprosentti)
+TARVIKE (tarvikeID, nimi, sisaanostohinta, myyntihinta, yksikko, varastoLkm, alv)
+TARVIKELUETTELO (suoritusID, tarvikeID, lkm, aleProsentti)
