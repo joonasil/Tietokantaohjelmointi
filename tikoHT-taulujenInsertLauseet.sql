@@ -22,6 +22,7 @@ INSERT INTO lasku VALUES (DEFAULT, 2, '2019-12-31', '2020-01-31', '2020-01-21', 
 INSERT INTO lasku VALUES (DEFAULT, 2, '2019-01-15', '2020-03-31', null, null);
 INSERT INTO lasku VALUES (DEFAULT, 4, '2019-11-15', '2020-12-31', null, null);
 INSERT INTO lasku VALUES (DEFAULT, 4, '2019-01-15', '2020-02-28', null, 4);
+INSERT INTO lasku VALUES (DEFAULT, 4, '2019-02-15', '2020-03-15', null, 5);
 
 INSERT INTO tuntityohinnasto VALUES ('suunnittelu', 55, 24);
 INSERT INTO tuntityohinnasto VALUES ('asennustyo', 45, 24);
