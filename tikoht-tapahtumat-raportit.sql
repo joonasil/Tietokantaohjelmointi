@@ -5,6 +5,10 @@
 INSERT INTO tyokohde (kohdeID, omistajaID, kohdetyyppi, osoite)
 VALUES ($asiakasid, $omistajaID, $kohdetyyppi, $osoite);
 
+Lue asiakasID realatiosta asiakas
+Lue lastValue relaatiosta tyokohde_kohdeid_seq
+uusiKohde := 
+
 -- esimerkki
 INSERT INTO tyokohde VALUES (DEFAULT, 3, 'Omakotitalo', 'Katutiekuja x');
 
@@ -87,9 +91,11 @@ SELECT a.nimi, a.osoite, ts.
 -- - muille tarvikkeille annettu 20% alennus
 -- - Opaskirjan (10 euroa – huom. eri alv)
 -- - Alennukset kohdistuvat alv-verottomaan hintaan
+
 -- R4: Urakkatarjous, joka sisältää
 -- - asiakkaan ja työkohteen tiedot
 -- - Arvioidun työn osuuden (peruste 5 tuntia suunnittelua, 20 tuntia asennustyötä; annetaan 10% alennus)
 -- - Tarvikkeiden osuudet (3 eri tyyppiä, ainakin 2 kutakin)
 -- - Alv-erittely
+
 -- R5: Muodosta hyväksytystä urakkatarjouksesta kaksi samansuuruista laskua siten, että toinen laskutetaan heti ja toinen ensi vuoden tammikuun 1 päivä.
