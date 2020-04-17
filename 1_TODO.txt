@@ -1,6 +1,2 @@
-- Työtarjousten liittäminen työsopimus relaatioon
-- Laskun tarkastaminen, mahdollistaako kaikki tarvittavat ominaisuudet
-- Relaatioide BCNF muoto
-- Null-arvojen minimointi
-	- Hyvä esimerkki tyyppimuuttuja työsopimukselle (vs tuntisopimus:NULL, urakkasopimus:TRUE)
 - Reduntanttisuuden tarkastaminen
+- BC funktionaalinen normalisointi?
