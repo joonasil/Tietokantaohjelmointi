@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Scanner;
 
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
@@ -14,18 +15,32 @@ public class Main {
 	public static void main(String args[]) throws SQLException {
 		System.out.println("This is a test for JDBC connection to a SSH secured DB server.");
 		
+		System.out.println("Remote username:");
+        Scanner systemIn = new Scanner(System.in);
+        String user = systemIn.next();
+        System.out.println("Remote username:");
+        String password = systemIn.next();
+        System.out.println("Database username:");
+        String dbuserName = systemIn.next();
+        System.out.println("Database password:");
+        String dbpassword = systemIn.next();
+        System.out.println("Database schema");
+        String schema = systemIn.next();
+		
+		
 		int lport=5656;
 	    String rhost="dbstud2.sis.uta.fi";
 	    String host="shell.sis.uta.fi";
 	    int rport=5432;
-	    String user="ji431301"; 															// T�h�n tunnus mill� kirjaudut shell.sis.uta (peruspalvelutunnus)
-	    String password="";																	// Yliopiston k�ytt�j�tilin salasana
-	    String dbuserName = "ji431301";														// dbstud2.sis.uta.fi k�ytt�j�, pit�is olla kans peruspalvelutunnus
-        String dbpassword = "";																// dbstud2.sis.uta.fi k�ytt�j�n salasana
-        String url = "jdbc:postgresql://localhost:"+lport+"/ji431301?currentSchema=jdbc";	// T�h�n vaihdat ton /ji4313?currentSchema="jdbc" sun tietokannaksi ja schemaksi
+	    //String user=""; 																	// T�h�n tunnus mill� kirjaudut shell.sis.uta (peruspalvelutunnus)
+	    //String password="";																// Yliopiston k�ytt�j�tilin salasana
+	    //String dbuserName = "";															// dbstud2.sis.uta.fi k�ytt�j�, pit�is olla kans peruspalvelutunnus
+        //String dbpassword = "";															// dbstud2.sis.uta.fi k�ytt�j�n salasana
+        String url = "jdbc:postgresql://localhost:"+lport+"/" + dbuserName + "?currentSchema=" + schema;	// T�h�n vaihdat ton /ji4313?currentSchema="jdbc" sun tietokannaksi ja schemaksi
         //String driverName="org.postgresql.Driver";										// Jos noi referenced libraries kusee ku gitin takia niin lis��t
         Connection conn = null;																// vaan projektiin noi jsch.jar ja postgresql.jar sillee ku pistin kuvan
         Session session= null;
+        systemIn.close();
 	    try{
 	    	//Set StrictHostKeyChecking property to no to avoid UnknownHostKey issue
 	    	java.util.Properties config = new java.util.Properties(); 
