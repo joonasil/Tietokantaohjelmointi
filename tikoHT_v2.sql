@@ -7,13 +7,13 @@ CREATE TYPE yksikot AS ENUM ('kpl', 'kg', 'm', 'cm', 'g', 'l', 'kela');
 CREATE TYPE sopimusTila AS ENUM ('luonnos', 'tarjous', 'hyvaksytty');
 
 CREATE TABLE asiakas (
-	asiakasID INT PRIMARY KEY,
+	asiakasID SERIAL PRIMARY KEY,
 	nimi VARCHAR (50) NOT NULL,
 	osoite VARCHAR (100) NOT NULL
 );
 
 CREATE TABLE tyokohde (
-	kohdeID INT PRIMARY KEY,
+	kohdeID SERIAL PRIMARY KEY,
 	omistajaID INT,
 	kohdetyyppi VARCHAR (50) NOT NULL,
 	osoite VARCHAR (100) NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE tyokohde (
 );
 
 CREATE TABLE tyosopimus (
-	sopimusID INT PRIMARY KEY,
+	sopimusID SERIAL PRIMARY KEY,
 	kohdeID INT,
 	tyyppi SOPIMUSLAJI NOT NULL,
 	tyonHinta NUMERIC,
@@ -43,7 +43,7 @@ CREATE TABLE tyosopimus (
 
 -- Laskussa tarkistus, ettei laskun eräpäivä ole myöhemmin kuin laskun pvm
 CREATE TABLE lasku (
-	laskuID INT PRIMARY KEY,
+	laskuID SERIAL PRIMARY KEY,
 	sopimusID INT,
 	pvm DATE NOT NULL,
 	erapaiva DATE NOT NULL,
@@ -63,7 +63,7 @@ CREATE TABLE tuntityo (
 );
 
 CREATE TABLE tyosuoritus (
-	suoritusID INT PRIMARY KEY,
+	suoritusID SERIAL PRIMARY KEY,
 	sopimusID INT,
 	suoritusPvm DATE NOT NULL,
 	FOREIGN KEY (sopimusID) REFERENCES tyosopimus(sopimusID)
@@ -79,7 +79,7 @@ CREATE TABLE tyosuorituksenTuntityo (
 );
 
 CREATE TABLE tarvike (
-	tarvikeID INT PRIMARY KEY,
+	tarvikeID SERIAL PRIMARY KEY,
 	nimi VARCHAR (50),
 	sisaanostohinta NUMERIC,
 	myyntihinta NUMERIC,
