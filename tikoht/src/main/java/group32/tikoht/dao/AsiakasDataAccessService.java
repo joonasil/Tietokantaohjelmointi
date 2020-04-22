@@ -21,9 +21,11 @@ public class AsiakasDataAccessService implements AsiakasDao {
     }
 
     @Override
-    public int insertAsiakas(Integer asiakasID, Asiakas asiakas) {
-        // TODO Auto-generated method stub
-        return 0;
+    public int insertAsiakas(Asiakas asiakas) {
+        String nimi = asiakas.getNimi();
+        String osoite = asiakas.getOsoite();
+        final String sql = "INSERT INTO asiakas(nimi, osoite) VALUES(?, ?)";
+        return jdbcTemplate.update(sql, new Object[]{nimi, osoite});
     }
 
     @Override
@@ -38,21 +40,29 @@ public class AsiakasDataAccessService implements AsiakasDao {
     }
 
     @Override
-    public Optional<Asiakas> selectAsiakasById(Integer asiakasID) {
-        // TODO Auto-generated method stub
-        return null;
+    public Optional<Asiakas> selectAsiakasById(Integer id) {
+        final String sql = "SELECT asiakasID, nimi, osoite FROM asiakas WHERE asiakasID = ?";
+        Asiakas asiakas = jdbcTemplate.queryForObject(sql, new Object[]{id}, (rs, i) -> {
+            Integer asiakasID = rs.getInt("asiakasID");
+            String nimi = rs.getString("nimi");
+            String osoite = rs.getString("osoite");
+            return new Asiakas(asiakasID, nimi, osoite);
+        });
+        return Optional.ofNullable(asiakas);
     }
 
     @Override
-    public int deleteAsiakasById(Integer asiakasID) {
-        // TODO Auto-generated method stub
-        return 0;
+    public int deleteAsiakasById(Integer id) {
+        final String sql = "DELETE FROM asiakas WHERE asiakasID = ?";
+        return jdbcTemplate.update(sql, new Object[]{id});
     }
 
     @Override
-    public int updateAsiakasById(Integer asiakasID, Asiakas asiakas) {
-        // TODO Auto-generated method stub
-        return 0;
+    public int updateAsiakasById(Integer id, Asiakas asiakas) {
+        String nimi = asiakas.getNimi();
+        String osoite = asiakas.getOsoite();
+        final String sql = "UPDATE asiakas SET nimi = ?, osoite = ? WHERE asiakasID = ?";
+        return jdbcTemplate.update(sql, new Object[]{nimi, osoite, id});
     }
 
 
