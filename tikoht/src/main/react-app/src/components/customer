@@ -1,0 +1,12 @@
+import React, { Component } from 'react';
+
+class Customer extends React.Component {
+
+    constructor(id, name, address) {
+
+    }
+
+    render() {
+        return;
+    }
+}
