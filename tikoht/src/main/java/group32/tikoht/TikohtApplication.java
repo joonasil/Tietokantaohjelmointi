@@ -12,7 +12,12 @@ public class TikohtApplication {
 	private static Session session = null;
 
 	public static void main(String[] args) {
-		session = DatabaseConnection.getSSHConnection(args[0], args[1]);
+		if (args[0] != null && args[1] != null) {
+			session = DatabaseConnection.getSSHConnection(args[0], args[1]);
+		}
+		else {
+			System.out.println("CommandLine arguments are empty!");
+		}
 
 		if(session != null) {
 			SpringApplication.run(TikohtApplication.class, args);	
