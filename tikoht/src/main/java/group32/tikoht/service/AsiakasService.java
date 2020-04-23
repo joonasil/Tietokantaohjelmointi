@@ -10,13 +10,14 @@ import org.springframework.stereotype.Service;
 import group32.tikoht.dao.AsiakasDao;
 import group32.tikoht.model.Asiakas;
 
+// Mahdollinen tarvittava serverilogiikka tähän
 @Service
 public class AsiakasService {
 
     private final AsiakasDao asiakasDao;
 
     @Autowired
-    public AsiakasService(@Qualifier("postgres") AsiakasDao asiakasDao) {
+    public AsiakasService(@Qualifier("asiakasPSQL") AsiakasDao asiakasDao) {
         this.asiakasDao = asiakasDao;
     }
 

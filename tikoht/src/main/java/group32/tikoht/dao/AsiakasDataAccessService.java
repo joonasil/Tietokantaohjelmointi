@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import group32.tikoht.model.Asiakas;
 
-@Repository("postgres")
+@Repository("asiakasPSQL")
 public class AsiakasDataAccessService implements AsiakasDao {
 
     @Autowired

@@ -8,7 +8,7 @@ public class DatabaseConnection {
     public static Session getSSHConnection(String user, String password) {
         int lport=5656;
 	    String rhost="dbstud2.sis.uta.fi";
-	    String host="shell.sis.uta.fi";
+	    String host="linux-ssh.tuni.fi";
 	    int rport=5432;															   												
         Session session= null;
 

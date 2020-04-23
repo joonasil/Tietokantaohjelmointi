@@ -7,9 +7,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Asiakas {
 
     private final Integer asiakasID;
-    
     @NotBlank
     private final String nimi;
+    @NotBlank
     private final String osoite;
 
     public Asiakas( @JsonProperty("asikasID") Integer asiakasID,
