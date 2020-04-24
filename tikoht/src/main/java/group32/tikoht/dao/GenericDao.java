@@ -1,7 +1,5 @@
 package group32.tikoht.dao;
 
-import group32.tikoht.model.Asiakas;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -11,9 +9,9 @@ public interface GenericDao<T, G> {
 
     List<T> selectAll();
 
-    Optional<T> selectById(G entityID);
+    Optional<T> selectById(G id);
 
-    int deleteById(Integer entityID);
+    int deleteById(G id);
 
-    int updateById(Integer ID, T entity);
+    int updateById(G id, T entity);
 }
