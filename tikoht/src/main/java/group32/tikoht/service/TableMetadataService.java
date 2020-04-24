@@ -1,7 +1,6 @@
 package group32.tikoht.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import group32.tikoht.dao.TableMetadataDao;
 import group32.tikoht.model.TableMetadata;

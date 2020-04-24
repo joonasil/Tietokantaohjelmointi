@@ -64,7 +64,4 @@ public class AsiakasDao implements GenericDao<Asiakas, Integer> {
         final String sql = "UPDATE asiakas SET nimi = ?, osoite = ? WHERE asiakasID = ?";
         return jdbcTemplate.update(sql, new Object[]{nimi, osoite, id});
     }
-
-
-
 }

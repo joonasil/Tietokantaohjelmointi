@@ -1,6 +1,6 @@
 package group32.tikoht.dao;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,10 +28,10 @@ public class TyosopimusDao implements GenericDao<Tyosopimus, Integer> {
         Double tyonHinta = sopimus.getTyonHinta();
         Double tarvikkeidenHinta = sopimus.getTarvikkeidenHinta();
         Integer osamaksu = sopimus.getOsamaksu();
-        Date pvm = sopimus.getPvm();
+        LocalDate pvm = sopimus.getPvm();
         String sopimuksenTila = sopimus.getSopimuksenTila();
         String selite = sopimus.getSelite();
-        final String sql = "INSERT INTO tyosopimus(kohdeID, tyyppi, tyonHinta, tarvikkeidenHinta, osamaksu, pvm, sopimuksenTila, selite) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        final String sql = "INSERT INTO tyosopimus(kohdeID, tyyppi, tyonHinta, tarvikkeidenHinta, osamaksu, pvm, sopimuksenTila, selite) VALUES(?, ?::sopimuslaji, ?, ?, ?, ?, ?::sopimusTila, ?)";
         return jdbcTemplate.update(sql, new Object[]{kohdeID, tyyppi, tyonHinta, tarvikkeidenHinta, osamaksu, pvm, sopimuksenTila, selite});
     }
 
@@ -45,7 +45,7 @@ public class TyosopimusDao implements GenericDao<Tyosopimus, Integer> {
             Double tyonHinta = rs.getDouble("tyonHinta");
             Double tarvikkeidenHinta = rs.getDouble("tarvikkeidenHinta");
             Integer osamaksu = rs.getInt("osamaksu");
-            Date pvm = rs.getDate("pvm");
+            LocalDate pvm = rs.getObject("pvm", LocalDate.class);
             String sopimuksenTila = rs.getString("sopimuksenTila");
             String selite = rs.getString("selite");
             return new Tyosopimus(sopimusID, kohdeID, tyyppi, tyonHinta, tarvikkeidenHinta, osamaksu, pvm, sopimuksenTila, selite);
@@ -62,7 +62,7 @@ public class TyosopimusDao implements GenericDao<Tyosopimus, Integer> {
             Double tyonHinta = rs.getDouble("tyonHinta");
             Double tarvikkeidenHinta = rs.getDouble("tarvikkeidenHinta");
             Integer osamaksu = rs.getInt("osamaksu");
-            Date pvm = rs.getDate("pvm");
+            LocalDate pvm = rs.getObject("pvm", LocalDate.class);
             String sopimuksenTila = rs.getString("sopimuksenTila");
             String selite = rs.getString("selite");
             return new Tyosopimus(sopimusID, kohdeID, tyyppi, tyonHinta, tarvikkeidenHinta, osamaksu, pvm, sopimuksenTila, selite);
@@ -83,10 +83,10 @@ public class TyosopimusDao implements GenericDao<Tyosopimus, Integer> {
         Double tyonHinta = sopimus.getTyonHinta();
         Double tarvikkeidenHinta = sopimus.getTarvikkeidenHinta();
         Integer osamaksu = sopimus.getOsamaksu();
-        Date pvm = sopimus.getPvm();
+        LocalDate pvm = sopimus.getPvm();
         String sopimuksenTila = sopimus.getSopimuksenTila();
         String selite = sopimus.getSelite();
-        final String sql = "UPDATE tyosopimus SET kohdeID = ?, tyyppi = ?, tyonHinta = ?, tarvikkeidenHinta = ?, osamaksu = ?, pvm = ?, sopimuksenTila = ?, selite = ? WHERE sopimusID = ?";
+        final String sql = "UPDATE tyosopimus SET kohdeID = ?, tyyppi = ?::sopimuslaji, tyonHinta = ?, tarvikkeidenHinta = ?, osamaksu = ?, pvm = ?, sopimuksenTila = ?::sopimusTila, selite = ? WHERE sopimusID = ?";
         return jdbcTemplate.update(sql, new Object[]{kohdeID, tyyppi, tyonHinta, tarvikkeidenHinta, osamaksu, pvm, sopimuksenTila, selite, id});
     }
 }
