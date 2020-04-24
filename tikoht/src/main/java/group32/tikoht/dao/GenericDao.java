@@ -14,4 +14,5 @@ public interface GenericDao<T, K> {
     int deleteById(K key);
 
     int updateById(K key, T entity);
+    
 }

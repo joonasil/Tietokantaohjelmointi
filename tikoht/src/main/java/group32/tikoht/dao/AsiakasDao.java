@@ -24,13 +24,15 @@ public class AsiakasDao implements GenericDao<Asiakas, Integer> {
     public int insert(Asiakas asiakas) {
         String nimi = asiakas.getNimi();
         String osoite = asiakas.getOsoite();
-        final String sql = "INSERT INTO asiakas(nimi, osoite) VALUES(?, ?)";
+        final String sql =  "INSERT INTO asiakas(nimi, osoite) " +
+                            "VALUES(?, ?)";
         return jdbcTemplate.update(sql, new Object[]{nimi, osoite});
     }
 
     @Override
     public List<Asiakas> selectAll() {
-        final String sql = "SELECT asiakasID, nimi, osoite FROM asiakas";
+        final String sql =  "SELECT asiakasID, nimi, osoite " +
+                            "FROM asiakas";
         return jdbcTemplate.query(sql, (rs, i) -> {
             Integer asiakasID = rs.getInt("asiakasID");
             String nimi = rs.getString("nimi");
@@ -41,7 +43,9 @@ public class AsiakasDao implements GenericDao<Asiakas, Integer> {
 
     @Override
     public Optional<Asiakas> selectById(Integer id) {
-        final String sql = "SELECT asiakasID, nimi, osoite FROM asiakas WHERE asiakasID = ?";
+        final String sql =  "SELECT asiakasID, nimi, osoite " +
+                            "FROM asiakas " +
+                            "WHERE asiakasID = ?";
         Asiakas asiakas = jdbcTemplate.queryForObject(sql, new Object[]{id}, (rs, i) -> {
             Integer asiakasID = rs.getInt("asiakasID");
             String nimi = rs.getString("nimi");
@@ -53,7 +57,8 @@ public class AsiakasDao implements GenericDao<Asiakas, Integer> {
 
     @Override
     public int deleteById(Integer id) {
-        final String sql = "DELETE FROM asiakas WHERE asiakasID = ?";
+        final String sql =  "DELETE FROM asiakas " +
+                            "WHERE asiakasID = ?";
         return jdbcTemplate.update(sql, new Object[]{id});
     }
 
@@ -61,7 +66,10 @@ public class AsiakasDao implements GenericDao<Asiakas, Integer> {
     public int updateById(Integer id, Asiakas asiakas) {
         String nimi = asiakas.getNimi();
         String osoite = asiakas.getOsoite();
-        final String sql = "UPDATE asiakas SET nimi = ?, osoite = ? WHERE asiakasID = ?";
+        final String sql =  "UPDATE asiakas " +
+                            "SET nimi = ?, osoite = ? " +
+                            "WHERE asiakasID = ?";
         return jdbcTemplate.update(sql, new Object[]{nimi, osoite, id});
     }
+    
 }

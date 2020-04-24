@@ -28,13 +28,15 @@ public class TarvikeDao implements GenericDao<Tarvike, Integer> {
         String yksikko = tarvike.getYksikko();
         Integer varastoLkm = tarvike.getVarastoLkm();
         Integer alv = tarvike.getAlv();
-        final String sql = "INSERT INTO tarvike(nimi, sisaanostohinta, myyntihinta, yksikko, varastoLkm, alv) VALUES(?, ?, ?, ?::yksikot, ?, ?)";
+        final String sql =  "INSERT INTO tarvike(nimi, sisaanostohinta, myyntihinta, yksikko, varastoLkm, alv) " +
+                            "VALUES(?, ?, ?, ?::yksikot, ?, ?)";
         return jdbcTemplate.update(sql, new Object[]{nimi, sisaanostohinta, myyntihinta, yksikko, varastoLkm, alv});
     }
 
     @Override
     public List<Tarvike> selectAll() {
-        final String sql = "SELECT tarvikeID, nimi, sisaanostohinta, myyntihinta, yksikko, varastoLkm, alv FROM tarvike";
+        final String sql =  "SELECT tarvikeID, nimi, sisaanostohinta, myyntihinta, yksikko, varastoLkm, alv " +
+                            "FROM tarvike";
         return jdbcTemplate.query(sql, (rs, i) -> {
             Integer tarvikeID = rs.getInt("tarvikeID");
             String nimi = rs.getString("nimi");
@@ -49,7 +51,9 @@ public class TarvikeDao implements GenericDao<Tarvike, Integer> {
 
     @Override
     public Optional<Tarvike> selectById(Integer key) {
-        final String sql = "SELECT tarvikeID, nimi, sisaanostohinta, myyntihinta, yksikko, varastoLkm, alv FROM tarvike WHERE tarvikeID = ?";
+        final String sql =  "SELECT tarvikeID, nimi, sisaanostohinta, myyntihinta, yksikko, varastoLkm, alv " +
+                            "FROM tarvike " +
+                            "WHERE tarvikeID = ?";
         Tarvike tarvike = jdbcTemplate.queryForObject(sql,new Object[]{key} ,(rs, i) -> {
             Integer tarvikeID = rs.getInt("tarvikeID");
             String nimi = rs.getString("nimi");
@@ -65,7 +69,8 @@ public class TarvikeDao implements GenericDao<Tarvike, Integer> {
 
     @Override
     public int deleteById(Integer key) {
-        final String sql = "DELETE FROM tarvike WHERE tarvikeID = ?";
+        final String sql =  "DELETE FROM tarvike " +
+                            "WHERE tarvikeID = ?";
         return jdbcTemplate.update(sql, new Object[]{key});
     }
 

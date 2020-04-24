@@ -31,13 +31,15 @@ public class TyosopimusDao implements GenericDao<Tyosopimus, Integer> {
         LocalDate pvm = sopimus.getPvm();
         String sopimuksenTila = sopimus.getSopimuksenTila();
         String selite = sopimus.getSelite();
-        final String sql = "INSERT INTO tyosopimus(kohdeID, tyyppi, tyonHinta, tarvikkeidenHinta, osamaksu, pvm, sopimuksenTila, selite) VALUES(?, ?::sopimuslaji, ?, ?, ?, ?, ?::sopimusTila, ?)";
+        final String sql =  "INSERT INTO tyosopimus(kohdeID, tyyppi, tyonHinta, tarvikkeidenHinta, osamaksu, pvm, sopimuksenTila, selite) " +
+                            "VALUES(?, ?::sopimuslaji, ?, ?, ?, ?, ?::sopimusTila, ?)";
         return jdbcTemplate.update(sql, new Object[]{kohdeID, tyyppi, tyonHinta, tarvikkeidenHinta, osamaksu, pvm, sopimuksenTila, selite});
     }
 
     @Override
     public List<Tyosopimus> selectAll() {
-        final String sql = "SELECT sopimusID, kohdeID, tyyppi, tyonHinta, tarvikkeidenHinta, osamaksu, pvm, sopimuksenTila, selite FROM tyosopimus";
+        final String sql =  "SELECT sopimusID, kohdeID, tyyppi, tyonHinta, tarvikkeidenHinta, osamaksu, pvm, sopimuksenTila, selite " +
+                            "FROM tyosopimus";
         return jdbcTemplate.query(sql, (rs, i) -> {
             Integer sopimusID = rs.getInt("sopimusID");
             Integer kohdeID = rs.getInt("kohdeID");
@@ -54,7 +56,9 @@ public class TyosopimusDao implements GenericDao<Tyosopimus, Integer> {
 
     @Override
     public Optional<Tyosopimus> selectById(Integer id) {
-        final String sql = "SELECT sopimusID, kohdeID, tyyppi, tyonHinta, tarvikkeidenHinta, osamaksu, pvm, sopimuksenTila, selite FROM tyosopimus WHERE sopimusID = ?";
+        final String sql =  "SELECT sopimusID, kohdeID, tyyppi, tyonHinta, tarvikkeidenHinta, osamaksu, pvm, sopimuksenTila, selite " +
+                            "FROM tyosopimus " +
+                            "WHERE sopimusID = ?";
         Tyosopimus sopimus = jdbcTemplate.queryForObject(sql, new Object[]{id}, (rs, i) -> {
             Integer sopimusID = rs.getInt("sopimusID");
             Integer kohdeID = rs.getInt("kohdeID");
@@ -72,7 +76,8 @@ public class TyosopimusDao implements GenericDao<Tyosopimus, Integer> {
 
     @Override
     public int deleteById(Integer id) {
-        final String sql = "DELETE FROM tyosopimus WHERE sopimusID = ?";
+        final String sql =  "DELETE FROM tyosopimus " +
+                            "WHERE sopimusID = ?";
         return jdbcTemplate.update(sql, new Object[]{id});
     }
 
@@ -86,7 +91,9 @@ public class TyosopimusDao implements GenericDao<Tyosopimus, Integer> {
         LocalDate pvm = sopimus.getPvm();
         String sopimuksenTila = sopimus.getSopimuksenTila();
         String selite = sopimus.getSelite();
-        final String sql = "UPDATE tyosopimus SET kohdeID = ?, tyyppi = ?::sopimuslaji, tyonHinta = ?, tarvikkeidenHinta = ?, osamaksu = ?, pvm = ?, sopimuksenTila = ?::sopimusTila, selite = ? WHERE sopimusID = ?";
+        final String sql =  "UPDATE tyosopimus " +
+                            "SET kohdeID = ?, tyyppi = ?::sopimuslaji, tyonHinta = ?, tarvikkeidenHinta = ?, osamaksu = ?, pvm = ?, sopimuksenTila = ?::sopimusTila, selite = ? " +
+                            "WHERE sopimusID = ?";
         return jdbcTemplate.update(sql, new Object[]{kohdeID, tyyppi, tyonHinta, tarvikkeidenHinta, osamaksu, pvm, sopimuksenTila, selite, id});
     }
 }

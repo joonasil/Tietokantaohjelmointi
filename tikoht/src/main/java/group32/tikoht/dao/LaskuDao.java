@@ -37,7 +37,8 @@ public class LaskuDao implements GenericDao<Lasku, Integer> {
 
     @Override
     public List<Lasku> selectAll() {
-        final String sql = "SELECT laskuID, sopimusID, pvm, erapaiva, maksettuPvm, edeltavaLasku, muistutusLkm, viivastyskulut FROM lasku";
+        final String sql =  "SELECT laskuID, sopimusID, pvm, erapaiva, maksettuPvm, edeltavaLasku, muistutusLkm, viivastyskulut " +
+                            "FROM lasku";
         return jdbcTemplate.query(sql, (rs, i) -> {
             Integer laskuID = rs.getInt("laskuID");
             Integer sopimusID = rs.getInt("sopimusID");
@@ -53,7 +54,9 @@ public class LaskuDao implements GenericDao<Lasku, Integer> {
 
     @Override
     public Optional<Lasku> selectById(Integer id) {
-        final String sql = "SELECT laskuID, sopimusID, pvm, erapaiva, maksettuPvm, edeltavaLasku, muistutusLkm, viivastyskulut FROM lasku WHERE laskuID = ?";
+        final String sql =  "SELECT laskuID, sopimusID, pvm, erapaiva, maksettuPvm, edeltavaLasku, muistutusLkm, viivastyskulut " +
+                            "FROM lasku " +
+                            "WHERE laskuID = ?";
         Lasku lasku = jdbcTemplate.queryForObject(sql, new Object[]{id}, (rs, i) -> {
             Integer laskuID = rs.getInt("laskuID");
             Integer sopimusID = rs.getInt("sopimusID");
@@ -70,7 +73,8 @@ public class LaskuDao implements GenericDao<Lasku, Integer> {
 
     @Override
     public int deleteById(Integer id) {
-        final String sql = "DELETE FROM lasku WHERE laskuID = ?";
+        final String sql =  "DELETE FROM lasku " +
+                            "WHERE laskuID = ?";
         return jdbcTemplate.update(sql, new Object[]{id});
     }
 
@@ -83,7 +87,9 @@ public class LaskuDao implements GenericDao<Lasku, Integer> {
         Integer edeltavaLasku = lasku.getEdeltavaLasku();
         Integer muistutusLkm = lasku.getMuistutusLkm();
         Double viivastyskulut = lasku.getViivastyskulut();
-        final String sql = "UPDATE lasku SET sopimusID = ?, pvm = ?, erapaiva = ?, maksettuPvm = ?, edeltavaLasku = ?, muistutusLkm = ?, viivastyskulut = ? WHERE laskuID = ?";
+        final String sql =  "UPDATE lasku " +
+                            "SET sopimusID = ?, pvm = ?, erapaiva = ?, maksettuPvm = ?, edeltavaLasku = ?, muistutusLkm = ?, viivastyskulut = ? " +
+                            "WHERE laskuID = ?";
         return jdbcTemplate.update(sql, new Object[]{sopimusID, pvm, erapaiva, maksettuPvm, edeltavaLasku, muistutusLkm, viivastyskulut, id});
     }
 

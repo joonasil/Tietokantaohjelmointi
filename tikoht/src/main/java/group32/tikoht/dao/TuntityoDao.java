@@ -25,13 +25,15 @@ public class TuntityoDao implements GenericDao<Tuntityo, String> {
         String tyonTyyppi = tuntityo.getTyonTyyppi();
         Integer hinta = tuntityo.getHinta();
         Integer alv = tuntityo.getAlv();
-        final String sql = "INSERT INTO tuntityo values (?, ?, ?)";
+        final String sql =  "INSERT INTO tuntityo " +
+                            "VALUES (?, ?, ?)";
         return jdbcTemplate.update(sql, new Object[]{tyonTyyppi, hinta, alv});
     }
 
     @Override
     public List<Tuntityo> selectAll() {
-        final String sql = "SELECT tyonTyyppi, hinta, alv FROM tuntityo";
+        final String sql =  "SELECT tyonTyyppi, hinta, alv " +
+                            "FROM tuntityo";
         return jdbcTemplate.query(sql, (rs, i) -> {
             String tyonTyyppi = rs.getString("tyonTyyppi");
             Integer hinta = rs.getInt("hinta");
@@ -42,7 +44,9 @@ public class TuntityoDao implements GenericDao<Tuntityo, String> {
 
     @Override
     public Optional<Tuntityo> selectById(String id) {
-        final String sql = "SELECT tyonTyyppi, hinta, alv FROM tuntityo WHERE tyonTyyppi = ?";
+        final String sql =  "SELECT tyonTyyppi, hinta, alv " +
+                            "FROM tuntityo " +
+                            "WHERE tyonTyyppi = ?";
         Tuntityo tuntityo = jdbcTemplate.queryForObject(sql, new Object[]{id}, (rs, i) -> {
             String tyonTyyppi = rs.getString("tyonTyyppi");
             Integer hinta = rs.getInt("hinta");
@@ -54,7 +58,8 @@ public class TuntityoDao implements GenericDao<Tuntityo, String> {
 
     @Override
     public int deleteById(String id) {
-        final String sql = "DELETE FROM tuntityo WHERE tyonTyyppi = ?";
+        final String sql =  "DELETE FROM tuntityo " +
+                            "WHERE tyonTyyppi = ?";
         return jdbcTemplate.update(sql, new Object[]{id});
     }
 
@@ -62,10 +67,10 @@ public class TuntityoDao implements GenericDao<Tuntityo, String> {
     public int updateById(String id, Tuntityo tuntityo) {
         Integer hinta = tuntityo.getHinta();
         Integer alv = tuntityo.getAlv();
-        final String sql = "UPDATE tuntityo SET hinta = ?, alv = ? WHERE tyonTyyppi = ?";
+        final String sql =  "UPDATE tuntityo " +
+                            "SET hinta = ?, alv = ? " +
+                            "WHERE tyonTyyppi = ?";
         return jdbcTemplate.update(sql, new Object[]{hinta, alv, id});
     }
-
-
-
+    
 }

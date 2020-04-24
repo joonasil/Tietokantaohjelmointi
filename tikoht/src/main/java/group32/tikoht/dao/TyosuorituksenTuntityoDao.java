@@ -27,13 +27,15 @@ public class TyosuorituksenTuntityoDao implements GenericDao<TyosuorituksenTunti
         String tyonTyyppi = tyot.getTyonTyyppi();
         Double tuntiLkm = tyot.getTuntiLkm();
         Double aleProsentti = tyot.getAleProsentti();
-        final String sql = "INSERT INTO tyosuorituksenTuntityo VALUES(?, ?, ?, ?)";
+        final String sql =  "INSERT INTO tyosuorituksenTuntityo " +
+                            "VALUES(?, ?, ?, ?)";
         return jdbcTemplate.update(sql, new Object[]{suoritusID, tyonTyyppi, tuntiLkm, aleProsentti});
     }
 
     @Override
     public List<TyosuorituksenTuntityo> selectAll() {
-        final String sql = "SELECT suoritusID, tyonTyyppi, tuntiLkm, aleProsentti FROM tyosuorituksenTuntityo";
+        final String sql =  "SELECT suoritusID, tyonTyyppi, tuntiLkm, aleProsentti " +
+                            "FROM tyosuorituksenTuntityo";
         return jdbcTemplate.query(sql, (rs, i) -> {
             Integer suoritusID = rs.getInt("suoritusID");
             String tyonTyyppi = rs.getString("tyonTyyppi");
@@ -45,7 +47,9 @@ public class TyosuorituksenTuntityoDao implements GenericDao<TyosuorituksenTunti
 
     @Override
     public Optional<TyosuorituksenTuntityo> selectById(Integer key) {
-        final String sql = "SELECT suoritusID, tyonTyyppi, tuntiLkm, aleProsentti FROM tyosuorituksenTuntityo WHERE suoritusID = ?";
+        final String sql =  "SELECT suoritusID, tyonTyyppi, tuntiLkm, aleProsentti " +
+                            "FROM tyosuorituksenTuntityo " +
+                            "WHERE suoritusID = ?";
         TyosuorituksenTuntityo tyot = jdbcTemplate.queryForObject(sql, new Object[]{key}, (rs, i) -> {
             Integer suoritusID = rs.getInt("suoritusID");
             String tyonTyyppi = rs.getString("tyonTyyppi");
@@ -58,7 +62,8 @@ public class TyosuorituksenTuntityoDao implements GenericDao<TyosuorituksenTunti
 
     @Override
     public int deleteById(Integer key) {
-        final String sql = "DELETE FROM tyosuorituksenTuntityo WHERE suoritusID = ?";
+        final String sql =  "DELETE FROM tyosuorituksenTuntityo " +
+                            "WHERE suoritusID = ?";
         return jdbcTemplate.update(sql, new Object[]{key});
     }
 
@@ -68,7 +73,8 @@ public class TyosuorituksenTuntityoDao implements GenericDao<TyosuorituksenTunti
         String tyonTyyppi = tyot.getTyonTyyppi();
         Double tuntiLkm = tyot.getTuntiLkm();
         Double aleProsentti = tyot.getAleProsentti();
-        final String sql = "UPDATE tyosopimus SET suoritusID = ?, tyonTyyppi = ?, tuntiLkm = ?, aleProsentti = ?";
+        final String sql =  "UPDATE tyosopimus " +
+                            "SET suoritusID = ?, tyonTyyppi = ?, tuntiLkm = ?, aleProsentti = ?";
         return jdbcTemplate.update(sql, new Object[]{suoritusID, tyonTyyppi, tuntiLkm, aleProsentti, key});
     }
 

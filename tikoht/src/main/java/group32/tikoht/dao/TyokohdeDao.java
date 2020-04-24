@@ -25,13 +25,15 @@ public class TyokohdeDao implements GenericDao<Tyokohde, Integer> {
         Integer omistajaID = kohde.getOmistajaID();
         String tyyppi = kohde.getKohdetyyppi();
         String osoite = kohde.getOsoite();
-        final String sql = "INSERT INTO tyokohde(omistajaID, kohdetyyppi, osoite) VALUES(?, ?, ?)";
+        final String sql =  "INSERT INTO tyokohde(omistajaID, kohdetyyppi, osoite) " +
+                            "VALUES(?, ?, ?)";
         return jdbcTemplate.update(sql, new Object[]{omistajaID, tyyppi, osoite});
     }
 
     @Override
     public List<Tyokohde> selectAll() {
-        final String sql = "SELECT kohdeID, omistajaID, kohdetyyppi, osoite FROM tyokohde";
+        final String sql =  "SELECT kohdeID, omistajaID, kohdetyyppi, osoite " +
+                            "FROM tyokohde";
         return jdbcTemplate.query(sql, (rs, i) -> {
             Integer kohdeID = rs.getInt("kohdeID");
             Integer omistajaID = rs.getInt("omistajaID");
@@ -43,7 +45,9 @@ public class TyokohdeDao implements GenericDao<Tyokohde, Integer> {
 
     @Override
     public Optional<Tyokohde> selectById(Integer id) {
-        final String sql = "SELECT kohdeID, omistajaID, kohdetyyppi, osoite FROM tyokohde WHERE kohdeID = ?";
+        final String sql =  "SELECT kohdeID, omistajaID, kohdetyyppi, osoite " +
+                            "FROM tyokohde " +
+                            "WHERE kohdeID = ?";
         Tyokohde kohde = jdbcTemplate.queryForObject(sql, new Object[]{id}, (rs, i) -> {
             Integer kohdeID = rs.getInt("kohdeID");
             Integer omistajaID = rs.getInt("omistajaID");
@@ -56,7 +60,8 @@ public class TyokohdeDao implements GenericDao<Tyokohde, Integer> {
 
     @Override
     public int deleteById(Integer id) {
-        final String sql = "DELETE FROM tyokohde WHERE kohdeID = ?";
+        final String sql =  "DELETE FROM tyokohde " +
+                            "WHERE kohdeID = ?";
         return jdbcTemplate.update(sql, new Object[]{id});
     }
 
@@ -65,7 +70,9 @@ public class TyokohdeDao implements GenericDao<Tyokohde, Integer> {
         Integer omistajaID = kohde.getOmistajaID();
         String tyyppi = kohde.getKohdetyyppi();
         String osoite = kohde.getOsoite();
-        final String sql = "UPDATE tyokohde SET omistajaID = ?, kohdetyyppi = ?, osoite = ? WHERE kohdeID = ?";
+        final String sql =  "UPDATE tyokohde " +
+                            "SET omistajaID = ?, kohdetyyppi = ?, osoite = ? " +
+                            "WHERE kohdeID = ?";
         return jdbcTemplate.update(sql, new Object[]{omistajaID, tyyppi, osoite, id});
     }
 
