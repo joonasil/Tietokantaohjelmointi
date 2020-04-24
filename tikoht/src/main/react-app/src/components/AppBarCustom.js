@@ -17,9 +17,8 @@ class AppBarCustom extends React.Component {
                     <MenuIcon />
                     </IconButton>
                     <Typography variant="h6">
-                        Relaatiot
+                        Menu
                     </Typography>
-                    <Button color="inherit">Login</Button>
                 </Toolbar>
             </AppBar>
         )
