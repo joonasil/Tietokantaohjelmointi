@@ -8,6 +8,8 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
+import AppBarCustom from './AppBarCustom.js';
+
 
 class App extends Component {
   state = {
@@ -25,28 +27,31 @@ class App extends Component {
   render() {
 
     return (
-      <TableContainer component={Paper}>
-      <Table aria-label="simple table" size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell>AsiakasID</TableCell>
-            <TableCell align="right">nimi</TableCell>
-            <TableCell align="right">osoite</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {this.state.customers.map((customer) => (
-            <TableRow key={customer.asiakasID}>
-              <TableCell component="th" scope="row">
-                {customer.asiakasID}
-              </TableCell>
-              <TableCell align="right">{customer.nimi}</TableCell>
-              <TableCell align="right">{customer.osoite}</TableCell>
+      <div className="App">
+        <AppBarCustom/>
+        <TableContainer component={Paper}>
+        <Table aria-label="simple table" size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell>AsiakasID</TableCell>
+              <TableCell align="right">nimi</TableCell>
+              <TableCell align="right">osoite</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {this.state.customers.map((customer) => (
+              <TableRow key={customer.asiakasID}>
+                <TableCell component="th" scope="row">
+                  {customer.asiakasID}
+                </TableCell>
+                <TableCell align="right">{customer.nimi}</TableCell>
+                <TableCell align="right">{customer.osoite}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </div>
     );
   }
 }
