@@ -78,7 +78,7 @@ public class TarvikeDao implements GenericDao<Tarvike, Integer> {
         Integer varastoLkm = tarvike.getVarastoLkm();
         Integer alv = tarvike.getAlv();
         final String sql =  "UPDATE asiakas " + 
-                            "SET nimi = ?, sisaanostohinta = ?, myyntihinta = ?, yksikko = ?, varastoLkm = ?, alv = ? " +
+                            "SET nimi = ?, sisaanostohinta = ?, myyntihinta = ?, yksikko = ?::yksikot, varastoLkm = ?, alv = ? " +
                             "WHERE tarvikeID = ?";
         return jdbcTemplate.update(sql, new Object[]{nimi, sisaanostohinta, myyntihinta, yksikko, varastoLkm, alv, key});
     }
