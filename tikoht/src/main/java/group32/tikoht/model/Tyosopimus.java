@@ -1,6 +1,6 @@
 package group32.tikoht.model;
 
-import java.sql.Date;
+import 	java.time.LocalDate;
 
 import javax.validation.constraints.NotBlank;
 
@@ -15,7 +15,7 @@ public class Tyosopimus {
     private final Double tyonHinta;
     private final Double tarvikkeidenHinta;
     private final Integer osamaksu;
-    private final Date pvm;
+    private final LocalDate pvm;
     @NotBlank
     private final String sopimuksenTila;
     private final String selite;
@@ -26,7 +26,7 @@ public class Tyosopimus {
                         @JsonProperty("tyonHinta") Double tyonHinta,
                         @JsonProperty("tarvikkeidenHinta") Double tarvikkeidenHinta,
                         @JsonProperty("osamaksu") Integer osamaksu,
-                        @JsonProperty("pvm") Date pvm,
+                        @JsonProperty("pvm") LocalDate pvm,
                         @JsonProperty("sopimuksenTila") @NotBlank String sopimuksenTila,
                         @JsonProperty("selite") String selite) {
         this.sopimusID = sopimusID;
@@ -48,7 +48,7 @@ public class Tyosopimus {
         return selite;
     }
 
-    public Date getPvm() {
+    public LocalDate getPvm() {
         return pvm;
     }
 

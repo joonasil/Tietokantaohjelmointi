@@ -22,23 +22,23 @@ public class AsiakasService {
     }
 
     public int addAsiakas(Asiakas asiakas) {
-        return asiakasDao.insertAsiakas(asiakas);
+        return asiakasDao.insert(asiakas);
     }
 
     public List<Asiakas> getAllAsiakas() {
-        return asiakasDao.selectAllAsiakas();
+        return asiakasDao.selectAll();
     }
 
     public Optional<Asiakas> getAsiakasById(Integer asiakasID) {
-        return asiakasDao.selectAsiakasById(asiakasID);
+        return asiakasDao.selectById(asiakasID);
     }
 
     public int deleteAsiakas(Integer asiakasID) {
-        return asiakasDao.deleteAsiakasById(asiakasID);
+        return asiakasDao.deleteById(asiakasID);
     }
 
     public int updateAsiakas(Integer asiakasID, Asiakas asiakas) {
-        return asiakasDao.updateAsiakasById(asiakasID, asiakas);
+        return asiakasDao.updateById(asiakasID, asiakas);
     }
 
 }

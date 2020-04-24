@@ -22,23 +22,23 @@ public class TyosopimusService {
     }
 
     public int addTyosopimus(Tyosopimus sopimus) {
-        return tyosopimusDao.insertTyosopimus(sopimus);
+        return tyosopimusDao.insert(sopimus);
     }
 
     public List<Tyosopimus> getAllTyosopimus() {
-        return tyosopimusDao.selectAllTyosopimus();
+        return tyosopimusDao.selectAll();
     }
 
     public Optional<Tyosopimus> getTyosopimusById(Integer sopimusID) {
-        return tyosopimusDao.selectTyosopimusById(sopimusID);
+        return tyosopimusDao.selectById(sopimusID);
     }
 
     public int deleteTyosopimus(Integer sopimusID) {
-        return tyosopimusDao.deleteTyosopimusById(sopimusID);
+        return tyosopimusDao.deleteById(sopimusID);
     }
 
     public int updateTyosopimus(Integer sopimusID, Tyosopimus sopimus) {
-        return tyosopimusDao.updateTyosopimusById(sopimusID, sopimus);
+        return tyosopimusDao.updateById(sopimusID, sopimus);
     }
 
 }

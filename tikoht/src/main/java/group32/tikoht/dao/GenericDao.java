@@ -1,19 +1,17 @@
 package group32.tikoht.dao;
 
-import group32.tikoht.model.Asiakas;
-
 import java.util.List;
 import java.util.Optional;
 
-public interface GenericDao<T, G> {
+public interface GenericDao<T, K> {
 
     int insert(T entity);
 
     List<T> selectAll();
 
-    Optional<T> selectById(G entityID);
+    Optional<T> selectById(K key);
 
-    int deleteById(Integer entityID);
+    int deleteById(K key);
 
-    int updateById(Integer ID, T entity);
+    int updateById(K key, T entity);
 }

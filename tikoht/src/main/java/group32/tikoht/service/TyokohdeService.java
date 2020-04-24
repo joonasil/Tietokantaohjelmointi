@@ -22,23 +22,23 @@ public class TyokohdeService {
     }
 
     public int addTyokohde(Tyokohde kohde) {
-        return tyokohdeDao.insertTyokohde(kohde);
+        return tyokohdeDao.insert(kohde);
     }
 
     public List<Tyokohde> getAllTyokohde() {
-        return tyokohdeDao.selectAllTyokohde();
+        return tyokohdeDao.selectAll();
     }
 
     public Optional<Tyokohde> getTyokohdeById(Integer kohdeID) {
-        return tyokohdeDao.selectTyokohdeById(kohdeID);
+        return tyokohdeDao.selectById(kohdeID);
     }
 
     public int deleteTyokohde(Integer kohdeID) {
-        return tyokohdeDao.deleteTyokohdeById(kohdeID);
+        return tyokohdeDao.deleteById(kohdeID);
     }
 
     public int updateTyokohde(Integer kohdeID, Tyokohde kohde) {
-        return tyokohdeDao.updateTyokohdeById(kohdeID, kohde);
+        return tyokohdeDao.updateById(kohdeID, kohde);
     }
 
 }
