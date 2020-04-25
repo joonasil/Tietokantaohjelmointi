@@ -75,5 +75,10 @@ public class Tyosopimus {
     public String getSopimuksenTila() {
         return sopimuksenTila;
     }
+
+    // Omat metodi
+    public Double getSopimuksenSumma() {
+        return tarvikkeidenHinta + tyonHinta;
+    }
     
 }

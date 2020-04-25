@@ -54,4 +54,11 @@ public class LaskuController {
     public void updateLasku(@PathVariable("laskuID") Integer laskuID,@Valid @NotNull @RequestBody Lasku laskuToUpdate) {
         laskuService.updateLasku(laskuID, laskuToUpdate);
     }
+
+    // LASKUN OMAT
+    @GetMapping(path = "eraantyneet")
+    public List<Lasku> getAllOverdue() { return laskuService.getAllOverdue();}
+
+    @PostMapping(path = "eraantyneet/muistuta")
+    public int generateOverdueInvoices() { return laskuService.generateOverdueInvoices(); }
 }

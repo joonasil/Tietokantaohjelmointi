@@ -41,4 +41,9 @@ public class LaskuService {
         return laskuDao.updateById(laskuID, lasku);
     }
 
+    // Laskun omat
+    public List<Lasku> getAllOverdue() { return laskuDao.selectAllOverdue();}
+
+    public int generateOverdueInvoices() { return laskuDao.generateOverdueInvoices();}
+
 }

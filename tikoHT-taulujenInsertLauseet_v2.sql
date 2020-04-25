@@ -18,7 +18,7 @@ INSERT INTO tyosopimus VALUES (DEFAULT, 3, 'urakka', 1200.00, 400.00, null, null
 INSERT INTO lasku VALUES (DEFAULT, 1, '2019-11-21', '2020-01-31', null, null, 0, 0);
 INSERT INTO lasku VALUES (DEFAULT, 2, '2019-12-31', '2020-01-31', '2020-01-21', null, 0, 0);
 INSERT INTO lasku VALUES (DEFAULT, 2, '2019-01-15', '2020-03-31', null, null, 0, 0);
-INSERT INTO lasku VALUES (DEFAULT, 4, '2019-11-15', '2020-12-31', null, null, 0, 0);
+INSERT INTO lasku VALUES (DEFAULT, 4, '2019-11-15', '2019-12-31', null, null, 0, 0);
 INSERT INTO lasku VALUES (DEFAULT, 4, '2019-01-15', '2020-02-28', null, 4, 1, 5);
 INSERT INTO lasku VALUES (DEFAULT, 4, '2019-02-15', '2020-03-15', null, 5, 2, 10);
 

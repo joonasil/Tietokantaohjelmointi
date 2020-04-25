@@ -95,9 +95,7 @@ class App extends Component {
           <TableBody>
             {this.state.customers.map((customer) => (
               <TableRow key={customer.asiakasID}>
-                <TableCell component="th" scope="row">
-                  {customer.asiakasID}
-                </TableCell>
+                <TableCell component="th" scope="row">{customer.asiakasID}</TableCell>
                 <TableCell align="right">{customer.nimi}</TableCell>
                 <TableCell align="right">{customer.osoite}</TableCell>
               </TableRow>
