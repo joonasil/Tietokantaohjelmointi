@@ -58,7 +58,7 @@ function App() {
     const [update, setUpdate] = React.useState(true);
     const [htmlTable, setHtmlTable] = React.useState([]);
     const [htmlTableHead, setHtmlTableHead] = React.useState([]);
-    const [relations, setRelations] = React.useState(['asiakas', 'tyokohde', 'tyosopimus', 'tyosuoritus', 'tyosuoritustenTuntityo', 'lasku', 'tarvikeluettelo', 'tarvike', 'tuntityo']);
+    const [relations, setRelations] = React.useState(['asiakas', 'tyokohde', 'tyosopimus', 'tyosuoritus', 'tyosuorituksentuntityo', 'lasku', 'tarvikeluettelo', 'tarvike', 'tuntityo']);
 
     const canvasRef = useRef(null);
 
@@ -68,6 +68,7 @@ function App() {
 
     const fetchTable = (tableName) => {
         let newTable = {};
+        console.log('http://localhost:8080/api/v1/' + tableName);
         fetch('http://localhost:8080/api/v1/' + tableName)
             .then(res => res.json())
             .then((data) => { 
@@ -80,7 +81,7 @@ function App() {
             .then(setActiveTable(newTable))
             .then(setTimeout(function(){
                 formHtmlTable();
-            }, 1500))
+            }, 800))
                 .catch(console.log))
         
     }
@@ -94,8 +95,7 @@ function App() {
         let html = [];
         for (let i = 0; i < columnCount; i++) {
             let item = metadata[i];
-            console.log(item.column_name);
-            html.push(<TableCell key={"row" + i}>{item.column_name}</TableCell>)}
+            html.push(<TableCell key={item.column_name + "_" + i}>{item.column_name}</TableCell>)}
         setHtmlTableHead(html);
         html = [];
         
@@ -104,6 +104,7 @@ function App() {
             
             let cells = []
             Object.keys(item).forEach(function(key) {
+                if (item != null)
                 cells.push(<TableCell key={item[key] + "_" + i}>{item[key]}</TableCell>);
             });
             html.push(<TableRow key={i}>{cells}</TableRow>);
@@ -125,9 +126,16 @@ function App() {
         <AppBarCustom/>
         <AppBar position="static">
               <Tabs  aria-label="simple tabs example">
-                {relations.map((tab) =>
-                  <Button label={tab} value={tab} key={tab} onClick={() => {setTableName(tab)}}></Button>
-                )}
+                  <Tab label={relations[0]} key={0} onClick={() => {setTableName(relations[0])}}/>
+                  <Tab label={relations[1]} key={1} onClick={() => {setTableName(relations[1])}}/>
+                  <Tab label={relations[2]} key={2} onClick={() => {setTableName(relations[2])}}/>
+                  <Tab label={relations[3]} key={3} onClick={() => {setTableName(relations[3])}}/>
+                  <Tab label={relations[4]} key={4} onClick={() => {setTableName(relations[4])}}/>
+                  <Tab label={relations[5]} key={5} onClick={() => {setTableName(relations[5])}}/>
+                  <Tab label={relations[6]} key={6} onClick={() => {setTableName(relations[6])}}/>
+                  <Tab label={relations[7]} key={7} onClick={() => {setTableName(relations[7])}}/>
+                  <Tab label={relations[8]} key={8} onClick={() => {setTableName(relations[8])}}/>
+                  <Tab label={relations[9]} key={9} onClick={() => {setTableName(relations[9])}}/>
               </Tabs>
           </AppBar>
 
