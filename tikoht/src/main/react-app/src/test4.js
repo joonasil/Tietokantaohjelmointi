@@ -59,8 +59,7 @@ function App() {
     const [htmlTable, setHtmlTable] = React.useState([]);
     const [htmlTableHead, setHtmlTableHead] = React.useState([]);
     const [relations, setRelations] = React.useState(['asiakas', 'tyokohde', 'tyosopimus', 'tyosuoritus', 'tyosuorituksentuntityo', 'lasku', 'tarvikeluettelo', 'tarvike', 'tuntityo']);
-
-    const canvasRef = useRef(null);
+    const [insertFields, setInsertFields] = React.useState([]);
 
     const updatePage = () => {
         setUpdate(true);
@@ -93,30 +92,43 @@ function App() {
         let columnCount = Object.keys(metadata).length
         console.log(columnCount + " " + tableSize);
         let html = [];
+        let textFields = [];
         for (let i = 0; i < columnCount; i++) {
             let item = metadata[i];
-            html.push(<TableCell key={item.column_name + "_" + i}>{item.column_name}</TableCell>)}
+            html.push(<TableCell key={tableName + "_" + item.column_name + "_" + i}>{item.column_name}</TableCell>)
+            textFields.push(<TextField key={tableName + "_" + item.column_name} label={item.column_name} variant="outlined" />)
+        }
         setHtmlTableHead(html);
-        html = [];
+        setInsertFields(textFields);
         
+        html = [];
         for (let i = 0; i < tableSize; i++) {
             let item = table[i];
             
             let cells = []
             Object.keys(item).forEach(function(key) {
-                if (item != null)
-                cells.push(<TableCell key={item[key] + "_" + i}>{item[key]}</TableCell>);
+                if (item != null) {
+                    cells.push(<TableCell key={tableName + "_" + item[key] + "_" + i}>{item[key]}</TableCell>);
+                }
+                else {
+                    cells.push(<TableCell key={tableName + "_" + item[key] + "_" + i}>NULL</TableCell>);
+                }
             });
             html.push(<TableRow key={i}>{cells}</TableRow>);
         }
+        console.log(html);
         setHtmlTable(html);
     }
+
+    const handleTabChange = (event, newValue) => {
+        console.log("from tab value: " + newValue);
+        setTableName(newValue);
+      };
 
     useEffect(() => {
         fetchTable(tableName)
         console.log("active table: ") 
         console.log(activeTable)
-        setUpdate(false)
         
 	}, [tableName]);
 
@@ -125,17 +137,17 @@ function App() {
 
         <AppBarCustom/>
         <AppBar position="static">
-              <Tabs  aria-label="simple tabs example">
-                  <Tab label={relations[0]} key={0} onClick={() => {setTableName(relations[0])}}/>
-                  <Tab label={relations[1]} key={1} onClick={() => {setTableName(relations[1])}}/>
-                  <Tab label={relations[2]} key={2} onClick={() => {setTableName(relations[2])}}/>
-                  <Tab label={relations[3]} key={3} onClick={() => {setTableName(relations[3])}}/>
-                  <Tab label={relations[4]} key={4} onClick={() => {setTableName(relations[4])}}/>
-                  <Tab label={relations[5]} key={5} onClick={() => {setTableName(relations[5])}}/>
-                  <Tab label={relations[6]} key={6} onClick={() => {setTableName(relations[6])}}/>
-                  <Tab label={relations[7]} key={7} onClick={() => {setTableName(relations[7])}}/>
-                  <Tab label={relations[8]} key={8} onClick={() => {setTableName(relations[8])}}/>
-                  <Tab label={relations[9]} key={9} onClick={() => {setTableName(relations[9])}}/>
+              <Tabs value={tableName}>
+                  <Tab label={relations[0]} value={relations[0]} onClick={() => {setTableName(relations[0])}}/>
+                  <Tab label={relations[1]} value={relations[1]} onClick={() => {setTableName(relations[1])}}/>
+                  <Tab label={relations[2]} value={relations[2]} onClick={() => {setTableName(relations[2])}}/>
+                  <Tab label={relations[3]} value={relations[3]} onClick={() => {setTableName(relations[3])}}/>
+                  <Tab label={relations[4]} value={relations[4]} onClick={() => {setTableName(relations[4])}}/>
+                  <Tab label={relations[5]} value={relations[5]} onClick={() => {setTableName(relations[5])}}/>
+                  <Tab label={relations[6]} value={relations[6]} onClick={() => {setTableName(relations[6])}}/>
+                  <Tab label={relations[7]} value={relations[7]} onClick={() => {setTableName(relations[7])}}/>
+                  <Tab label={relations[8]} value={relations[8]} onClick={() => {setTableName(relations[8])}}/>
+                  <Tab label={relations[9]} value={relations[9]} onClick={() => {setTableName(relations[9])}}/>
               </Tabs>
           </AppBar>
 
@@ -148,9 +160,7 @@ function App() {
         <Paper elevation={3}>
           <Typography>Lisää entiteetti</Typography>
           <form noValidate autoComplete="off">
-            <TextField id="outlined-basic" label="ID" variant="outlined" />
-            <TextField id="outlined-basic" label="Nimi" variant="outlined" />
-            <TextField id="outlined-basic" label="Osoite" variant="outlined" />
+              {insertFields}
         </form>
           <Button variant="contained" color="primary">Lisää</Button>
         </Paper>
