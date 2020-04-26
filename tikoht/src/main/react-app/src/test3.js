@@ -14,12 +14,12 @@ import TabBarCustom from './components/TabBarCustom.js';
 import RelationTable from './components/RelationTable.js';
 
 
-const fetchRelation = (obj, name) => {
+const fetchRelation = (name) => {
   return fetch('http://localhost:8080/api/v1/' + name)
     .then(res => res.json())
     .then((data) => {
       this.setState({ customers: data })
-      console.log(this.state.customers)
+      console.log(this.state)
     })
       .catch(console.log)
 }
@@ -39,7 +39,7 @@ class App extends Component {
 
   componentDidMount() {
     this.setState({activeRelation: fetchRelation(this, "asiakas")});
-    console.log(fetchRelation(this, "asiakas"));
+    console.log(fetchRelation(this.state));
   }
 
   render() {

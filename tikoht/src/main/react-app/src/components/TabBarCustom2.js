@@ -20,7 +20,7 @@ class AppBarCustom extends React.Component {
           <AppBar position="static">
               <Tabs  aria-label="simple tabs example">
                 {this.props.tableNames.map((tab) =>
-                  <Tab label={tab} value={tab}></Tab>
+                  <Tab label={tab} value={tab} key={tab}></Tab>
                 )}
               </Tabs>
           </AppBar>

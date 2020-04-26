@@ -19,34 +19,31 @@ import Typography from '@material-ui/core/Typography';
 class App extends Component {
 
   state = {
-    relations: ['asiakas', 'tyokohde', 'tyosopimus'],
-    customers: [],
-    workTarget: [],
-    contract: [],
+    asiakas: [], tyokohde: [], tyosopimus: [],
   }
 
   componentDidMount() {
     fetch('http://localhost:8080/api/v1/asiakas')
     .then(res => res.json())
     .then((data) => {
-      this.setState({ customers: data })
-      console.log(this.state.customers)
+      this.setState({ asiakas: data })
+      console.log(this.state)
     })
     .catch(console.log)
 
     fetch('http://localhost:8080/api/v1/tyokohde')
     .then(res => res.json())
     .then((data) => {
-      this.setState({ workTarget: data })
-      console.log(this.state.workTarget)
+      this.setState({ tyokohde: data })
+      console.log(this.state)
     })
     .catch(console.log)
     
     fetch('http://localhost:8080/api/v1/tyosopimus')
     .then(res => res.json())
     .then((data) => {
-      this.setState({ contract: data })
-      console.log(this.state.contract)
+      this.setState({ tyosopimus: data })
+      console.log(this.state)
     })
     .catch(console.log)
   }
@@ -57,7 +54,7 @@ class App extends Component {
       <div className="App">
 
         <AppBarCustom/>
-        <TabBarCustom2 tableNames={this.state.relations}/>
+        <TabBarCustom tableNames={this.state.relations}/>
 
         <Paper elevation={3}>
           <Typography>Hae avaimella</Typography>
@@ -93,7 +90,7 @@ class App extends Component {
             </TableRow>
           </TableHead>
           <TableBody>
-            {this.state.customers.map((customer) => (
+            {this.state.asiakas.map((customer) => (
               <TableRow key={customer.asiakasID}>
                 <TableCell component="th" scope="row">{customer.asiakasID}</TableCell>
                 <TableCell align="right">{customer.nimi}</TableCell>

@@ -21,9 +21,10 @@ public class TableMetadataDataAccessService implements TableMetadataDao {
 
     @Override
     public List<TableMetadata> selectMetadataByTableName(String tableName) {
-        final String sql = "SELECT columns.table_name, columns.column_name, columns.data_type, columns.is_nullable\n" +
-                            "FROM information_schema.columns\n" +
-                            "WHERE columns.table_name = ?";
+        final String sql = "SELECT columns.table_name, columns.column_name, columns.data_type, columns.is_nullable " +
+                            "FROM information_schema.columns " +
+                            "WHERE table_schema = 'tikoht' " +
+                            "AND columns.table_name = ? ";
         return jdbcTemplate.query(sql, new Object[]{tableName}, (rs, i) -> {
             String table_name = rs.getString("table_name");
             String column_name = rs.getString("column_name");
