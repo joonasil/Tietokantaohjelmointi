@@ -14,21 +14,12 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 
 import AppBarCustom from './components/AppBarCustom.js';
-import TabBarCustom2 from './components/TabBarCustom2.js';
-import TabBarCustom from './components/TabBarCustom.js';
 import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles (theme => ({
-    canvas: {
-        zIndex: 1, 
-        position: "fixed",
-        borderStyle: 'solid',
-        borderWidth: '2px',
-        borderColor: 'black',
-        margin: '10px',
-    },
-    box: {
-        margin: '10px',
+
+    textFields: {
+        margin: '5px 10px 5px 10px',
     },
     textBox: {
         margin: "10px 10px 10px 0px",
@@ -48,15 +39,20 @@ function App() {
     const [deleteFieldValue, setDeleteFieldValue] = React.useState([]);
     const [searchFieldValue, setSearchFieldValue] = React.useState([]);
     const [insertFieldValue, setInsertFieldValue] = React.useState({});
+    const [additionalForm, setAdditionalForm] = React.useState([]);
 
-    const fetchTable = (newTableName) => {
+    const fetchTable = (newTableName, newMetadataTableName) => {
         let newTable = {};
+        if (/*!relations.includes(newMetadataTableName)*/ newMetadataTableName == undefined || newMetadataTableName == null) {
+            newMetadataTableName = "metadata/" + newTableName;
+        }
         if (newTableName !== "" && newTableName !== null) {
             console.log('http://localhost:8080/api/v1/' + newTableName);
+            console.log('http://localhost:8080/api/v1/' + newMetadataTableName);
             fetch('http://localhost:8080/api/v1/' + newTableName)
                 .then(res => res.json())
                 .then((data) => {(newTable.table = data )})
-                .then(fetch('http://localhost:8080/api/v1/metadata/' + newTableName)
+                .then(fetch('http://localhost:8080/api/v1/' + newMetadataTableName)
                 .then(res => res.json())
                 .then((data) => {(newTable.metadata = data )})
                 .then(() => {
@@ -71,7 +67,6 @@ function App() {
         console.log("Rendeöidään taulu")
         console.log(newTable)
         if (newTable.metadata[0].table_name == "asiakas") {
-            console.log(newTable.table);
             newTable.table = sortJSONByKey(newTable.table);
         }
         setHtmlTable([]);
@@ -88,7 +83,7 @@ function App() {
                 html.push(<TableCell key={tableName + "_" + item.column_name + "_" + i + Math.random()}>{item.column_name}</TableCell>)
                 // Input kentät
                 textFields.push(
-                    <TextField key={tableName + "_" + item.column_name + Math.random()} label={item.column_name} variant="outlined" 
+                    <TextField className={classes.textFields} key={tableName + "_" + item.column_name + Math.random()} label={item.column_name} variant="outlined" 
                         onChange={(e) => {updateInsertFieldValue(e, metadata[i].column_name)}}
                     />
                 )
@@ -111,6 +106,7 @@ function App() {
                 html.push(<TableRow key={i}>{cells}</TableRow>);
             }
             setHtmlTable(html);
+            updateAdditionalForm();
         }
     }
     // This id only for customer table
@@ -122,7 +118,6 @@ function App() {
             sortedArray.push({asiakasID : [array[i].asiakasID], nimi : [array[i].nimi], osoite : [array[i].osoite]});
         }
         // Run native sort function and returns sorted array.
-        console.log(sortedArray);
         return sortedArray;
     }
 
@@ -138,6 +133,27 @@ function App() {
         state[[label]] = event.target.value;
         setInsertFieldValue(state);
     }
+    // ADDITIONAL FORM
+    const updateAdditionalForm = () => {
+        let formArray = [];
+        if (tableName == "lasku") {
+            formArray.push( 
+                <Paper key="invoiceButtonPaper" className={classes.textFields}  className={classes.textFields} elevation={2}>
+                    <Typography key="heading" className={classes.textFields} >Hallitse Laskuja</Typography>
+                    <Button key="all" className={classes.textFields}  variant="contained" color="default" onClick={(e) => fetchTable("lasku")}>Näytä kaikki laskut</Button>
+                    <Button key="overdue" className={classes.textFields}  variant="contained" color="default" onClick={(e) => fetchTable("lasku/eraantyneet", "metadata/lasku")}>Näytä erääntyneet laskut</Button>
+                    <Button key="generates"className={classes.textFields}  variant="contained" color="default" onClick={generateOverdueInvoices}>Luo muistutuslaskut erääntyneistä</Button>
+                </Paper>
+            )
+        }
+        setAdditionalForm(formArray);
+    }
+    const generateOverdueInvoices = () => {
+        const requestOptions = { method: 'POST', headers: { 'Content-Type': 'application/json' } };
+        fetch("http://localhost:8080/api/v1/lasku/eraantyneet/muistuta", requestOptions).then((response) => { return response.json()}).then((result) => { console.log(result)}).catch(console.log);
+        fetchTable("lasku");
+    }
+
     // DELETE HANDLER
     const handleDeleteClick = () => {
         const requestOptions = {
@@ -213,28 +229,30 @@ function App() {
               </Tabs>
           </AppBar>
 
-        <Paper elevation={3}>
-          <Typography>Hae avaimella</Typography>
-          <TextField id="outlined-basic" label="Key" variant="outlined" value={searchFieldValue} onChange={updateSearchFieldValue}/>
-          <Button variant="contained" color="primary" onClick={handleSearchClick}>Hae</Button>
+        <Paper className={classes.textFields} elevation={2}>
+          <Typography className={classes.textFields}>Hae avaimella</Typography>
+          <TextField  className={classes.textFields} id="outlined-basic" label="Key" variant="outlined" value={searchFieldValue} onChange={updateSearchFieldValue}/>
+          <Button className={classes.textFields} variant="contained" color="primary" onClick={handleSearchClick}>Hae</Button>
         </Paper>
 
-        <Paper elevation={3}>
-          <Typography>Lisää entiteetti</Typography>
+        <Paper className={classes.textFields} elevation={2}>
+          <Typography className={classes.textFields} >Lisää entiteetti</Typography>
           <form noValidate autoComplete="off">
               {insertFields}
         </form>
-          <Button variant="contained" color="primary" onClick={handleInsertClick}>Lisää</Button>
+          <Button className={classes.textFields}  variant="contained" color="primary" onClick={handleInsertClick}>Lisää</Button>
         </Paper>
 
-        <Paper elevation={3}>
-          <Typography>poista entiteetti</Typography>
+        <Paper className={classes.textFields}  className={classes.textFields} elevation={2}>
+          <Typography className={classes.textFields} >poista entiteetti</Typography>
           <form noValidate autoComplete="off">
-            <TextField id="outlined-basic" label="ID" variant="outlined" value={deleteFieldValue} onChange={updateDeleteFieldValue}/>
+            <TextField className={classes.textFields}  id="outlined-basic" label="ID" variant="outlined" value={deleteFieldValue} onChange={updateDeleteFieldValue}/>
           </form>
-          <Button variant="contained" color="secondary" onClick={handleDeleteClick}>Poista</Button>
+          <Button className={classes.textFields}  variant="contained" color="secondary" onClick={handleDeleteClick}>Poista</Button>
         </Paper>
         
+        {additionalForm}
+
         {/* TABLE */ }
         <TableContainer component={Paper}>
         <Table aria-label="simple table" size="small">
