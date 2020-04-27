@@ -41,7 +41,7 @@ function App() {
     const [insertFieldValue, setInsertFieldValue] = React.useState({});
     const [additionalForm, setAdditionalForm] = React.useState([]);
 
-    const fetchTable = (newTableName, newMetadataTableName) => {
+    const fetchTable = async (newTableName, newMetadataTableName) => {
         let newTable = {};
         if (/*!relations.includes(newMetadataTableName)*/ newMetadataTableName == undefined || newMetadataTableName == null) {
             newMetadataTableName = "metadata/" + newTableName;
@@ -49,21 +49,24 @@ function App() {
         if (newTableName !== "" && newTableName !== null) {
             console.log('http://localhost:8080/api/v1/' + newTableName);
             console.log('http://localhost:8080/api/v1/' + newMetadataTableName);
-            fetch('http://localhost:8080/api/v1/' + newTableName)
+            await fetch('http://localhost:8080/api/v1/' + newTableName)
                 .then(res => res.json())
-                .then((data) => {(newTable.table = data )})
-                .then(fetch('http://localhost:8080/api/v1/' + newMetadataTableName)
-                .then(res => res.json())
-                .then((data) => {(newTable.metadata = data )})
-                .then(() => {
-                    setActiveTable(newTable)
-                })
-                .then(() => {
-                    formHtmlTable(newTable)
-                })).catch(console.log);
-    }}
+                .then((data) => {(newTable.table = data )}).catch(console.log);
 
-    const formHtmlTable = (newTable) => {
+            await fetch('http://localhost:8080/api/v1/' + newMetadataTableName)
+                .then(res => res.json())
+                .then((data) => {(newTable.metadata = data )}).catch(console.log);
+            
+            await setActiveTable(newTable);
+            await formHtmlTable(newTable);
+    }}
+    // FUNCTION TO SLEEP zzz milliseconds
+    const sleep = (milliseconds) => {
+        console.log("sleep: " + milliseconds);
+        return new Promise(resolve => setTimeout(resolve, milliseconds));
+    }
+
+    const formHtmlTable = async (newTable) => {
         console.log("Rendeöidään taulu")
         console.log(newTable)
         if (newTable.metadata[0].table_name == "asiakas") {
@@ -148,30 +151,29 @@ function App() {
         }
         setAdditionalForm(formArray);
     }
-    const generateOverdueInvoices = () => {
+    const generateOverdueInvoices = async () => {
         const requestOptions = { method: 'POST', headers: { 'Content-Type': 'application/json' } };
-        fetch("http://localhost:8080/api/v1/lasku/eraantyneet/muistuta", requestOptions).then((response) => { return response.json()}).then((result) => { console.log(result)}).catch(console.log);
+        await fetch("http://localhost:8080/api/v1/lasku/eraantyneet/muistuta", requestOptions).then((response) => { return response.json()}).then((result) => { console.log(result)}).catch(console.log);
         fetchTable("lasku");
     }
 
     // DELETE HANDLER
-    const handleDeleteClick = () => {
+    const handleDeleteClick = async () => {
         const requestOptions = {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' }
         };
-        fetch("http://localhost:8080/api/v1/" + tableName + "/" + deleteFieldValue, requestOptions).then((response) => {
-          return response.json();
-        }).then((result) => {
-            fetchTable(tableName)
-        })
-        .catch(console.log);
+        await fetch("http://localhost:8080/api/v1/" + tableName + "/" + deleteFieldValue, requestOptions)
+            .then(response => response.json())
+            .then(result => console.log(result))
+            .catch(console.log);
+        fetchTable(tableName);
     }
     // SEARCH HANDLER
-    const handleSearchClick = () => {
+    const handleSearchClick = async () => {
         if (searchFieldValue != null && searchFieldValue != "") {
             console.log("http://localhost:8080/api/v1/" + tableName + "/" + searchFieldValue)
-            fetch("http://localhost:8080/api/v1/" + tableName + "/" + searchFieldValue).then((response) => {
+            await fetch("http://localhost:8080/api/v1/" + tableName + "/" + searchFieldValue).then((response) => {
             return response.json();
             }).then((result) => {
                 let newTable = {};
@@ -183,19 +185,18 @@ function App() {
         fetchTable(tableName);
     }
     // INSERT HANDLER
-    const handleInsertClick = () => {
-            const requestOptions = {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(insertFieldValue)
-              };
-            console.log("http://localhost:8080/api/v1/" + tableName + "/", requestOptions)
-            fetch("http://localhost:8080/api/v1/" + tableName + "/", requestOptions).then((response) => {
-            return response.json();
-            }).then((result) => {
-                console.log(result);
-            }).catch(console.log);
-        fetchTable(tableName);
+    const handleInsertClick = async () => {
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(insertFieldValue)
+            };
+        console.log("http://localhost:8080/api/v1/" + tableName + "/", requestOptions)
+        await fetch("http://localhost:8080/api/v1/" + tableName + "/", requestOptions)
+            .then(response => response.json())
+            .then(result => console.log(result))
+            .catch(console.log);
+    fetchTable(tableName);
     }
 
     const handleTabChange = (event, newValue) => {
@@ -205,7 +206,6 @@ function App() {
       };
 
     useEffect(() => {
-        console.log("Hello world")
         console.log(tableName)
         fetchTable(tableName)
 	}, [tableName]);
