@@ -71,7 +71,7 @@ function App() {
 
     const formHtmlTable = (newTable) => {
         console.log("Rendeöidään taulu")
-        console.log(activeTable)
+        console.log(newTable)
         setHtmlTable([]);
         if (newTable.table != null && newTable.metadata != null) {
             console.log("Ei ole null")
@@ -83,8 +83,8 @@ function App() {
             let textFields = [];
             for (let i = 0; i < columnCount; i++) {
                 let item = metadata[i];
-                html.push(<TableCell key={tableName + "_" + item.column_name + "_" + i}>{item.column_name}</TableCell>)
-                textFields.push(<TextField key={tableName + "_" + item.column_name} label={item.column_name} variant="outlined" />)
+                html.push(<TableCell key={tableName + "_" + item.column_name + "_" + i + Math.random()}>{item.column_name}</TableCell>)
+                textFields.push(<TextField key={tableName + "_" + item.column_name + Math.random()} label={item.column_name} variant="outlined" />)
             }
             setHtmlTableHead(html);
             setInsertFields(textFields);
@@ -96,9 +96,9 @@ function App() {
                 let cells = []
                 Object.keys(item).forEach(function(key) {
                     if (item[key] != null) {
-                        cells.push(<TableCell key={tableName + "_" + item[key] + "_" + i}>{item[key]}</TableCell>);
+                        cells.push(<TableCell key={tableName + "_" + item[key] + "_" + i + Math.random()}>{item[key]}</TableCell>);
                     } else {
-                        cells.push(<TableCell key={tableName + "_" + item[key] + "_" + i}>NULL</TableCell>);
+                        cells.push(<TableCell key={tableName + "_" + item[key] + "_" + i + Math.random()}>NULL</TableCell>);
                     }
                 });
                 html.push(<TableRow key={i}>{cells}</TableRow>);
