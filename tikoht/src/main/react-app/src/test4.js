@@ -69,6 +69,7 @@ function App() {
     }}
 
     const formHtmlTable = () => {
+        setHtmlTable([]);
         if (activeTable.table != null && activeTable.metadata != null) {
             let table = activeTable.table;
             let metadata = activeTable.metadata;
@@ -88,14 +89,13 @@ function App() {
             html = [];
             for (let i = 0; i < tableSize; i++) {
                 let item = table[i];
-                console.log(item);
                 
                 let cells = []
                 Object.keys(item).forEach(function(key) {
+                    console.log(item[key])
                     if (item[key] != null) {
                         cells.push(<TableCell key={tableName + "_" + item[key] + "_" + i}>{item[key]}</TableCell>);
-                    }
-                    else {
+                    } else {
                         cells.push(<TableCell key={tableName + "_" + item[key] + "_" + i}>NULL</TableCell>);
                     }
                 });
