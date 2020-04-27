@@ -39,85 +39,71 @@ function App() {
 
 	const classes = useStyles();
 
-    const [tableName, setTableName] = React.useState("asiakas");
-    const [activeTable, setActiveTable] = React.useState(() => {
-        let newTable = {};
-        fetch('http://localhost:8080/api/v1/' + tableName)
-            .then(res => res.json())
-            .then((data) => { 
-                (newTable.table = data ); 
-            })
-            .then(fetch('http://localhost:8080/api/v1/metadata/' + tableName)
-            .then(res => res.json())
-            .then((data) => { 
-                (newTable.metadata = data )
-            })
-            .catch(console.log))
-            return newTable;
-    });
-    const [update, setUpdate] = React.useState(true);
+    const [tableName, setTableName] = React.useState("");
+    const [activeTable, setActiveTable] = React.useState([]);
     const [htmlTable, setHtmlTable] = React.useState([]);
     const [htmlTableHead, setHtmlTableHead] = React.useState([]);
     const [relations, setRelations] = React.useState(['asiakas', 'tyokohde', 'tyosopimus', 'tyosuoritus', 'tyosuorituksentuntityo', 'lasku', 'tarvikeluettelo', 'tarvike', 'tuntityo']);
     const [insertFields, setInsertFields] = React.useState([]);
 
+    const [update, setUpdate] = React.useState(true);
     const updatePage = () => {
         setUpdate(true);
     }
 
-    const fetchTable = (tableName) => {
+    const fetchTable = (newTableName) => {
         let newTable = {};
-        console.log('http://localhost:8080/api/v1/' + tableName);
-        fetch('http://localhost:8080/api/v1/' + tableName)
-            .then(res => res.json())
-            .then((data) => { 
-                (newTable.table = data ); 
-            })
-            .then(fetch('http://localhost:8080/api/v1/metadata/' + tableName)
-            .then(res => res.json())
-            .then((data) => { 
-                (newTable.metadata = data )})
-            .then(setActiveTable(newTable))
-            .then(setTimeout(function(){
-                formHtmlTable();
-            }, 800))
-                .catch(console.log))
-        
-    }
+        if (newTableName != "" && newTableName != null) {
+            console.log('http://localhost:8080/api/v1/' + newTableName);
+            fetch('http://localhost:8080/api/v1/' + newTableName)
+                .then(res => res.json())
+                .then((data) => {(newTable.table = data )})
+                .then(fetch('http://localhost:8080/api/v1/metadata/' + newTableName)
+                .then(res => res.json())
+                .then((data) => {(newTable.metadata = data )})
+                .then(setActiveTable(newTable))
+                .then(setTimeout(function(){
+                    formHtmlTable();
+                }, 1000))
+                    .catch(console.log))
+    }}
 
     const formHtmlTable = () => {
-        let table = activeTable.table;
-        let metadata = activeTable.metadata;
-        let tableSize = Object.keys(table).length;
-        let columnCount = Object.keys(metadata).length
-        console.log(columnCount + " " + tableSize);
-        let html = [];
-        let textFields = [];
-        for (let i = 0; i < columnCount; i++) {
-            let item = metadata[i];
-            html.push(<TableCell key={tableName + "_" + item.column_name + "_" + i}>{item.column_name}</TableCell>)
-            textFields.push(<TextField key={tableName + "_" + item.column_name} label={item.column_name} variant="outlined" />)
-        }
-        setHtmlTableHead(html);
-        setInsertFields(textFields);
-        
-        html = [];
-        for (let i = 0; i < tableSize; i++) {
-            let item = table[i];
+        if (activeTable.table != null && activeTable.metadata != null) {
+            let table = activeTable.table;
+            let metadata = activeTable.metadata;
+            let tableSize = Object.keys(table).length;
+            let columnCount = Object.keys(metadata).length
+            console.log(columnCount + " " + tableSize);
+            let html = [];
+            let textFields = [];
+            for (let i = 0; i < columnCount; i++) {
+                let item = metadata[i];
+                html.push(<TableCell key={tableName + "_" + item.column_name + "_" + i}>{item.column_name}</TableCell>)
+                textFields.push(<TextField key={tableName + "_" + item.column_name} label={item.column_name} variant="outlined" />)
+            }
+            setHtmlTableHead(html);
+            setInsertFields(textFields);
             
-            let cells = []
-            Object.keys(item).forEach(function(key) {
-                if (item != null) {
-                    cells.push(<TableCell key={tableName + "_" + item[key] + "_" + i}>{item[key]}</TableCell>);
-                }
-                else {
-                    cells.push(<TableCell key={tableName + "_" + item[key] + "_" + i}>NULL</TableCell>);
-                }
-            });
-            html.push(<TableRow key={i}>{cells}</TableRow>);
+            html = [];
+            for (let i = 0; i < tableSize; i++) {
+                let item = table[i];
+                console.log(item);
+                
+                let cells = []
+                Object.keys(item).forEach(function(key) {
+                    if (item[key] != null) {
+                        cells.push(<TableCell key={tableName + "_" + item[key] + "_" + i}>{item[key]}</TableCell>);
+                    }
+                    else {
+                        cells.push(<TableCell key={tableName + "_" + item[key] + "_" + i}>NULL</TableCell>);
+                    }
+                });
+                html.push(<TableRow key={i}>{cells}</TableRow>);
+            }
+            console.log(html);
+            setHtmlTable(html);
         }
-        console.log(html);
-        setHtmlTable(html);
     }
 
     const handleTabChange = (event, newValue) => {
