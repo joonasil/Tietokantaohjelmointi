@@ -49,7 +49,6 @@ function App() {
     const [searchFieldValue, setSearchFieldValue] = React.useState([]);
     const [insertFieldValue, setInsertFieldValue] = React.useState({});
 
-
     const fetchTable = (newTableName) => {
         let newTable = {};
         if (newTableName !== "" && newTableName !== null) {
@@ -71,6 +70,10 @@ function App() {
     const formHtmlTable = (newTable) => {
         console.log("Rendeöidään taulu")
         console.log(newTable)
+        if (newTable.metadata[0].table_name == "asiakas") {
+            console.log(newTable.table);
+            newTable.table = sortJSONByKey(newTable.table);
+        }
         setHtmlTable([]);
         if (newTable.table != null && newTable.metadata != null) {
             let table = newTable.table;
@@ -110,6 +113,18 @@ function App() {
             setHtmlTable(html);
         }
     }
+    // This id only for customer table
+    function sortJSONByKey(array){
+        var sortedArray = [];
+        // Push each JSON Object entry in array by [key, value]
+        for(var i in array)
+        {
+            sortedArray.push({asiakasID : [array[i].asiakasID], nimi : [array[i].nimi], osoite : [array[i].osoite]});
+        }
+        // Run native sort function and returns sorted array.
+        console.log(sortedArray);
+        return sortedArray;
+    }
 
     // UI HANDLERIT
     const updateDeleteFieldValue = (event) => {
@@ -131,8 +146,9 @@ function App() {
         };
         fetch("http://localhost:8080/api/v1/" + tableName + "/" + deleteFieldValue, requestOptions).then((response) => {
           return response.json();
-        }).then((result) => {console.log(result)})
-        .then(fetchTable(tableName))
+        }).then((result) => {
+            fetchTable(tableName)
+        })
         .catch(console.log);
     }
     // SEARCH HANDLER
