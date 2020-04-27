@@ -1,1 +1,36 @@
 .vscode/.project
+
+tikoht/HELP.md
+tikoht/target/
+tikoht/!.mvn/wrapper/maven-wrapper.jar
+tikoht/!**/src/main/**
+tikoht/!**/src/test/**
+
+### STS ###
+tikoht/.apt_generated
+tikoht/.classpath
+tikoht/.factorypath
+tikoht/.project
+tikoht/.settings
+tikoht/.springBeans
+tikoht/.sts4-cache
+
+### IntelliJ IDEA ###
+tikoht/.idea
+tikoht/*.iws
+tikoht/*.iml
+tikoht/*.ipr
+
+### NetBeans ###
+tikoht/nbproject/private/
+tikoht/nbbuild/
+tikoht/dist/
+tikoht/nbdist/
+tikoht/.nb-gradle/
+tikoht/build/
+
+### VS Code ###
+tikoht/.vscode/
+
+### Database Connection Auth ###
+tikoht/src/main/resources/application.properties
