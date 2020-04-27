@@ -1,4 +1,5 @@
 import React, {useRef, useEffect} from 'react';
+import 'date-fns';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -12,6 +13,14 @@ import TextField from '@material-ui/core/TextField';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+
+import {
+    MuiPickersUtilsProvider,
+    KeyboardTimePicker,
+    KeyboardDatePicker,
+  } from '@material-ui/pickers';
+// pick a date util library
+import DateFnsUtils from '@date-io/date-fns';
 
 import AppBarCustom from './components/AppBarCustom.js';
 import Typography from '@material-ui/core/Typography';
@@ -47,8 +56,8 @@ function App() {
             newMetadataTableName = "metadata/" + newTableName;
         }
         if (newTableName !== "" && newTableName !== null) {
-            console.log('http://localhost:8080/api/v1/' + newTableName);
-            console.log('http://localhost:8080/api/v1/' + newMetadataTableName);
+            //console.log('http://localhost:8080/api/v1/' + newTableName);
+            //console.log('http://localhost:8080/api/v1/' + newMetadataTableName);
             await fetch('http://localhost:8080/api/v1/' + newTableName)
                 .then(res => res.json())
                 .then((data) => {(newTable.table = data )}).catch(console.log);
@@ -59,6 +68,8 @@ function App() {
             
             await setActiveTable(newTable);
             await formHtmlTable(newTable);
+            console.log(newTable.table);
+            console.log(newTable.metadata);
     }}
     // FUNCTION TO SLEEP zzz milliseconds
     const sleep = (milliseconds) => {
@@ -67,8 +78,8 @@ function App() {
     }
 
     const formHtmlTable = async (newTable) => {
-        console.log("Rendeöidään taulu")
-        console.log(newTable)
+        //console.log("Rendeöidään taulu")
+        //console.log(newTable)
         if (newTable.metadata[0].table_name == "asiakas") {
             newTable.table = sortJSONByKey(newTable.table);
         }
@@ -83,13 +94,31 @@ function App() {
             for (let i = 0; i < columnCount; i++) {
                 let item = metadata[i];
                 // Sarakkeiden nimet
-                html.push(<TableCell key={tableName + "_" + item.column_name + "_" + i + Math.random()}>{item.column_name}</TableCell>)
+                html.push(<TableCell key={tableName + "_" + item.column_name + "_" + i + Math.random()}>{item.column_name}</TableCell>);
                 // Input kentät
-                textFields.push(
-                    <TextField className={classes.textFields} key={tableName + "_" + item.column_name + Math.random()} label={item.column_name} variant="outlined" 
-                        onChange={(e) => {updateInsertFieldValue(e, metadata[i].column_name)}}
-                    />
-                )
+                if (item.column_name.endsWith("pvm")) {
+                    textFields.push(
+                        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                            <KeyboardDatePicker
+                                key={tableName + "_" + item.column_name + Math.random()}
+                                disableToolbar
+                                variant="contained"
+                                format="yyyy/MM/dd"
+                                margin="normal"
+                                key={"date-picker-inline" + Math.random()}
+                                label={item.column_name}
+                                onChange={(e) => {updateInsertFieldValue(e, metadata[i].column_name)}}
+                                KeyboardButtonProps={{
+                                    'aria-label': 'change date',
+                                }}
+                            /></MuiPickersUtilsProvider>
+                )}
+                else {
+                    textFields.push(
+                        <TextField className={classes.textFields} key={tableName + "_" + item.column_name + Math.random()} label={item.column_name} variant="outlined" 
+                            onChange={(e) => {updateInsertFieldValue(e, metadata[i].column_name)}}
+                        />
+                )}
             }
             setHtmlTableHead(html);
             setInsertFields(textFields);
@@ -134,6 +163,7 @@ function App() {
     const updateInsertFieldValue = (event, label) => {
         let state = insertFieldValue;
         state[[label]] = event.target.value;
+        console.log(state);
         setInsertFieldValue(state);
     }
     // ADDITIONAL FORM
@@ -186,10 +216,16 @@ function App() {
     }
     // INSERT HANDLER
     const handleInsertClick = async () => {
+        console.log(insertFieldValue);
+        console.log(JSON.stringify(insertFieldValue))
+        var arrayToString = JSON.stringify(Object.assign({}, insertFieldValue));  // convert array to string
+        var stringToJsonObject = JSON.parse(arrayToString);  // convert string to json object
+        console.log(stringToJsonObject);
+        
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(insertFieldValue)
+            body: JSON.stringify(stringToJsonObject)
             };
         console.log("http://localhost:8080/api/v1/" + tableName + "/", requestOptions)
         await fetch("http://localhost:8080/api/v1/" + tableName + "/", requestOptions)
@@ -198,9 +234,32 @@ function App() {
             .catch(console.log);
     fetchTable(tableName);
     }
+    // EDIT HANDLER
+    const handleEditClick = async () => {
+        let keys = [];
+        let key = "";
+        for (let key in insertFieldValue) keys.push(key);
+        for (let keyName in keys) {
+            if (keys[keyName].endsWith("id")) {
+                key = keys[keyName];
+            }
+        }
+        console.log(key);
+        console.log(insertFieldValue[key])
+
+        const requestOptions = {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(insertFieldValue)};
+        console.log("http://localhost:8080/api/v1/" + tableName + "/" + insertFieldValue[key] + "/", requestOptions)
+        await fetch("http://localhost:8080/api/v1/" + tableName + "/" + insertFieldValue[key] + "/", requestOptions)
+            .then(response => response.json())
+            .then(result => console.log(result))
+            .catch(console.log);
+        fetchTable(tableName);
+    }
 
     const handleTabChange = (event, newValue) => {
-        console.log(newValue);
         setInsertFieldValue([]);
         setTableName(newValue);
       };
@@ -236,11 +295,12 @@ function App() {
         </Paper>
 
         <Paper className={classes.textFields} elevation={2}>
-          <Typography className={classes.textFields} >Lisää entiteetti</Typography>
+          <Typography className={classes.textFields} >Lisää tai muokkaa entiteettiä</Typography>
           <form noValidate autoComplete="off">
               {insertFields}
         </form>
           <Button className={classes.textFields}  variant="contained" color="primary" onClick={handleInsertClick}>Lisää</Button>
+          <Button className={classes.textFields}  variant="contained" color="primary" onClick={handleEditClick}>Muokkaa</Button>
         </Paper>
 
         <Paper className={classes.textFields}  className={classes.textFields} elevation={2}>

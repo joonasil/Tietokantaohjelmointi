@@ -6,29 +6,30 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Tyokohde {
 
-    private final Integer kohdeID;
-    private final Integer omistajaID;
+    private final Integer kohdeid;
+    private final Integer omistajaid;
     @NotBlank
     private final String kohdetyyppi;
+
     @NotBlank
     private final String osoite;
 
-    public Tyokohde(@JsonProperty("kohdeID") Integer kohdeID,
-                    @JsonProperty("omistajaID") Integer omistajaID,
+    public Tyokohde(@JsonProperty("kohdeid") Integer kohdeid,
+                    @JsonProperty("omistajaid") Integer omistajaid,
                     @JsonProperty("kohdetyyppi") String kohdetyyppi,
                     @JsonProperty("osoite") String osoite) {
-        this.kohdeID = kohdeID;
-        this.omistajaID = omistajaID;
+        this.kohdeid = kohdeid;
+        this.omistajaid = omistajaid;
         this.kohdetyyppi = kohdetyyppi;
         this.osoite = osoite;
     }
 
-    public Integer getKohdeID() {
-        return kohdeID;
+    public Integer getKohdeid() {
+        return kohdeid;
     }
 
-    public Integer getOmistajaID() {
-        return omistajaID;
+    public Integer getOmistajaid() {
+        return omistajaid;
     }
 
     public String getKohdetyyppi() {
