@@ -101,9 +101,12 @@ public class LaskuDao implements GenericDao<Lasku, Integer> {
 
     public List<Lasku> selectAllOverdue() {
         LocalDate localDate = java.time.LocalDate.now();
-        final String sql =  "SELECT laskuID, sopimusID, pvm, erapaiva, maksettuPvm, edeltavaLasku, muistutusLkm, viivastyskulut " +
+        final String sql =
+                "SELECT laskuID, sopimusID, pvm, erapaiva, maksettuPvm, edeltavaLasku, muistutusLkm, viivastyskulut " +
                 "FROM lasku " +
-                "WHERE erapaiva < ? AND maksettuPVM ISNULL";
+                "WHERE erapaiva < ? " +
+                    "AND maksettuPVM ISNULL " +
+                    "AND laskuID NOT IN (SELECT DISTINCT edeltavaLasku FROM lasku WHERE edeltavaLasku IS NOT NULL)";
         return jdbcTemplate.query(sql, new Object[]{localDate}, (rs, i) -> {
             Integer laskuID = rs.getInt("laskuID");
             Integer sopimusID = rs.getInt("sopimusID");
