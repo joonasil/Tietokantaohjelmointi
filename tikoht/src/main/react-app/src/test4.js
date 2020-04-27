@@ -45,15 +45,14 @@ function App() {
     const [htmlTableHead, setHtmlTableHead] = React.useState([]);
     const [relations, setRelations] = React.useState(['asiakas', 'tyokohde', 'tyosopimus', 'tyosuoritus', 'tyosuorituksentuntityo', 'lasku', 'tarvikeluettelo', 'tarvike', 'tuntityo']);
     const [insertFields, setInsertFields] = React.useState([]);
+    const [deleteFieldValue, setDeleteFieldValue] = React.useState([]);
+    const [searchFieldValue, setSearchFieldValue] = React.useState([]);
+    const [insertFieldValue, setInsertFieldValue] = React.useState({});
 
-    const [update, setUpdate] = React.useState(true);
-    const updatePage = () => {
-        setUpdate(true);
-    }
 
     const fetchTable = (newTableName) => {
         let newTable = {};
-        if (newTableName != "" && newTableName != null) {
+        if (newTableName !== "" && newTableName !== null) {
             console.log('http://localhost:8080/api/v1/' + newTableName);
             fetch('http://localhost:8080/api/v1/' + newTableName)
                 .then(res => res.json())
@@ -74,7 +73,6 @@ function App() {
         console.log(newTable)
         setHtmlTable([]);
         if (newTable.table != null && newTable.metadata != null) {
-            console.log("Ei ole null")
             let table = newTable.table;
             let metadata = newTable.metadata;
             let tableSize = Object.keys(table).length;
@@ -83,8 +81,14 @@ function App() {
             let textFields = [];
             for (let i = 0; i < columnCount; i++) {
                 let item = metadata[i];
+                // Sarakkeiden nimet
                 html.push(<TableCell key={tableName + "_" + item.column_name + "_" + i + Math.random()}>{item.column_name}</TableCell>)
-                textFields.push(<TextField key={tableName + "_" + item.column_name + Math.random()} label={item.column_name} variant="outlined" />)
+                // Input kentät
+                textFields.push(
+                    <TextField key={tableName + "_" + item.column_name + Math.random()} label={item.column_name} variant="outlined" 
+                        onChange={(e) => {updateInsertFieldValue(e, metadata[i].column_name)}}
+                    />
+                )
             }
             setHtmlTableHead(html);
             setInsertFields(textFields);
@@ -107,8 +111,61 @@ function App() {
         }
     }
 
+    // UI HANDLERIT
+    const updateDeleteFieldValue = (event) => {
+        setDeleteFieldValue(event.target.value);
+    }
+    const updateSearchFieldValue = (event) => {
+        setSearchFieldValue(event.target.value);
+    }
+    const updateInsertFieldValue = (event, label) => {
+        let state = insertFieldValue;
+        state[[label]] = event.target.value;
+        setInsertFieldValue(state);
+    }
+    // DELETE HANDLER
+    const handleDeleteClick = () => {
+        const requestOptions = {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' }
+        };
+        fetch("http://localhost:8080/api/v1/" + tableName + "/" + deleteFieldValue, requestOptions).then((response) => {
+          return response.json();
+        }).then((result) => {console.log(result)});
+        fetchTable(tableName);
+    }
+    // SEARCH HANDLER
+    const handleSearchClick = () => {
+        if (searchFieldValue != null && searchFieldValue != "") {
+            console.log("http://localhost:8080/api/v1/" + tableName + "/" + searchFieldValue)
+            fetch("http://localhost:8080/api/v1/" + tableName + "/" + searchFieldValue).then((response) => {
+            return response.json();
+            }).then((result) => {
+                let newTable = {};
+                newTable.table = [result];
+                newTable.metadata = activeTable.metadata;
+                formHtmlTable(newTable)
+            });
+    }}
+    // INSERT HANDLER
+    const handleInsertClick = () => {
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(insertFieldValue)
+              };
+            console.log("http://localhost:8080/api/v1/" + tableName + "/", requestOptions)
+            fetch("http://localhost:8080/api/v1/" + tableName + "/", requestOptions).then((response) => {
+            return response.json();
+            }).then((result) => {
+                console.log(result);
+            }).catch(console.log);
+        fetchTable(tableName);
+    }
+
     const handleTabChange = (event, newValue) => {
         console.log(newValue);
+        setInsertFieldValue([]);
         setTableName(newValue);
       };
 
@@ -139,8 +196,8 @@ function App() {
 
         <Paper elevation={3}>
           <Typography>Hae avaimella</Typography>
-          <TextField id="outlined-basic" label="Key" variant="outlined" />
-          <Button variant="contained" color="primary">Hae</Button>
+          <TextField id="outlined-basic" label="Key" variant="outlined" value={searchFieldValue} onChange={updateSearchFieldValue}/>
+          <Button variant="contained" color="primary" onClick={handleSearchClick}>Hae</Button>
         </Paper>
 
         <Paper elevation={3}>
@@ -148,15 +205,15 @@ function App() {
           <form noValidate autoComplete="off">
               {insertFields}
         </form>
-          <Button variant="contained" color="primary">Lisää</Button>
+          <Button variant="contained" color="primary" onClick={handleInsertClick}>Lisää</Button>
         </Paper>
 
         <Paper elevation={3}>
           <Typography>poista entiteetti</Typography>
           <form noValidate autoComplete="off">
-            <TextField id="outlined-basic" label="ID" variant="outlined" />
+            <TextField id="outlined-basic" label="ID" variant="outlined" value={deleteFieldValue} onChange={updateDeleteFieldValue}/>
           </form>
-          <Button variant="contained" color="secondary">Poista</Button>
+          <Button variant="contained" color="secondary" onClick={handleDeleteClick}>Poista</Button>
         </Paper>
         
         {/* TABLE */ }
