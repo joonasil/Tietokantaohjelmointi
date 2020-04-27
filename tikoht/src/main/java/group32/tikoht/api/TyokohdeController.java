@@ -6,14 +6,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import group32.tikoht.model.Tyokohde;
 import group32.tikoht.service.TyokohdeService;
@@ -29,27 +22,32 @@ public class TyokohdeController {
         this.tyokohdeService = tyokohdeService;
     }
 
+    @CrossOrigin
     @PostMapping
     public void addTyokohde(@Valid @NotNull @RequestBody Tyokohde tyokohde) {
         tyokohdeService.addTyokohde(tyokohde);
     }
 
+    @CrossOrigin
     @GetMapping
     public List<Tyokohde> getAllTyokohde() {
         return tyokohdeService.getAllTyokohde();
     }
 
+    @CrossOrigin
     @GetMapping(path = "{kohdeID}")
     public Tyokohde getTyokohdeById(@PathVariable("kohdeID") Integer kohdeID) {
         return tyokohdeService.getTyokohdeById(kohdeID)
                 .orElse(null);
     }
 
+    @CrossOrigin
     @DeleteMapping(path = "{kohdeID}")
     public void deleteTyokohdeById(@PathVariable("kohdeID") Integer kohdeID) {
         tyokohdeService.deleteTyokohde(kohdeID);
     }
 
+    @CrossOrigin
     @PutMapping(path = "{kohdeID}")
     public void updateTyokohde(@PathVariable("kohdeID") Integer kohdeID,@Valid @NotNull @RequestBody Tyokohde tyokohdeToUpdate) {
         tyokohdeService.updateTyokohde(kohdeID, tyokohdeToUpdate);

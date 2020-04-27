@@ -8,14 +8,7 @@ import javax.validation.constraints.NotNull;
 
 import group32.tikoht.service.LaskuService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import group32.tikoht.model.Tyosopimus;
 import group32.tikoht.service.TyosopimusService;
@@ -33,32 +26,38 @@ public class TyosopimusController {
         this.laskuService = laskuService;
     }
 
+    @CrossOrigin
     @PostMapping
     public void addTyosopimus(@Valid @NotNull @RequestBody Tyosopimus tyosopimus) {
         tyosopimusService.addTyosopimus(tyosopimus);
     }
+    @CrossOrigin
     @GetMapping
     public List<Tyosopimus> getAllTyosopimus() {
         return tyosopimusService.getAllTyosopimus();
     }
 
+    @CrossOrigin
     @GetMapping(path = "{sopimusID}")
     public Tyosopimus getTyosopimusById(@PathVariable("sopimusID") Integer sopimusID) {
         return tyosopimusService.getTyosopimusById(sopimusID)
                 .orElse(null);
     }
 
+    @CrossOrigin
     @DeleteMapping(path = "{sopimusID}")
     public void deleteTyosopimusById(@PathVariable("sopimusID") Integer sopimusID) {
         tyosopimusService.deleteTyosopimus(sopimusID);
     }
 
+    @CrossOrigin
     @PutMapping(path = "{sopimusID}")
     public void updateTyosopimus(@PathVariable("sopimusID") Integer sopimusID,@Valid @NotNull @RequestBody Tyosopimus tyosopimusToUpdate) {
         tyosopimusService.updateTyosopimus(sopimusID, tyosopimusToUpdate);
     }
 
     // TYOSOPIMUS OMAT
+    @CrossOrigin
     @PostMapping(path = "{sopimusID}")
     public void makeInvoice(@PathVariable("SopimusID") Integer sopimusID, @NotNull List<Date> duedates) {
         Tyosopimus tyosopimus = getTyosopimusById((sopimusID));

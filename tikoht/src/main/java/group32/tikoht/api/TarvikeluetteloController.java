@@ -6,14 +6,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import group32.tikoht.model.Tarvikeluettelo;
 import group32.tikoht.service.TarvikeluetteloService;
@@ -29,27 +22,32 @@ public class TarvikeluetteloController {
         this.luetteloService = luetteloService;
     }
 
+    @CrossOrigin
     @PostMapping
     public void addTarvikeluettelo(@Valid @NotNull @RequestBody Tarvikeluettelo luettelo) {
         luetteloService.addTarvikeluettelo(luettelo);
     }
 
+    @CrossOrigin
     @GetMapping
     public List<Tarvikeluettelo> getAllTarvikeluettelo() {
         return luetteloService.getAllTarvikeluettelo();
     }
 
+    @CrossOrigin
     @GetMapping(path = "{suoritusID}")
     public Tarvikeluettelo getTarvikeluetteloById(@PathVariable("suoritusID") Integer suoritusID) {
         return luetteloService.getTarvikeluetteloById(suoritusID)
                 .orElse(null);
     }
 
+    @CrossOrigin
     @DeleteMapping(path = "{suoritusID}")
     public void deleteTarvikeluetteloById(@PathVariable("suoritusID") Integer suoritusID) {
         luetteloService.deleteTarvikeluettelo(suoritusID);
     }
 
+    @CrossOrigin
     @PutMapping(path = "{suoritusID}")
     public void updateTarvikeluettelo(@PathVariable("suoritusID") Integer suoritusID,@Valid @NotNull @RequestBody Tarvikeluettelo luetteloToUpdate) {
         luetteloService.updateTarvikeluettelo(suoritusID, luetteloToUpdate);

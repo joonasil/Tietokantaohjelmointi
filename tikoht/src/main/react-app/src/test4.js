@@ -131,8 +131,9 @@ function App() {
         };
         fetch("http://localhost:8080/api/v1/" + tableName + "/" + deleteFieldValue, requestOptions).then((response) => {
           return response.json();
-        }).then((result) => {console.log(result)});
-        fetchTable(tableName);
+        }).then((result) => {console.log(result)})
+        .then(fetchTable(tableName))
+        .catch(console.log);
     }
     // SEARCH HANDLER
     const handleSearchClick = () => {
@@ -145,8 +146,10 @@ function App() {
                 newTable.table = [result];
                 newTable.metadata = activeTable.metadata;
                 formHtmlTable(newTable)
-            });
-    }}
+            });    
+        }
+        fetchTable(tableName);
+    }
     // INSERT HANDLER
     const handleInsertClick = () => {
             const requestOptions = {
