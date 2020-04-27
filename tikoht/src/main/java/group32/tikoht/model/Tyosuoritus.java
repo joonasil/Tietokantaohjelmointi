@@ -8,28 +8,28 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Tyosuoritus {
 
-    private final Integer suoritusID;
-    private final Integer sopimusID;
+    private final Integer suoritusid;
+    private final Integer sopimusid;
     @NotBlank
-    private final LocalDate suoritusPvm;
+    private final LocalDate suorituspvm;
 
-    public Tyosuoritus( @JsonProperty("suoritusID") Integer suoritusID,
-                        @JsonProperty("sopimusID") Integer sopimusID,
-                        @JsonProperty("suoritusPvm") LocalDate suoritusPvm) {
-        this.suoritusID = suoritusID;
-        this.sopimusID = sopimusID;
-        this.suoritusPvm = suoritusPvm;
+    public Tyosuoritus( @JsonProperty("suoritusid") Integer suoritusid,
+                        @JsonProperty("sopimusid") Integer sopimusid,
+                        @JsonProperty("suorituspvm") LocalDate suorituspvm) {
+        this.suoritusid = suoritusid;
+        this.sopimusid = sopimusid;
+        this.suorituspvm = suorituspvm;
     }
 
-    public Integer getSuoritusID() {
-        return suoritusID;
+    public Integer getSuoritusid() {
+        return suoritusid;
     }
 
-    public Integer getSopimusID() {
-        return sopimusID;
+    public Integer getSopimusid() {
+        return sopimusid;
     }
 
-    public LocalDate getSuoritusPvm() {
-        return suoritusPvm;
+    public LocalDate getSuorituspvm() {
+        return suorituspvm;
     }
 }

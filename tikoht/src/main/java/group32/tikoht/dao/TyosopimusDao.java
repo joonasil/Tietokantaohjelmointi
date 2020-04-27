@@ -23,53 +23,53 @@ public class TyosopimusDao implements GenericDao<Tyosopimus, Integer> {
 
     @Override
     public int insert(Tyosopimus sopimus) {
-        Integer kohdeID = sopimus.getKohdeID();
+        Integer kohdeid = sopimus.getKohdeid();
         String tyyppi = sopimus.getTyyppi();
-        Double tyonHinta = sopimus.getTyonHinta();
-        Double tarvikkeidenHinta = sopimus.getTarvikkeidenHinta();
+        Double tyonhinta = sopimus.getTyonHinta();
+        Double tarvikkeidenhinta = sopimus.getTarvikkeidenhinta();
         Integer osamaksu = sopimus.getOsamaksu();
         LocalDate pvm = sopimus.getPvm();
-        String sopimuksenTila = sopimus.getSopimuksenTila();
+        String sopimuksentila = sopimus.getSopimuksentila();
         String selite = sopimus.getSelite();
-        final String sql =  "INSERT INTO tyosopimus(kohdeID, tyyppi, tyonHinta, tarvikkeidenHinta, osamaksu, pvm, sopimuksenTila, selite) " +
+        final String sql =  "INSERT INTO tyosopimus(kohdeid, tyyppi, tyonhinta, tarvikkeidenhinta, osamaksu, pvm, sopimuksentila, selite) " +
                             "VALUES(?, ?::sopimuslaji, ?, ?, ?, ?, ?::sopimusTila, ?)";
-        return jdbcTemplate.update(sql, new Object[]{kohdeID, tyyppi, tyonHinta, tarvikkeidenHinta, osamaksu, pvm, sopimuksenTila, selite});
+        return jdbcTemplate.update(sql, new Object[]{kohdeid, tyyppi, tyonhinta, tarvikkeidenhinta, osamaksu, pvm, sopimuksentila, selite});
     }
 
     @Override
     public List<Tyosopimus> selectAll() {
-        final String sql =  "SELECT sopimusID, kohdeID, tyyppi, tyonHinta, tarvikkeidenHinta, osamaksu, pvm, sopimuksenTila, selite " +
+        final String sql =  "SELECT sopimusid, kohdeid, tyyppi, tyonhinta, tarvikkeidenhinta, osamaksu, pvm, sopimuksentila, selite " +
                             "FROM tyosopimus";
         return jdbcTemplate.query(sql, (rs, i) -> {
-            Integer sopimusID = rs.getInt("sopimusID");
-            Integer kohdeID = rs.getInt("kohdeID");
+            Integer sopimusid = rs.getInt("sopimusid");
+            Integer kohdeid = rs.getInt("kohdeid");
             String tyyppi = rs.getString("tyyppi");
-            Double tyonHinta = rs.getDouble("tyonHinta");
-            Double tarvikkeidenHinta = rs.getDouble("tarvikkeidenHinta");
+            Double tyonhinta = rs.getDouble("tyonhinta");
+            Double tarvikkeidenhinta = rs.getDouble("tarvikkeidenhinta");
             Integer osamaksu = rs.getInt("osamaksu");
             LocalDate pvm = rs.getObject("pvm", LocalDate.class);
-            String sopimuksenTila = rs.getString("sopimuksenTila");
+            String sopimuksentila = rs.getString("sopimuksentila");
             String selite = rs.getString("selite");
-            return new Tyosopimus(sopimusID, kohdeID, tyyppi, tyonHinta, tarvikkeidenHinta, osamaksu, pvm, sopimuksenTila, selite);
+            return new Tyosopimus(sopimusid, kohdeid, tyyppi, tyonhinta, tarvikkeidenhinta, osamaksu, pvm, sopimuksentila, selite);
         });
     }
 
     @Override
     public Optional<Tyosopimus> selectById(Integer id) {
-        final String sql =  "SELECT sopimusID, kohdeID, tyyppi, tyonHinta, tarvikkeidenHinta, osamaksu, pvm, sopimuksenTila, selite " +
+        final String sql =  "SELECT sopimusid, kohdeid, tyyppi, tyonhinta, tarvikkeidenhinta, osamaksu, pvm, sopimuksentila, selite " +
                             "FROM tyosopimus " +
-                            "WHERE sopimusID = ?";
+                            "WHERE sopimusid = ?";
         Tyosopimus sopimus = jdbcTemplate.queryForObject(sql, new Object[]{id}, (rs, i) -> {
-            Integer sopimusID = rs.getInt("sopimusID");
-            Integer kohdeID = rs.getInt("kohdeID");
+            Integer sopimusid = rs.getInt("sopimusid");
+            Integer kohdeid = rs.getInt("kohdeid");
             String tyyppi = rs.getString("tyyppi");
-            Double tyonHinta = rs.getDouble("tyonHinta");
-            Double tarvikkeidenHinta = rs.getDouble("tarvikkeidenHinta");
+            Double tyonhinta = rs.getDouble("tyonhinta");
+            Double tarvikkeidenhinta = rs.getDouble("tarvikkeidenhinta");
             Integer osamaksu = rs.getInt("osamaksu");
             LocalDate pvm = rs.getObject("pvm", LocalDate.class);
-            String sopimuksenTila = rs.getString("sopimuksenTila");
+            String sopimuksentila = rs.getString("sopimuksentila");
             String selite = rs.getString("selite");
-            return new Tyosopimus(sopimusID, kohdeID, tyyppi, tyonHinta, tarvikkeidenHinta, osamaksu, pvm, sopimuksenTila, selite);
+            return new Tyosopimus(sopimusid, kohdeid, tyyppi, tyonhinta, tarvikkeidenhinta, osamaksu, pvm, sopimuksentila, selite);
         });
         return Optional.ofNullable(sopimus);
     }
@@ -77,23 +77,23 @@ public class TyosopimusDao implements GenericDao<Tyosopimus, Integer> {
     @Override
     public int deleteById(Integer id) {
         final String sql =  "DELETE FROM tyosopimus " +
-                            "WHERE sopimusID = ?";
+                            "WHERE sopimusid = ?";
         return jdbcTemplate.update(sql, new Object[]{id});
     }
 
     @Override
     public int updateById(Integer id, Tyosopimus sopimus) {
-        Integer kohdeID = sopimus.getKohdeID();
+        Integer kohdeid = sopimus.getKohdeid();
         String tyyppi = sopimus.getTyyppi();
-        Double tyonHinta = sopimus.getTyonHinta();
-        Double tarvikkeidenHinta = sopimus.getTarvikkeidenHinta();
+        Double tyonhinta = sopimus.getTyonHinta();
+        Double tarvikkeidenhinta = sopimus.getTarvikkeidenhinta();
         Integer osamaksu = sopimus.getOsamaksu();
         LocalDate pvm = sopimus.getPvm();
-        String sopimuksenTila = sopimus.getSopimuksenTila();
+        String sopimuksentila = sopimus.getSopimuksentila();
         String selite = sopimus.getSelite();
         final String sql =  "UPDATE tyosopimus " +
-                            "SET kohdeID = ?, tyyppi = ?::sopimuslaji, tyonHinta = ?, tarvikkeidenHinta = ?, osamaksu = ?, pvm = ?, sopimuksenTila = ?::sopimusTila, selite = ? " +
-                            "WHERE sopimusID = ?";
-        return jdbcTemplate.update(sql, new Object[]{kohdeID, tyyppi, tyonHinta, tarvikkeidenHinta, osamaksu, pvm, sopimuksenTila, selite, id});
+                            "SET kohdeid = ?, tyyppi = ?::sopimuslaji, tyonhinta = ?, tarvikkeidenhinta = ?, osamaksu = ?, pvm = ?, sopimuksentila = ?::sopimusTila, selite = ? " +
+                            "WHERE sopimusid = ?";
+        return jdbcTemplate.update(sql, new Object[]{kohdeid, tyyppi, tyonhinta, tarvikkeidenhinta, osamaksu, pvm, sopimuksentila, selite, id});
     }
 }

@@ -4,27 +4,27 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Tarvikeluettelo {
 
-    private final Integer suoritusID;
-    private final Integer tarvikeID;
+    private final Integer suoritusid;
+    private final Integer tarvikeid;
     private final Integer lkm;
-    private final Integer aleProsentti;
+    private final Integer aleprosentti;
 
-    public Tarvikeluettelo( @JsonProperty("suoritusID") Integer suoritusID,
-                            @JsonProperty("tarvikeID") Integer tarvikeID,
+    public Tarvikeluettelo( @JsonProperty("suoritusid") Integer suoritusid,
+                            @JsonProperty("tarvikeid") Integer tarvikeid,
                             @JsonProperty("lkm") Integer lkm,
-                            @JsonProperty("aleProsentti") Integer aleProsentti) {
-        this.suoritusID = suoritusID;
-        this.tarvikeID = tarvikeID;
+                            @JsonProperty("aleprosentti") Integer aleprosentti) {
+        this.suoritusid = suoritusid;
+        this.tarvikeid = tarvikeid;
         this.lkm = lkm;
-        this.aleProsentti = aleProsentti;
+        this.aleprosentti = aleprosentti;
     }
 
     public Integer getSuoritusID() {
-        return suoritusID;
+        return suoritusid;
     }
 
     public Integer getTarvikeID() {
-        return tarvikeID;
+        return tarvikeid;
     }
 
     public Integer getLkm() {
@@ -32,7 +32,7 @@ public class Tarvikeluettelo {
     }
 
     public Integer getAleProsentti() {
-        return aleProsentti;
+        return aleprosentti;
     }
 
 

@@ -6,35 +6,35 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TyosuorituksenTuntityo {
 
-    private final Integer suoritusID;
-    private final String tyonTyyppi;
+    private final Integer suoritusid;
+    private final String tyontyyppi;
     @NotBlank
-    private final Double tuntiLkm;
-    private final Double aleProsentti;
+    private final Double tuntilkm;
+    private final Double aleprosentti;
 
-    public TyosuorituksenTuntityo(  @JsonProperty("suoritusID") Integer suoritusID,
-                                    @JsonProperty("tyonTyyppi") String tyonTyyppi, 
-                                    @JsonProperty("tuntiLkm") Double tuntiLkm,
-                                    @JsonProperty("aleProsentti") Double aleProsentti) {
-        this.suoritusID = suoritusID;
-        this.tyonTyyppi = tyonTyyppi;
-        this.tuntiLkm = tuntiLkm;
-        this.aleProsentti = aleProsentti;
+    public TyosuorituksenTuntityo(  @JsonProperty("suoritusid") Integer suoritusid,
+                                    @JsonProperty("tyontyyppi") String tyontyyppi,
+                                    @JsonProperty("tuntilkm") Double tuntilkm,
+                                    @JsonProperty("aleprosentti") Double aleprosentti) {
+        this.suoritusid = suoritusid;
+        this.tyontyyppi = tyontyyppi;
+        this.tuntilkm = tuntilkm;
+        this.aleprosentti = aleprosentti;
     }
 
     public Integer getSuoritusID() {
-        return suoritusID;
+        return suoritusid;
     }
 
     public String getTyonTyyppi() {
-        return tyonTyyppi;
+        return tyontyyppi;
     }
 
     public Double getTuntiLkm() {
-        return tuntiLkm;
+        return tuntilkm;
     }
 
     public Double getAleProsentti() {
-        return aleProsentti;
+        return aleprosentti;
     }
 }

@@ -8,35 +8,35 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Tyosopimus {
 
-    private final Integer sopimusID;
-    private final Integer kohdeID;
+    private final Integer sopimusid;
+    private final Integer kohdeid;
     @NotBlank
     private final String tyyppi;
-    private final Double tyonHinta;
-    private final Double tarvikkeidenHinta;
+    private final Double tyonhinta;
+    private final Double tarvikkeidenhinta;
     private final Integer osamaksu;
     private final LocalDate pvm;
     @NotBlank
-    private final String sopimuksenTila;
+    private final String sopimuksentila;
     private final String selite;
 
-    public Tyosopimus(  @JsonProperty("sopimusID") Integer sopimusID,
-                        @JsonProperty("kohdeID") Integer kohdeID,
+    public Tyosopimus(  @JsonProperty("sopimusid") Integer sopimusid,
+                        @JsonProperty("kohdeid") Integer kohdeid,
                         @JsonProperty("tyyppi") @NotBlank String tyyppi,
-                        @JsonProperty("tyonHinta") Double tyonHinta,
-                        @JsonProperty("tarvikkeidenHinta") Double tarvikkeidenHinta,
+                        @JsonProperty("tyonhinta") Double tyonhinta,
+                        @JsonProperty("tarvikkeidenhinta") Double tarvikkeidenhinta,
                         @JsonProperty("osamaksu") Integer osamaksu,
                         @JsonProperty("pvm") LocalDate pvm,
-                        @JsonProperty("sopimuksenTila") @NotBlank String sopimuksenTila,
+                        @JsonProperty("sopimuksentila") @NotBlank String sopimuksentila,
                         @JsonProperty("selite") String selite) {
-        this.sopimusID = sopimusID;
-        this.kohdeID = kohdeID;
+        this.sopimusid = sopimusid;
+        this.kohdeid = kohdeid;
         this.tyyppi = tyyppi;
-        this.tyonHinta = tyonHinta;
-        this.tarvikkeidenHinta = tarvikkeidenHinta;
+        this.tyonhinta = tyonhinta;
+        this.tarvikkeidenhinta = tarvikkeidenhinta;
         this.osamaksu = osamaksu;
         this.pvm = pvm;
-        this.sopimuksenTila = sopimuksenTila;
+        this.sopimuksentila = sopimuksentila;
         this.selite = selite;
     }
 
@@ -56,29 +56,27 @@ public class Tyosopimus {
         return osamaksu;
     }
 
-    public Double getTarvikkeidenHinta() {
-        return tarvikkeidenHinta;
+    public Double getTarvikkeidenhinta() {
+        return tarvikkeidenhinta;
     }
 
     public Double getTyonHinta() {
-        return tyonHinta;
+        return tyonhinta;
     }
 
-    public Integer getSopimusID() {
-        return sopimusID;
+    public Integer getSopimusid() { return sopimusid; }
+
+    public Integer getKohdeid() {
+        return kohdeid;
     }
 
-    public Integer getKohdeID() {
-        return kohdeID;
-    }
-
-    public String getSopimuksenTila() {
-        return sopimuksenTila;
+    public String getSopimuksentila() {
+        return sopimuksentila;
     }
 
     // Omat metodi
     public Double getSopimuksenSumma() {
-        return tarvikkeidenHinta + tyonHinta;
+        return tarvikkeidenhinta + tyonhinta;
     }
     
 }

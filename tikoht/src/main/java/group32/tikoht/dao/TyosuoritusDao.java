@@ -23,35 +23,35 @@ public class TyosuoritusDao implements GenericDao<Tyosuoritus, Integer> {
 
     @Override
     public int insert(Tyosuoritus tyosuoritus) {
-        Integer sopimusID = tyosuoritus.getSopimusID();
-        LocalDate suoritusPvm = tyosuoritus.getSuoritusPvm();
-        final String sql =  "INSERT INTO tyosuoritus(sopimusID, suoritusPvm) " +
+        Integer sopimusid = tyosuoritus.getSopimusid();
+        LocalDate suorituspvm = tyosuoritus.getSuorituspvm();
+        final String sql =  "INSERT INTO tyosuoritus(sopimusid, suorituspvm) " +
                             "VALUES(?, ?)";
-        return jdbcTemplate.update(sql, new Object[]{sopimusID, suoritusPvm});
+        return jdbcTemplate.update(sql, new Object[]{sopimusid, suorituspvm});
     }
 
     @Override
     public List<Tyosuoritus> selectAll() {
-        final String sql =  "SELECT suoritusID, sopimusID, suoritusPvm " +
+        final String sql =  "SELECT suoritusid, sopimusid, suorituspvm " +
                             "FROM tyosuoritus";
         return jdbcTemplate.query(sql, (rs, i) -> {
-            Integer suoritusID = rs.getInt("suoritusID");
-            Integer sopimusID = rs.getInt("sopimusID");
-            LocalDate suoritusPvm = rs.getObject("suoritusPvm", LocalDate.class);
-            return new Tyosuoritus(suoritusID, sopimusID, suoritusPvm);
+            Integer suoritusid = rs.getInt("suoritusid");
+            Integer sopimusid = rs.getInt("sopimusid");
+            LocalDate suorituspvm = rs.getObject("suorituspvm", LocalDate.class);
+            return new Tyosuoritus(suoritusid, sopimusid, suorituspvm);
         });
     }
 
     @Override
     public Optional<Tyosuoritus> selectById(Integer id) {
-        final String sql =  "SELECT suoritusID, sopimusID, suoritusPvm " +
+        final String sql =  "SELECT suoritusid, sopimusid, suorituspvm " +
                             "FROM tyosuoritus " +
-                            "WHERE suoritusID = ?";
+                            "WHERE suoritusid = ?";
         Tyosuoritus tyosuoritus = jdbcTemplate.queryForObject(sql, new Object[]{id}, (rs, i) -> {
-            Integer suoritusID = rs.getInt("suoritusID");
-            Integer sopimusID = rs.getInt("sopimusID");
-            LocalDate suoritusPvm = rs.getObject("suoritusPvm", LocalDate.class);
-            return new Tyosuoritus(suoritusID, sopimusID, suoritusPvm);
+            Integer suoritusid = rs.getInt("suoritusid");
+            Integer sopimusid = rs.getInt("sopimusid");
+            LocalDate suorituspvm = rs.getObject("suorituspvm", LocalDate.class);
+            return new Tyosuoritus(suoritusid, sopimusid, suorituspvm);
         });
         return Optional.ofNullable(tyosuoritus);
     }
@@ -59,18 +59,18 @@ public class TyosuoritusDao implements GenericDao<Tyosuoritus, Integer> {
     @Override
     public int deleteById(Integer id) {
         final String sql =  "DELETE FROM tyosuoritus " +
-                            "WHERE suoritusID = ?";
+                            "WHERE suoritusid = ?";
         return jdbcTemplate.update(sql, new Object[]{id});
     }
 
     @Override
     public int updateById(Integer id, Tyosuoritus tyosuoritus) {
-        Integer sopimusID = tyosuoritus.getSopimusID();
-        LocalDate suoritusPvm = tyosuoritus.getSuoritusPvm();
+        Integer sopimusid = tyosuoritus.getSopimusid();
+        LocalDate suorituspvm = tyosuoritus.getSuorituspvm();
         final String sql =  "UPDATE tyosuoritus " +
-                            "SET sopimusID = ?, suoritusPvm = ? " +
-                            "WHERE suoritusID = ?";
-        return jdbcTemplate.update(sql, new Object[]{sopimusID, suoritusPvm, id});
+                            "SET sopimusid = ?, suorituspvm = ? " +
+                            "WHERE suoritusid = ?";
+        return jdbcTemplate.update(sql, new Object[]{sopimusid, suorituspvm, id});
     }
 
 

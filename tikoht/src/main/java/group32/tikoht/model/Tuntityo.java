@@ -6,22 +6,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Tuntityo {
 
-    private final String tyonTyyppi;
+    private final String tyontyyppi;
     @NotBlank
     private final Integer hinta;
     @NotBlank
     private final Integer alv;
 
-    public Tuntityo( @JsonProperty("tyonTyyppi") String tyonTyyppi,
+    public Tuntityo( @JsonProperty("tyontyyppi") String tyontyyppi,
                     @JsonProperty("hinta") Integer hinta,
                     @JsonProperty("alv") Integer alv) {
-        this.tyonTyyppi = tyonTyyppi;
+        this.tyontyyppi = tyontyyppi;
         this.hinta = hinta;
         this.alv = alv;
     }
 
     public String getTyonTyyppi() {
-        return tyonTyyppi;
+        return tyontyyppi;
     }
 
     public Integer getHinta() {

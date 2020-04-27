@@ -23,39 +23,39 @@ public class TyosuorituksenTuntityoDao implements GenericDao<TyosuorituksenTunti
 
     @Override
     public int insert(TyosuorituksenTuntityo tyot) {
-        Integer suoritusID = tyot.getSuoritusID();
-        String tyonTyyppi = tyot.getTyonTyyppi();
-        Double tuntiLkm = tyot.getTuntiLkm();
-        Double aleProsentti = tyot.getAleProsentti();
+        Integer suoritusid = tyot.getSuoritusID();
+        String tyontyyppi = tyot.getTyonTyyppi();
+        Double tuntilkm = tyot.getTuntiLkm();
+        Double aleprosentti = tyot.getAleProsentti();
         final String sql =  "INSERT INTO tyosuorituksenTuntityo " +
                             "VALUES(?, ?, ?, ?)";
-        return jdbcTemplate.update(sql, new Object[]{suoritusID, tyonTyyppi, tuntiLkm, aleProsentti});
+        return jdbcTemplate.update(sql, new Object[]{suoritusid, tyontyyppi, tuntilkm, aleprosentti});
     }
 
     @Override
     public List<TyosuorituksenTuntityo> selectAll() {
-        final String sql =  "SELECT suoritusID, tyonTyyppi, tuntiLkm, aleProsentti " +
+        final String sql =  "SELECT suoritusid, tyontyyppi, tuntilkm, aleprosentti " +
                             "FROM tyosuorituksenTuntityo";
         return jdbcTemplate.query(sql, (rs, i) -> {
-            Integer suoritusID = rs.getInt("suoritusID");
-            String tyonTyyppi = rs.getString("tyonTyyppi");
-            Double tuntiLkm = rs.getDouble("tuntiLkm");
-            Double aleProsentti = rs.getDouble("aleProsentti");
-            return new TyosuorituksenTuntityo(suoritusID, tyonTyyppi, tuntiLkm, aleProsentti);
+            Integer suoritusid = rs.getInt("suoritusid");
+            String tyontyyppi = rs.getString("tyontyyppi");
+            Double tuntilkm = rs.getDouble("tuntilkm");
+            Double aleprosentti = rs.getDouble("aleprosentti");
+            return new TyosuorituksenTuntityo(suoritusid, tyontyyppi, tuntilkm, aleprosentti);
         });
     }
 
     @Override
     public Optional<TyosuorituksenTuntityo> selectById(Integer key) {
-        final String sql =  "SELECT suoritusID, tyonTyyppi, tuntiLkm, aleProsentti " +
+        final String sql =  "SELECT suoritusid, tyontyyppi, tuntilkm, aleprosentti " +
                             "FROM tyosuorituksenTuntityo " +
-                            "WHERE suoritusID = ?";
+                            "WHERE suoritusid = ?";
         TyosuorituksenTuntityo tyot = jdbcTemplate.queryForObject(sql, new Object[]{key}, (rs, i) -> {
-            Integer suoritusID = rs.getInt("suoritusID");
-            String tyonTyyppi = rs.getString("tyonTyyppi");
-            Double tuntiLkm = rs.getDouble("tuntiLkm");
-            Double aleProsentti = rs.getDouble("aleProsentti");
-            return new TyosuorituksenTuntityo(suoritusID, tyonTyyppi, tuntiLkm, aleProsentti);
+            Integer suoritusid = rs.getInt("suoritusid");
+            String tyontyyppi = rs.getString("tyontyyppi");
+            Double tuntilkm = rs.getDouble("tuntilkm");
+            Double aleprosentti = rs.getDouble("aleprosentti");
+            return new TyosuorituksenTuntityo(suoritusid, tyontyyppi, tuntilkm, aleprosentti);
         });  
         return Optional.ofNullable(tyot);
     }
@@ -63,19 +63,19 @@ public class TyosuorituksenTuntityoDao implements GenericDao<TyosuorituksenTunti
     @Override
     public int deleteById(Integer key) {
         final String sql =  "DELETE FROM tyosuorituksenTuntityo " +
-                            "WHERE suoritusID = ?";
+                            "WHERE suoritusid = ?";
         return jdbcTemplate.update(sql, new Object[]{key});
     }
 
     @Override
     public int updateById(Integer key, TyosuorituksenTuntityo tyot) {
-        Integer suoritusID = tyot.getSuoritusID();
-        String tyonTyyppi = tyot.getTyonTyyppi();
-        Double tuntiLkm = tyot.getTuntiLkm();
-        Double aleProsentti = tyot.getAleProsentti();
+        Integer suoritusid = tyot.getSuoritusID();
+        String tyontyyppi = tyot.getTyonTyyppi();
+        Double tuntilkm = tyot.getTuntiLkm();
+        Double aleprosentti = tyot.getAleProsentti();
         final String sql =  "UPDATE tyosopimus " +
-                            "SET suoritusID = ?, tyonTyyppi = ?, tuntiLkm = ?, aleProsentti = ?";
-        return jdbcTemplate.update(sql, new Object[]{suoritusID, tyonTyyppi, tuntiLkm, aleProsentti, key});
+                            "SET suoritusid = ?, tyontyyppi = ?, tuntilkm = ?, aleprosentti = ?";
+        return jdbcTemplate.update(sql, new Object[]{suoritusid, tyontyyppi, tuntilkm, aleprosentti, key});
     }
 
 }
