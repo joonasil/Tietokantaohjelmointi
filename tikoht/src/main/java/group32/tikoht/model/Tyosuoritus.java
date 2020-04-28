@@ -18,7 +18,7 @@ public class Tyosuoritus {
 
     private final Integer suoritusid;
     private final Integer sopimusid;
-    @NotBlank
+    // @NotBlank
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)

@@ -24,7 +24,7 @@ public class LaskuController {
 
     @CrossOrigin
     @PostMapping
-    public void addLasku(@Valid @NotNull @RequestBody Lasku lasku) {
+    public void addLasku(/*@Valid @NotNull*/ @RequestBody Lasku lasku) {
         laskuService.addLasku(lasku);
     }
 
@@ -49,7 +49,7 @@ public class LaskuController {
 
     @CrossOrigin
     @PutMapping(path = "{laskuID}")
-    public void updateLasku(@PathVariable("laskuID") Integer laskuID,@Valid @NotNull @RequestBody Lasku laskuToUpdate) {
+    public void updateLasku(@PathVariable("laskuID") Integer laskuID,/*@Valid @NotNull*/ @RequestBody Lasku laskuToUpdate) {
         laskuService.updateLasku(laskuID, laskuToUpdate);
     }
 
