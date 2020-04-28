@@ -78,8 +78,8 @@ function App() {
             await setActiveTable(newTable);
             await formHtmlTable(newTable);
             extractAttributeNames(newTable.table);
-            console.log(newTable.table);
-            console.log(newTable.metadata);
+            //console.log(newTable.table);
+            //console.log(newTable.metadata);
     }}
 
     const extractAttributeNames = (tableJson) => {
@@ -117,7 +117,7 @@ function App() {
                         />)
                 }
                 // Selectorit
-                if (attributeNames[i] == "sopimuksentila" || attributeNames[i] == "yksikko" || attributeNames[i] == "tyyppi") {
+                else if (attributeNames[i] == "sopimuksentila" || attributeNames[i] == "yksikko" || attributeNames[i] == "tyyppi") {
                     let selectorValues = [];
                     console.log(attributeNames[i]);
                     if (attributeNames[i] == ("sopimuksentila")) {
@@ -188,18 +188,7 @@ function App() {
     }
     const updateInsertFieldValue = (event, label) => {
         let state = insertFieldValue;
-        // Muutetaan PVM Javan ymmärtämään muotoon
-        if (label.endsWith("pvm")) {
-            let pvmString = event.target.value;
-            let pvmArray = [];
-                pvmArray.push(parseInt(pvmString.substring(0,4)))
-                pvmArray.push(parseInt(pvmString.substring(5,7)))
-                pvmArray.push(parseInt(pvmString.substring(8,10)))
-            state[[label]] = pvmArray;
-        }
-        else {
-            state[[label]] = event.target.value;
-        }
+        state[[label]] = event.target.value;
         console.log(state);
         setInsertFieldValue(state);
     }
@@ -255,8 +244,6 @@ function App() {
     }
     // INSERT HANDLER
     const handleInsertClick = async () => {
-        reformatDates();
-
         console.log(insertFieldValue);
         console.log(JSON.stringify(insertFieldValue))
         var arrayToString = JSON.stringify(Object.assign({}, insertFieldValue));  // convert array to string
