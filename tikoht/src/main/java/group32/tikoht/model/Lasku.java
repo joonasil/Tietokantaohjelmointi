@@ -4,6 +4,7 @@ import 	java.time.LocalDate;
 
 import javax.validation.constraints.NotBlank;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Lasku {
@@ -20,9 +21,9 @@ public class Lasku {
 
     public Lasku(   @JsonProperty("laskuid") Integer laskuid,
                     @JsonProperty("sopimusid") Integer sopimusid,
-                    @JsonProperty("pvm") LocalDate pvm,
-                    @JsonProperty("erapaiva") LocalDate erapaiva, 
-                    @JsonProperty("maksettupvm") LocalDate maksettupvm,
+                    @JsonProperty("pvm") @JsonFormat(pattern = "yyyy-MM-dd") LocalDate pvm,
+                    @JsonProperty("erapaiva") @JsonFormat(pattern = "yyyy-MM-dd") LocalDate erapaiva,
+                    @JsonProperty("maksettupvm") @JsonFormat(pattern = "yyyy-MM-dd") LocalDate maksettupvm,
                     @JsonProperty("edeltavalasku") Integer edeltavalasku,
                     @JsonProperty("muistutuslkm") Integer muistutuslkm,
                     @JsonProperty("viivastyskulut") Double viivastyskulut) {

@@ -4,7 +4,9 @@ import 	java.time.LocalDate;
 
 import javax.validation.constraints.NotBlank;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.format.annotation.DateTimeFormat;
 
 public class Tyosopimus {
 
@@ -15,6 +17,7 @@ public class Tyosopimus {
     private final Double tyonhinta;
     private final Double tarvikkeidenhinta;
     private final Integer osamaksu;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private final LocalDate pvm;
     @NotBlank
     private final String sopimuksentila;
@@ -26,7 +29,7 @@ public class Tyosopimus {
                         @JsonProperty("tyonhinta") Double tyonhinta,
                         @JsonProperty("tarvikkeidenhinta") Double tarvikkeidenhinta,
                         @JsonProperty("osamaksu") Integer osamaksu,
-                        @JsonProperty("pvm") LocalDate pvm,
+                        @JsonProperty("pvm") @JsonFormat(pattern = "yyyy-MM-dd") LocalDate pvm,
                         @JsonProperty("sopimuksentila") @NotBlank String sopimuksentila,
                         @JsonProperty("selite") String selite) {
         this.sopimusid = sopimusid;

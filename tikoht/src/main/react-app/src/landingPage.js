@@ -49,6 +49,11 @@ function App() {
     const [searchFieldValue, setSearchFieldValue] = React.useState([]);
     const [insertFieldValue, setInsertFieldValue] = React.useState({});
     const [additionalForm, setAdditionalForm] = React.useState([]);
+    const currentDateIso = (new Date).toISOString().substring(0,10);
+    const sopimuslajiEnum = ("urakka", "tunti");
+    const yksikotEnum = ('kpl', 'kg', 'm', 'cm', 'g', 'l', 'kela');
+    const sopimusTilaEnum = ('luonnos', 'tarjous', 'hyvaksytty');
+
 
     const fetchTable = async (newTableName, newMetadataTableName) => {
         let newTable = {};
@@ -68,55 +73,56 @@ function App() {
             
             await setActiveTable(newTable);
             await formHtmlTable(newTable);
+            extractAttributeNames(newTable.table);
             console.log(newTable.table);
             console.log(newTable.metadata);
     }}
-    // FUNCTION TO SLEEP zzz milliseconds
-    const sleep = (milliseconds) => {
-        console.log("sleep: " + milliseconds);
-        return new Promise(resolve => setTimeout(resolve, milliseconds));
+
+    const extractAttributeNames = (tableJson) => {
+        let keys = [];
+        for (let key in tableJson[0]) {
+            keys.push(key.toLowerCase());
+            console.log(key);
+        }
+        return keys;
     }
 
     const formHtmlTable = async (newTable) => {
         //console.log("Rendeöidään taulu")
         //console.log(newTable)
-        if (newTable.metadata[0].table_name == "asiakas") {
+        /*if (newTable.metadata[0].table_name == "asiakas") {
             newTable.table = sortJSONByKey(newTable.table);
         }
+        */
         setHtmlTable([]);
-        if (newTable.table != null && newTable.metadata != null) {
+        if (newTable.table != null) {
             let table = newTable.table;
-            let metadata = newTable.metadata;
+            let metadata = newTable.metadata; // NOT USEED ANYMORE
+            let attributeNames = extractAttributeNames(table);
+            console.log(attributeNames)
             let tableSize = Object.keys(table).length;
-            let columnCount = Object.keys(metadata).length
             let html = [];
             let textFields = [];
-            for (let i = 0; i < columnCount; i++) {
-                let item = metadata[i];
+            for (let i = 0; i < attributeNames.length; i++) {
                 // Sarakkeiden nimet
-                html.push(<TableCell key={tableName + "_" + item.column_name + "_" + i + Math.random()}>{item.column_name}</TableCell>);
+                html.push(<TableCell key={tableName + "_" + attributeNames[i] + "_" + i + Math.random()}>{attributeNames[i]}</TableCell>);
                 // Input kentät
-                if (item.column_name.endsWith("pvm")) {
+                // PVM input
+                if (attributeNames[i].endsWith("pvm") || attributeNames[i].endsWith("paiva")) {
                     textFields.push(
-                        <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                            <KeyboardDatePicker
-                                key={tableName + "_" + item.column_name + Math.random()}
-                                disableToolbar
-                                variant="contained"
-                                format="yyyy/MM/dd"
-                                margin="normal"
-                                key={"date-picker-inline" + Math.random()}
-                                label={item.column_name}
-                                onChange={(e) => {updateInsertFieldValue(e, metadata[i].column_name)}}
-                                KeyboardButtonProps={{
-                                    'aria-label': 'change date',
-                                }}
-                            /></MuiPickersUtilsProvider>
-                )}
+                        <TextField
+                            key={tableName + "_" + attributeNames[i] + Math.random()}
+                            label={attributeNames[i]}
+                            type="date"
+                            className={classes.textField}
+                            InputLabelProps={{ shrink: true, }}
+                            onChange={(e) => {updateInsertFieldValue(e, attributeNames[i])}}
+                        />)
+                }
                 else {
                     textFields.push(
-                        <TextField className={classes.textFields} key={tableName + "_" + item.column_name + Math.random()} label={item.column_name} variant="outlined" 
-                            onChange={(e) => {updateInsertFieldValue(e, metadata[i].column_name)}}
+                        <TextField className={classes.textFields} key={tableName + "_" + attributeNames[i] + Math.random()} label={attributeNames[i]} variant="outlined" 
+                            onChange={(e) => {updateInsertFieldValue(e, attributeNames[i])}}
                         />
                 )}
             }
@@ -141,7 +147,7 @@ function App() {
             updateAdditionalForm();
         }
     }
-    // This id only for customer table
+    // This is only for customer table
     function sortJSONByKey(array){
         var sortedArray = [];
         // Push each JSON Object entry in array by [key, value]
@@ -162,7 +168,18 @@ function App() {
     }
     const updateInsertFieldValue = (event, label) => {
         let state = insertFieldValue;
-        state[[label]] = event.target.value;
+        // Muutetaan PVM Javan ymmärtämään muotoon
+        if (label.endsWith("pvm")) {
+            let pvmString = event.target.value;
+            let pvmArray = [];
+                pvmArray.push(parseInt(pvmString.substring(0,4)))
+                pvmArray.push(parseInt(pvmString.substring(5,7)))
+                pvmArray.push(parseInt(pvmString.substring(8,10)))
+            state[[label]] = pvmArray;
+        }
+        else {
+            state[[label]] = event.target.value;
+        }
         console.log(state);
         setInsertFieldValue(state);
     }
@@ -216,6 +233,8 @@ function App() {
     }
     // INSERT HANDLER
     const handleInsertClick = async () => {
+        reformatDates();
+
         console.log(insertFieldValue);
         console.log(JSON.stringify(insertFieldValue))
         var arrayToString = JSON.stringify(Object.assign({}, insertFieldValue));  // convert array to string
@@ -236,6 +255,7 @@ function App() {
     }
     // EDIT HANDLER
     const handleEditClick = async () => {
+        // Search for id
         let keys = [];
         let key = "";
         for (let key in insertFieldValue) keys.push(key);
@@ -244,9 +264,6 @@ function App() {
                 key = keys[keyName];
             }
         }
-        console.log(key);
-        console.log(insertFieldValue[key])
-
         const requestOptions = {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -258,7 +275,19 @@ function App() {
             .catch(console.log);
         fetchTable(tableName);
     }
+    // REFORMAT DATES IN INSEERT FIELD VALUES
+    const reformatDates = () => {
+        let keys = [];
+        for (let key in insertFieldValue) keys.push(key);
+        for (let keyName in keys) {
+            if (keys[keyName].endsWith("pvm")) {
+                insertFieldValue[[keyName]] = new Date(insertFieldValue[[keyName]]);
+            }
+        }
+    }
 
+
+    // HANDLE TABS
     const handleTabChange = (event, newValue) => {
         setInsertFieldValue([]);
         setTableName(newValue);

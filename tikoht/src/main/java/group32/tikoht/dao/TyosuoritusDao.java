@@ -25,6 +25,7 @@ public class TyosuoritusDao implements GenericDao<Tyosuoritus, Integer> {
     public int insert(Tyosuoritus tyosuoritus) {
         Integer sopimusid = tyosuoritus.getSopimusid();
         LocalDate suorituspvm = tyosuoritus.getSuorituspvm();
+        System.out.println(suorituspvm);
         final String sql =  "INSERT INTO tyosuoritus(sopimusid, suorituspvm) " +
                             "VALUES(?, ?)";
         return jdbcTemplate.update(sql, new Object[]{sopimusid, suorituspvm});
