@@ -1,5 +1,4 @@
 import React, {useRef, useEffect} from 'react';
-import 'date-fns';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -232,11 +231,13 @@ function App() {
             await fetch("http://localhost:8080/api/v1/" + tableName + "/" + searchFieldValue).then((response) => {
             return response.json();
             }).then((result) => {
-                let newTable = {};
-                newTable.table = [result];
-                newTable.metadata = activeTable.metadata;
-                formHtmlTable(newTable)
-            });    
+                if (result.status == 200) {
+                    let newTable = {};
+                    newTable.table = [result];
+                    newTable.metadata = activeTable.metadata;
+                    formHtmlTable(newTable)
+                }
+            }).catch(console.log);
         }
         else {
             fetchTable(tableName);
