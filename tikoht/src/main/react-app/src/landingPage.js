@@ -13,20 +13,24 @@ import TextField from '@material-ui/core/TextField';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+import InputLabel from '@material-ui/core/InputLabel';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import NativeSelect from '@material-ui/core/NativeSelect';
 
-import {
-    MuiPickersUtilsProvider,
-    KeyboardTimePicker,
-    KeyboardDatePicker,
-  } from '@material-ui/pickers';
-// pick a date util library
-import DateFnsUtils from '@date-io/date-fns';
 
 import AppBarCustom from './components/AppBarCustom.js';
 import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles (theme => ({
-
+    formControl: {
+        margin: theme.spacing(1),
+        minWidth: 120,
+      },
+      selectEmpty: {
+        marginTop: theme.spacing(2),
+      },
     textFields: {
         margin: '5px 10px 5px 10px',
     },
@@ -50,9 +54,9 @@ function App() {
     const [insertFieldValue, setInsertFieldValue] = React.useState({});
     const [additionalForm, setAdditionalForm] = React.useState([]);
     const currentDateIso = (new Date).toISOString().substring(0,10);
-    const sopimuslajiEnum = ("urakka", "tunti");
-    const yksikotEnum = ('kpl', 'kg', 'm', 'cm', 'g', 'l', 'kela');
-    const sopimusTilaEnum = ('luonnos', 'tarjous', 'hyvaksytty');
+    const sopimustyyppiEnum = ["urakka", "tunti"];
+    const yksikkoEnum = ['kpl', 'kg', 'm', 'cm', 'g', 'l', 'kela'];
+    const sopimusTilaEnum = ['luonnos', 'tarjous', 'hyvaksytty'];
 
 
     const fetchTable = async (newTableName, newMetadataTableName) => {
@@ -82,7 +86,6 @@ function App() {
         let keys = [];
         for (let key in tableJson[0]) {
             keys.push(key.toLowerCase());
-            console.log(key);
         }
         return keys;
     }
@@ -99,7 +102,6 @@ function App() {
             let table = newTable.table;
             let metadata = newTable.metadata; // NOT USEED ANYMORE
             let attributeNames = extractAttributeNames(table);
-            console.log(attributeNames)
             let tableSize = Object.keys(table).length;
             let html = [];
             let textFields = [];
@@ -110,14 +112,32 @@ function App() {
                 // PVM input
                 if (attributeNames[i].endsWith("pvm") || attributeNames[i].endsWith("paiva")) {
                     textFields.push(
-                        <TextField
-                            key={tableName + "_" + attributeNames[i] + Math.random()}
-                            label={attributeNames[i]}
-                            type="date"
-                            className={classes.textField}
-                            InputLabelProps={{ shrink: true, }}
+                        <TextField key={tableName + "_" + attributeNames[i] + Math.random()} label={attributeNames[i]} type="date" InputLabelProps={{ shrink: true, }}
                             onChange={(e) => {updateInsertFieldValue(e, attributeNames[i])}}
                         />)
+                }
+                // Selectorit
+                if (attributeNames[i] == "sopimuksentila" || attributeNames[i] == "yksikko" || attributeNames[i] == "tyyppi") {
+                    let selectorValues = [];
+                    console.log(attributeNames[i]);
+                    if (attributeNames[i] == ("sopimuksentila")) {
+                        selectorValues = JSON.parse(JSON.stringify(sopimusTilaEnum))}
+                    if (attributeNames[i] == ("yksikko")) {
+                        selectorValues = JSON.parse(JSON.stringify(yksikkoEnum))}
+                    if (attributeNames[i] == ("tyyppi")) {
+                        selectorValues = JSON.parse(JSON.stringify(sopimustyyppiEnum))}
+                    console.log(selectorValues)
+                    let options = [];
+                    for (let i = 0; i < selectorValues.length; i++) {
+                        options.push(<option >{selectorValues[i]}</option>)
+                    }
+                    textFields.push(
+                        <FormControl className={classes.formControl} variant="outlined">
+                            <InputLabel htmlFor="outlined-age-native-simple">{attributeNames[i]}</InputLabel>
+                                <Select native onChange={(e) => {updateInsertFieldValue(e, attributeNames[i])}} label={attributeNames[i]} inputProps={{ name: 'age', id: 'outlined-age-native-simple', }}>
+                                    {options}                 
+                                </Select>
+                        </FormControl>)
                 }
                 else {
                     textFields.push(
@@ -229,7 +249,9 @@ function App() {
                 formHtmlTable(newTable)
             });    
         }
-        fetchTable(tableName);
+        else {
+            fetchTable(tableName);
+        }
     }
     // INSERT HANDLER
     const handleInsertClick = async () => {
@@ -289,12 +311,13 @@ function App() {
 
     // HANDLE TABS
     const handleTabChange = (event, newValue) => {
+        setSearchFieldValue([]);
+        setDeleteFieldValue([]);
         setInsertFieldValue([]);
         setTableName(newValue);
-      };
+    };
 
     useEffect(() => {
-        console.log(tableName)
         fetchTable(tableName)
 	}, [tableName]);
 
