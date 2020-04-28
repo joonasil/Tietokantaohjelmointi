@@ -78,4 +78,17 @@ public class TyosuorituksenTuntityoDao implements GenericDao<TyosuorituksenTunti
         return jdbcTemplate.update(sql, new Object[]{suoritusid, tyontyyppi, tuntilkm, aleprosentti, key});
     }
 
+    public List<TyosuorituksenTuntityo> selectAllBySuoritusId(Integer key) {
+        final String sql =  "SELECT suoritusid, tyontyyppi, tuntilkm, aleprosentti " +
+                            "FROM tyosuorituksenTuntityo" +
+                            "WHERE suoritusid = ?";
+        return jdbcTemplate.query(sql, new Object[]{key}, (rs, i) -> {
+            Integer suoritusid = rs.getInt("suoritusid");
+            String tyontyyppi = rs.getString("tyontyyppi");
+            Double tuntilkm = rs.getDouble("tuntilkm");
+            Double aleprosentti = rs.getDouble("aleprosentti");
+            return new TyosuorituksenTuntityo(suoritusid, tyontyyppi, tuntilkm, aleprosentti);
+        });
+    }
+
 }

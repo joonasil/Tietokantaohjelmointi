@@ -31,6 +31,7 @@ public class Tyosuoritus {
     public Integer getSopimusid() {
         return sopimusid;
     }
+    
     @JsonFormat(pattern = "yyyy-MM-dd")
     public LocalDate getSuorituspvm() {
         return suorituspvm;
