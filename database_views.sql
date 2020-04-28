@@ -24,6 +24,14 @@ Select
 		join tyosuoritus ts on ts.sopimusid = s.sopimusid
 	where s.sopimusid = 1
 	;
+
+-- Kaikki Sopimukseen kirjatut työt kirjattu
+SELECT s.sopimusid, s.suoritusid, s.suorituspvm, tt.tyontyyppi, tstt.tuntilkm, tt.hinta, tstt.aleprosentti
+FROM tyosuoritus s LEFT OUTER JOIN tyosuorituksentuntityo tstt ON s.suoritusid = tstt.suoritusid
+	LEFT OUTER JOIN tuntityo tt ON tstt.tyontyyppi = tt.tyontyyppi
+	
+	WHERE s.sopimusid = 1
+	;
 	
 -- Testi
 SELECT DISTINCT *
