@@ -58,15 +58,15 @@ function App() {
     // Hooks for R1
     const [quoteId, setQuoteId] = React.useState("");
 
-    const [quoteProductsValue, setQuoteProductsValue] = React.useState([{ id : 0, tarvikeid : 1, lkm : 1, aleprosentti : 1 }]);
+    const [quoteProductsValue, setQuoteProductsValue] = React.useState([{ id : 0, tarvikeid : "", lkm : "", aleprosentti : "", tuote : {} }]);
     const [quoteServicesValue, setQuoteServicesValue] = React.useState([]);
 
 
     const fetchTable = async (newTableName, newMetadataTableName) => {
         let newTable = {};
-        if (/*!relations.includes(newMetadataTableName)*/ newMetadataTableName === "" || newMetadataTableName === null) {
+        /*if (/*!relations.includes(newMetadataTableName)*//* newMetadataTableName === "" || newMetadataTableName === null) {
             newMetadataTableName = "metadata/" + newTableName;
-        }
+        }*/
         if (newTableName !== "" && newTableName !== null) {
             //console.log('http://localhost:8080/api/v1/' + newTableName);
             //console.log('http://localhost:8080/api/v1/' + newMetadataTableName);
@@ -203,7 +203,7 @@ function App() {
                 <Paper key="invoiceButtonPaper" className={classes.textFields} elevation={2}>
                     <Typography key="heading" className={classes.textFields} >Hallitse Laskuja</Typography>
                     <Button key="all" className={classes.textFields}  variant="contained" color="default" onClick={(e) => fetchTable("lasku")}>Näytä kaikki laskut</Button>
-                    <Button key="overdue" className={classes.textFields}  variant="contained" color="default" onClick={(e) => fetchTable("lasku/eraantyneet", "metadata/lasku")}>Näytä erääntyneet laskut</Button>
+                    <Button key="overdue" className={classes.textFields}  variant="contained" color="default" onClick={(e) => fetchTable("lasku/eraantyneet" /*, "metadata/lasku" */)}>Näytä erääntyneet laskut</Button>
                     <Button key="generates"className={classes.textFields}  variant="contained" color="default" onClick={generateOverdueInvoices}>Luo muistutuslaskut erääntyneistä</Button>
                 </Paper>
             )
@@ -238,7 +238,7 @@ function App() {
                 if (result.status === 200) {
                     let newTable = {};
                     newTable.table = [result];
-                    newTable.metadata = activeTable.metadata;
+                    /*newTable.metadata = activeTable.metadata;*/
                     formHtmlTable(newTable)
                 }
             }).catch(console.log);
@@ -308,18 +308,20 @@ function App() {
         setTableName(newValue);
     };
 
-    const addQuoteProduct = () => {
-        
-    
-    }
-
     // FOR QUOTE GENERATE
-    const updateQuoteProductsValue = (event, label ,id) => {
+    const updateQuoteProductsValue = async(event, label ,id) => {
         let state = quoteProductsValue;
         let object = state[id]
         object[label] = event.target.value
         console.log(state[id]);
         //state[id] = event.target.value;
+        if (label === "tarvikeid") {
+            object.tuote = await fetchProductPrice(event.target.value);
+            if (object.tuote !== null) {
+                console.log(object.tuote);
+            }
+            console.log("tuote on null");
+        }
         setQuoteProductsValue(state);
     }
     const addProductRow = () => {
@@ -329,11 +331,50 @@ function App() {
         tmpArray.push(json);
         console.log(tmpArray);
         setQuoteProductsValue(tmpArray);
+        console.log(quoteProductsValue);
+        fetchTable(tableName)
     }
+    const fetchProductPrice = async (id) => {
+        let fetchResult = {};
+        await fetch('http://localhost:8080/api/v1/tarvike/' + id)
+                .then(res => res.json())
+                .then((data) => {(fetchResult = data )}).catch(console.log);
+
+        if (fetchResult !== null && fetchResult.hasOwnProperty("tarvikeID")) {
+            return fetchResult;
+        }
+        else {
+            console.log("ei ole kannassa")
+            return null;
+        }
+    }
+    /*const fetchProductPrice = async (id) => {
+        let statusCode = 0;
+        let hinta = "";
+        let alv = "";
+        await fetch("http://localhost:8080/api/v1/tarvike/" + id)
+            .then(response => {
+                statusCode = response.status
+                response.json()
+            })
+            .then((result) => {
+                console.log("status: " + statusCode)
+                if (statusCode == 200 ) {
+                    console.log(result.myyntihinta)
+                    console.log(result.alv)
+                    hinta = result.myyntihinta;
+                    alv = result.alv
+                    return [hinta, alv];
+                } else { 
+                    hinta = "Tuote ei ole kannassa!";
+                }
+            })
+            .catch(console.log);
+    }*/
 
     useEffect(() => {
         fetchTable(tableName)
-	}, [tableName]);
+	}, [tableName, quoteProductsValue]);
 
 	return (
 		<div className="App">
@@ -375,15 +416,21 @@ function App() {
             <TextField className={classes.textFields} key="quoteIdTextField" label="kohdeid" variant="outlined" value={quoteId} onChange={(event) => {setQuoteId(event.target.value)}}></TextField>
             <Button className={classes.textFields} variant="contained" color="default" onClick={addProductRow}>Lisää tuote</Button>
             <Button className={classes.textFields} variant="contained" color="default" >Lisää palvelu</Button>
-            <Button className={classes.textFields} variant="contained" color="default" >Mudosta hinta-arvio</Button>
+            <Button className={classes.textFields} variant="contained" color="default" onClick={fetchProductPrice}>Mudosta hinta-arvio</Button>
 
             {quoteProductsValue.map((item, index) =>
                         <div key={item.id}>
-                            <TextField className={classes.textFields} key={"quoteProducts_tarvikeid_" + item.id} label="tarvikeid" variant="outlined" onChange={(e) => {updateQuoteProductsValue(e, "tarvikeid", item.id)}}></TextField>
-                            <TextField className={classes.textFields} key={"quoteProducts_lkm" + item.id} label="lkm" variant="outlined" onChange={(e) => {updateQuoteProductsValue(e, "llkm", item.id)}}></TextField>
-                            <TextField className={classes.textFields} key={"quoteProducts_aleprosentti" + item.id} label="aleprosentti" variant="outlined" onChange={(e) => {updateQuoteProductsValue(e, "aleprosentti", item.id)}}></TextField>
+                            <TextField type="number" className={classes.textFields} key={"quoteProducts_tarvikeid_" + item.id} label="tarvikeid" variant="outlined" 
+                                onChange={ async (e) => {
+                                    updateQuoteProductsValue(e, "tarvikeid", item.id)
+                                    .then(console.log(quoteProductsValue[item.id].tuote.nimi))
+                                    }}></TextField>
+                            <TextField type="number" className={classes.textFields} key={"quoteProducts_lkm" + item.id} label="lkm" variant="outlined" onChange={(e) => {updateQuoteProductsValue(e, "lkm", item.id)}}></TextField>
+                            <TextField type="number" className={classes.textFields} key={"quoteProducts_aleprosentti" + item.id} label="aleprosentti" variant="outlined" onChange={(e) => {updateQuoteProductsValue(e, "aleprosentti", item.id)}}></TextField>
                             <Button className={classes.textFields}  variant="contained" color="secondary" onClick={handleDeleteClick}>Poista</Button>,
-                            <Typography className={classes.textFields}>ROW TOTAL</Typography>
+                            <Typography className={classes.textFields}>{"Tuotteen nimi: " + (quoteProductsValue[item.id].tuote.nimi)}</Typography>
+                            <Typography className={classes.textFields}>{"Tuotteen yksikkö: " + (quoteProductsValue[item.id].tuote.hinta)}</Typography>
+                            <Typography className={classes.textFields}>{"Tuotteen alv%: " + (quoteProductsValue[item.id].tuote.alv)}</Typography>
                         </div>
                     
                 )
