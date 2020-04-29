@@ -1,0 +1,11 @@
+{
+	id : 1
+    tarvikeid : 1,
+	lkm : 1,
+	aleprosentti : 1
+
+}
+
+
+
+{ id : 1, tarvikeid : 1, lkm : 1, aleprosentti : 1 }

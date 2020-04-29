@@ -8,7 +8,7 @@ WHERE a.asiakasid = t.omistajaid
 	;
 
 -- Kaikki sopimukseen liittyvä
-Select
+Select Distinct
 	s.sopimusid, 
 	a.nimi, 
 	tk.kohdetyyppi, 
@@ -24,12 +24,34 @@ Select
 		join tyosuoritus ts on ts.sopimusid = s.sopimusid
 	where s.sopimusid = 1
 	;
+-- Kaikki kohteeseen liittyvä
+Select
+	tk.kohdeid, 
+	a.nimi, 
+	tk.kohdetyyppi, 
+	tk.osoite,
+	s.tyyppi,
+	s.pvm,
+	s.sopimuksentila, 
+	s.selite,
+	s.tarvikkeidenhinta + s.tyonhinta AS sopimuksensumma,
+	(s.tyonHinta / 1.24) AS kotitalousvähennyskelpoinenosa
+	FROM asiakas a left outer join tyokohde tk on a.asiakasid = tk.omistajaid
+		join tyosopimus s on s.kohdeid = tk.kohdeid
+		join tyosuoritus ts on ts.sopimusid = s.sopimusid
+	where tk.kohdeid = 1
+	;
+	
+Select
+	tk.kohdeid, 
+	a.nimi,
+	s.sopimusid
+	from 
 
 -- Kaikki Sopimukseen kirjatut työt kirjattu
-SELECT s.sopimusid, s.suoritusid, s.suorituspvm, tt.tyontyyppi, tstt.tuntilkm, tt.hinta, tstt.aleprosentti
+SELECT s.sopimusid, s.suoritusid, s.suorituspvm, tt.tyontyyppi, tstt.tuntilkm, tt.hinta, tstt.aleprosentti, (tstt.tuntilkm * tt.hinta * (100 - tstt.aleprosentti) / 100) AS rivisumma
 FROM tyosuoritus s LEFT OUTER JOIN tyosuorituksentuntityo tstt ON s.suoritusid = tstt.suoritusid
 	LEFT OUTER JOIN tuntityo tt ON tstt.tyontyyppi = tt.tyontyyppi
-	
 	WHERE s.sopimusid = 1
 	;
 	

@@ -57,6 +57,12 @@ function App() {
     const yksikkoEnum = ['kpl', 'kg', 'm', 'cm', 'g', 'l', 'kela'];
     const sopimusTilaEnum = ['luonnos', 'tarjous', 'hyvaksytty'];
 
+    // Hooks for R1
+    const [quoteId, setQuoteId] = React.useState("");
+
+    const [quoteProductsValue, setQuoteProductsValue] = React.useState([{ id : 0, tarvikeid : 1, lkm : 1, aleprosentti : 1 }]);
+    const [quoteServicesValue, setQuoteServicesValue] = React.useState([]);
+
 
     const fetchTable = async (newTableName, newMetadataTableName) => {
         let newTable = {};
@@ -296,7 +302,6 @@ function App() {
         }
     }
 
-
     // HANDLE TABS
     const handleTabChange = (event, newValue) => {
         setSearchFieldValue([]);
@@ -304,6 +309,29 @@ function App() {
         setInsertFieldValue([]);
         setTableName(newValue);
     };
+
+    const addQuoteProduct = () => {
+        
+    
+    }
+
+    // FOR QUOTE GENERATE
+    const updateQuoteProductsValue = (event, label ,id) => {
+        let state = quoteProductsValue;
+        let object = state[id]
+        object[label] = event.target.value
+        console.log(state[id]);
+        //state[id] = event.target.value;
+        setQuoteProductsValue(state);
+    }
+    const addProductRow = () => {
+        let tmpArray = quoteProductsValue;
+        let length = tmpArray.length;
+        let json = { id : length, tarvikeid : "", lkm : "", aleprosentti : "" };
+        tmpArray.push(json);
+        console.log(tmpArray);
+        setQuoteProductsValue(tmpArray);
+    }
 
     useEffect(() => {
         fetchTable(tableName)
@@ -315,16 +343,7 @@ function App() {
         <AppBarCustom/>
         <AppBar position="static">
               <Tabs value={tableName} onChange={handleTabChange}>
-                  <Tab label={relations[0]} value={relations[0]}/>
-                  <Tab label={relations[1]} value={relations[1]}/>
-                  <Tab label={relations[2]} value={relations[2]}/>
-                  <Tab label={relations[3]} value={relations[3]}/>
-                  <Tab label={relations[4]} value={relations[4]}/>
-                  <Tab label={relations[5]} value={relations[5]}/>
-                  <Tab label={relations[6]} value={relations[6]}/>
-                  <Tab label={relations[7]} value={relations[7]}/>
-                  <Tab label={relations[8]} value={relations[8]}/>
-                  <Tab label={relations[9]} value={relations[9]}/>
+                  <Tab label={relations[0]} value={relations[0]}/><Tab label={relations[1]} value={relations[1]}/><Tab label={relations[2]} value={relations[2]}/><Tab label={relations[3]} value={relations[3]}/><Tab label={relations[4]} value={relations[4]}/><Tab label={relations[5]} value={relations[5]}/><Tab label={relations[6]} value={relations[6]}/><Tab label={relations[7]} value={relations[7]}/><Tab label={relations[8]} value={relations[8]}/><Tab label={relations[9]} value={relations[9]}/>
               </Tabs>
           </AppBar>
 
@@ -333,7 +352,6 @@ function App() {
           <TextField  className={classes.textFields} id="outlined-basic" label="Key" variant="outlined" value={searchFieldValue} onChange={updateSearchFieldValue}/>
           <Button className={classes.textFields} variant="contained" color="primary" onClick={handleSearchClick}>Hae</Button>
         </Paper>
-
         <Paper className={classes.textFields} elevation={2}>
           <Typography className={classes.textFields} >Lisää tai muokkaa entiteettiä</Typography>
           <form noValidate autoComplete="off">
@@ -342,7 +360,6 @@ function App() {
           <Button className={classes.textFields}  variant="contained" color="primary" onClick={handleInsertClick}>Lisää</Button>
           <Button className={classes.textFields}  variant="contained" color="primary" onClick={handleEditClick}>Muokkaa</Button>
         </Paper>
-
         <Paper className={classes.textFields}  className={classes.textFields} elevation={2}>
           <Typography className={classes.textFields} >poista entiteetti</Typography>
           <form noValidate autoComplete="off">
@@ -352,6 +369,29 @@ function App() {
         </Paper>
         
         {additionalForm}
+
+        {/* R1 Hinta-arvio */}
+        <Paper className={classes.textFields} elevation={2}>
+          <Typography className={classes.textFields} >Muodosta hinta-arvio kohteelle</Typography>
+          <form noValidate autoComplete="off"></form>
+            <TextField className={classes.textFields} key="quoteIdTextField" label="kohdeid" variant="outlined" value={quoteId} onChange={(event) => {setQuoteId(event.target.value)}}></TextField>
+            <Button className={classes.textFields} variant="contained" color="default" onClick={addProductRow}>Lisää tuote</Button>
+            <Button className={classes.textFields} variant="contained" color="default" >Lisää palvelu</Button>
+            <Button className={classes.textFields} variant="contained" color="default" >Mudosta hinta-arvio</Button>
+
+            {quoteProductsValue.map((item, index) =>
+                        <div key={item.id}>
+                            <TextField className={classes.textFields} key={"quoteProducts_" + item.id} label="tarvikeid" variant="outlined" onChange={(e) => {updateQuoteProductsValue(e, "tarvikeid", item.id)}}></TextField>
+                            <TextField className={classes.textFields} key={"quoteProducts_" + item.id} label="kpl" variant="outlined" onChange={(e) => {updateQuoteProductsValue(e, "kpl", item.id)}}></TextField>
+                            <TextField className={classes.textFields} key={"quoteProducts_" + item.id} label="aleProsentti" variant="outlined" onChange={(e) => {updateQuoteProductsValue(e, "aleprosentti", item.id)}}></TextField>
+                            <Button className={classes.textFields}  variant="contained" color="secondary" onClick={handleDeleteClick}>Poista</Button>,
+                            <Typography className={classes.textFields}>ROW TOTAL</Typography>
+                        </div>
+                    
+                )
+            }
+        </Paper>
+
 
         {/* TABLE */ }
         <TableContainer component={Paper}>
@@ -366,8 +406,12 @@ function App() {
             </TableBody>
         </Table>
       </TableContainer>
+
     </div>
     );
+
+
+
 }
 
 export default App;
