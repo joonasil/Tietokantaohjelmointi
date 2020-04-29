@@ -77,7 +77,7 @@ public class LaskuService {
                 Integer muistutusLkm = formerInvoice.getMuistutusLkm() == null ? 1 : formerInvoice.getMuistutusLkm() + 1;
                 Double viivastyskulut, viivastyskorko;
                 if (muistutusLkm >= 2) {
-                    Double summa = sopimusDao.urakkaSumma(formerInvoice.getSopimusID());
+                    Double summa = sopimusDao.urakkaLaskuSumma(formerInvoice.getSopimusID());
                     System.out.println("edellinen: " + formerInvoice.getSopimusID() + " : summa " + summa);
                     viivastyskorko = (0.16 * (DAYS.between(localDate, formerInvoice.getErapaiva()) / 365) * summa);
                     viivastyskulut = formerInvoice.getViivastyskulut() + 5 + viivastyskorko;

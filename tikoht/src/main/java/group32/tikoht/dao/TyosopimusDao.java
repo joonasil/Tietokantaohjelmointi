@@ -97,9 +97,9 @@ public class TyosopimusDao implements GenericDao<Tyosopimus, Integer> {
         return jdbcTemplate.update(sql, new Object[]{kohdeid, tyyppi, tyonhinta, tarvikkeidenhinta, osamaksu, pvm, sopimuksentila, selite, id});
     }
 
-    public double urakkaSumma(Integer key) {
+    public double urakkaLaskuSumma(Integer key) {
         Tyosopimus sopimus = selectById(key).get();
-        return sopimus.getTyonHinta() + sopimus.getTarvikkeidenhinta();
+        return sopimus.getTyonHinta() + sopimus.getTarvikkeidenhinta() / sopimus.getOsamaksu();
     }
 
 }

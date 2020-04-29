@@ -12,19 +12,25 @@ public class Tuntityolasku {
     private final List<Tyosuoritus> tyosuoritukset;
     private final List<TyosuorituksenTuntityo> tyontiedot;
     private final List<Tarvikeluettelo> tarvikkeet;
+    private final List<Tarvike> tarviketiedot;
+    private final Double summa;
 
     public Tuntityolasku(   @JsonProperty("asiakas") String asiakas, 
-                            @JsonProperty("asiakasosoite")String asiakasosoite, 
-                            @JsonProperty("kohdeosoite")String kohdeosoite,
+                            @JsonProperty("asiakasosoite") String asiakasosoite, 
+                            @JsonProperty("kohdeosoite") String kohdeosoite,
                             @JsonProperty("tyosuoritukset") List<Tyosuoritus> tyosuoritukset,
-                            @JsonProperty("tyontiedot")List<TyosuorituksenTuntityo> tyontiedot, 
-                            @JsonProperty("tarvikkeet")List<Tarvikeluettelo> tarvikkeet) {
+                            @JsonProperty("tyontiedot") List<TyosuorituksenTuntityo> tyontiedot, 
+                            @JsonProperty("tarvikkeet") List<Tarvikeluettelo> tarvikkeet,
+                            @JsonProperty("tarviketiedot") List<Tarvike> tarviketiedot,
+                            @JsonProperty("summa") Double summa) {
         this.asiakas = asiakas;
         this.asiakasosoite = asiakasosoite;
         this.kohdeosoite = kohdeosoite;
         this.tyosuoritukset = tyosuoritukset;
         this.tyontiedot = tyontiedot;
         this.tarvikkeet = tarvikkeet;
+        this.tarviketiedot = tarviketiedot;
+        this.summa = summa;
     }
 
     public String getAsiakas() {
@@ -49,6 +55,10 @@ public class Tuntityolasku {
 
     public List<Tarvikeluettelo> getTarvikkeet() {
         return tarvikkeet;
+    }
+
+    public Double getSumma () {
+        return summa;
     }
 
 }
