@@ -147,6 +147,9 @@ function App() {
                         />
                 )}
             }
+            if (tableName === "tyosopimus") {
+                html.push(<TableCell key={tableName + "_alvMaara_" + Math.random()}>ALV_määrä</TableCell>);
+            }
             setHtmlTableHead(html);
             setInsertFields(textFields);
             
@@ -162,8 +165,12 @@ function App() {
                         cells.push(<TableCell key={tableName + "_" + item[key] + "_" + i + Math.random()}>NULL</TableCell>);
                     }
                 });
+                if (tableName === "tyosopimus") {
+                    cells.push(<TableCell key={tableName + "_alvMaara_" + Math.random()}>{Number((item.sopimuksenSumma * 0.24).toFixed(2))}</TableCell>)
+                }
                 html.push(<TableRow key={i}>{cells}</TableRow>);
             }
+            console.log(activeTable)
             setHtmlTable(html);
             updateAdditionalForm();
         }
