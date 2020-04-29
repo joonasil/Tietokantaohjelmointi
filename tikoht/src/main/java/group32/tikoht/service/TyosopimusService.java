@@ -15,6 +15,7 @@ import group32.tikoht.dao.TyosuorituksenTuntityoDao;
 import group32.tikoht.dao.TyosuoritusDao;
 import group32.tikoht.model.Tarvikeluettelo;
 import group32.tikoht.model.Tuntityo;
+import group32.tikoht.model.Tuntityolasku;
 import group32.tikoht.model.Tyosopimus;
 import group32.tikoht.model.TyosuorituksenTuntityo;
 import group32.tikoht.model.Tyosuoritus;
@@ -84,11 +85,16 @@ public class TyosopimusService {
             Integer alv = suoritus.getAlv();
             Double tunteja = tyo.getTuntiLkm();
             Double alennus = tyo.getAleProsentti();
-            sum += hinta*tunteja*(1.0+(alv/100.0))*((100-alennus)/100);
+            sum += hinta*tunteja*(1.0+(alv/100.0)) - (hinta*tunteja*(alennus/100.0));
         }
         return sum;
     }
 
-
+    public Tuntityolasku getHourInvoice(Integer sopimusId) {
+        Tuntityolasku o1 = tyosopimusDao.getHourInvoice(sopimusId);
+        List<Tuntityo> tyotyypit = tuntityoDao.selectAllBySopimus(sopimusId);
+        List<TyosuorituksenTuntityo> tyot = tuntisuoritusDao.selectAllBySopimusIdGrouped(sopimusId);
+        return new Tuntityolasku(o1.getAsiakas(), o1.getAsiakasosoite(), o1.getKohdeosoite(), tyotyypit, tyot, null, null, null);
+    }
 
 }

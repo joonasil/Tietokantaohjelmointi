@@ -1,5 +1,6 @@
 package group32.tikoht.api;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -8,12 +9,16 @@ import javax.validation.constraints.NotNull;
 
 import group32.tikoht.service.AsiakasService;
 import group32.tikoht.service.LaskuService;
+import group32.tikoht.service.TarvikeService;
+import group32.tikoht.service.TarvikeluetteloService;
 import group32.tikoht.service.TyokohdeService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import group32.tikoht.model.Asiakas;
+import group32.tikoht.model.Tarvike;
+import group32.tikoht.model.Tarvikeluettelo;
 import group32.tikoht.model.Tuntityolasku;
 import group32.tikoht.model.Tyokohde;
 import group32.tikoht.model.Tyosopimus;
@@ -33,6 +38,8 @@ public class TyosopimusController {
     private final TyokohdeService kohdeService;
     private final TyosuoritusService tyosuoritusService;
     private final TyosuorituksenTuntityoService tyosuorService;
+    private final TarvikeService tarvikeService;
+    private final TarvikeluetteloService tarvikeluetteloService;
 
     @Autowired
     public TyosopimusController(TyosopimusService tyosopimusService, 
@@ -40,13 +47,17 @@ public class TyosopimusController {
                                 AsiakasService asiakasService,
                                 TyokohdeService kohdeService,
                                 TyosuoritusService tyosuoritusService,
-                                TyosuorituksenTuntityoService tyosuorService) {
+                                TyosuorituksenTuntityoService tyosuorService,
+                                TarvikeService tarvikeService,
+                                TarvikeluetteloService tarvikeluetteloService) {
         this.tyosopimusService = tyosopimusService;
         this.laskuService = laskuService;
         this.asiakasService = asiakasService;
         this.kohdeService = kohdeService;
         this.tyosuoritusService = tyosuoritusService;
         this.tyosuorService = tyosuorService;
+        this.tarvikeService = tarvikeService;
+        this.tarvikeluetteloService = tarvikeluetteloService;
     }
 
     @CrossOrigin
@@ -93,16 +104,7 @@ public class TyosopimusController {
     @CrossOrigin
     @GetMapping(path = "{sopimusID}/lasku")
     public Tuntityolasku getTuntityolasku(@PathVariable("sopimusID") Integer sopimusID) {
-        Tyosopimus tyosopimus = getTyosopimusById((sopimusID));
-        Tyokohde kohde = kohdeService.getTyokohdeById(tyosopimus.getKohdeid()).get();
-        Asiakas asiakastiedot = asiakasService.getAsiakasById(kohde.getOmistajaid()).get();
-        final String asiakas = asiakastiedot.getNimi();
-        final String asiakasosoite = asiakastiedot.getOsoite();
-        final String kohdeosoite = kohde.getOsoite();
-        final List<Tyosuoritus> tyosuoritukset = tyosuoritusService.getAllBySopimus(sopimusID);
-        // final List<TyosuorituksenTuntityo> tyontiedot = tyosuorService.getAllBySuoritusId(suoritusId);
-        // return new Tuntityolasku(null, null, null, null, null, null);
-        return null;
+        return tyosopimusService.getHourInvoice(sopimusID);
     }
 
 }

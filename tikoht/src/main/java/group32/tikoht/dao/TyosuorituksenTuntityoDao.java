@@ -91,4 +91,20 @@ public class TyosuorituksenTuntityoDao implements GenericDao<TyosuorituksenTunti
         });
     }
 
+    public List<TyosuorituksenTuntityo> selectAllBySopimusIdGrouped(Integer key) {
+        final String sql =  "SELECT suoritusid, tyontyyppi, SUM(tuntilkm), aleprosentti " +
+                            "FROM tyosuorituksenTuntityo, tyosuoritus, tyosopimus" +
+                            "WHERE tyosopimus.sopimusid = ?" +
+                            "AND tyosopimus.sopimusid = tyosuoritus.sopimusid" +
+                            "AND tyosuoritus.suoritusid = tyosuorituksenTuntityo.suoritusid" +
+                            "GROUP BY tyontyyppi, aleprosentti";
+        return jdbcTemplate.query(sql, new Object[]{key}, (rs, i) -> {
+            Integer suoritusid = rs.getInt("suoritusid");
+            String tyontyyppi = rs.getString("tyontyyppi");
+            Double tuntilkm = rs.getDouble("tuntilkm");
+            Double aleprosentti = rs.getDouble("aleprosentti");
+            return new TyosuorituksenTuntityo(suoritusid, tyontyyppi, tuntilkm, aleprosentti);
+        });
+    }
+
 }

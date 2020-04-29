@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import group32.tikoht.model.Tuntityolasku;
 import group32.tikoht.model.Tyosopimus;
 
 @Repository("tyosopimusPSQL")
@@ -100,6 +101,21 @@ public class TyosopimusDao implements GenericDao<Tyosopimus, Integer> {
     public double urakkaLaskuSumma(Integer key) {
         Tyosopimus sopimus = selectById(key).get();
         return sopimus.getTyonHinta() + sopimus.getTarvikkeidenhinta() / sopimus.getOsamaksu();
+    }
+
+    public Tuntityolasku getHourInvoice(Integer sopimusId) {
+        final String sql =  "SELECT nimi, asiakas.osoite AS aosoite, tyokohde.osoite AS tosoite, " +
+                            "FROM asiakas, tyokohde, tyosopimus " +
+                            "WHERE sopimusid = ? " +
+                            "AND tyosopimus.kohdeid = tyokohde.kohdeid " +
+                            "AND tyokohde.asiakasid = asiakas.asiakasid";
+        Tuntityolasku osa1 = jdbcTemplate.queryForObject(sql, new Object[]{sopimusId}, (rs, i) -> {
+            String asiakas = rs.getString("nimi");
+            String asiakasosoite = rs.getString("aosoite");
+            String kohdeosoite = rs.getString("tosoite");
+            return new Tuntityolasku(asiakas, asiakasosoite, kohdeosoite, null, null, null, null, null);
+        });
+        return osa1;
     }
 
 }
