@@ -62,6 +62,10 @@ public class TyosopimusService {
         return tyosopimusDao.updateById(sopimusID, sopimus);
     }
 
+    public double getContractWorkTotalSum(Integer sopimusID) {
+        return tyosopimusDao.urakkaLaskuSumma(sopimusID);
+    }
+
     // Palauttaa työsopimukseen liittyvien tuntitöiden kokonaissumman.
     public Double getHourWorkTotalSum(Integer sopimusID) {
         final List<Tyosuoritus> tyosuoritukset = suoritusDao.selectAllBySopimus(sopimusID);

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import group32.tikoht.dao.TyosopimusDao;
 import group32.tikoht.dao.LaskuDao;
 import group32.tikoht.model.Lasku;
+import group32.tikoht.model.Tyosopimus;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -20,12 +21,12 @@ import static java.time.temporal.ChronoUnit.DAYS;
 public class LaskuService {
 
     private final LaskuDao laskuDao;
-    private final TyosopimusDao sopimusDao;
+    private final TyosopimusService sopimusService;
 
     @Autowired
-    public LaskuService(@Qualifier("laskuPSQL") LaskuDao laskuDao, @Qualifier("tyosopimusPSQL") TyosopimusDao sopimusDao) {
+    public LaskuService(@Qualifier("laskuPSQL") LaskuDao laskuDao, TyosopimusService sopimusService) {
         this.laskuDao = laskuDao;
-        this.sopimusDao = sopimusDao;
+        this.sopimusService = sopimusService;
     }
 
     public int addLasku(Lasku lasku) {
@@ -76,9 +77,11 @@ public class LaskuService {
                 Integer edeltavaLasku = formerInvoice.getLaskuID();
                 Integer muistutusLkm = formerInvoice.getMuistutusLkm() == null ? 1 : formerInvoice.getMuistutusLkm() + 1;
                 Double viivastyskulut, viivastyskorko;
+                String sopimuslaji = sopimusService.getTyosopimusById(sopimusID).get().getTyyppi();
                 if (muistutusLkm >= 2) {
-                    Double summa = sopimusDao.urakkaLaskuSumma(formerInvoice.getSopimusID());
-                    System.out.println("edellinen: " + formerInvoice.getSopimusID() + " : summa " + summa);
+                    Double summa = sopimuslaji == "urakka" ? sopimusService.getContractWorkTotalSum(sopimusID)
+                                                            : sopimusService.getHourWorkTotalSum(sopimusID);
+                    System.out.println("edellinen: " + sopimusID + " : summa " + summa);
                     viivastyskorko = (0.16 * (DAYS.between(localDate, formerInvoice.getErapaiva()) / 365) * summa);
                     viivastyskulut = formerInvoice.getViivastyskulut() + 5 + viivastyskorko;
                 }
