@@ -23,7 +23,7 @@ public class LaskuService {
     private final TyosopimusDao sopimusDao;
 
     @Autowired
-    public LaskuService(@Qualifier("laskuPSQL") LaskuDao laskuDao, @Qualifier("sopimusPSQL") TyosopimusDao sopimusDao) {
+    public LaskuService(@Qualifier("laskuPSQL") LaskuDao laskuDao, @Qualifier("tyosopimusPSQL") TyosopimusDao sopimusDao) {
         this.laskuDao = laskuDao;
         this.sopimusDao = sopimusDao;
     }
