@@ -16,18 +16,50 @@ import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import Typography from '@material-ui/core/Typography';
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormLabel from '@material-ui/core/FormLabel';
+import DeleteIcon from '@material-ui/icons/Delete';
+import IconButton from '@material-ui/core/IconButton';
 
 import AppBarCustom from './components/AppBarCustom.js';
 
 const useStyles = makeStyles (theme => ({
+    app: {
+        color: "#2C3539",
+    },
     formControl: { margin: theme.spacing(1), minWidth: 120, },
     selectEmpty: { marginTop: theme.spacing(2), },
     textFields: { margin: '5px 10px 5px 10px', },
-    textFieldsShort: { width: "100px", margin: '5px 10px 5px 10px', },
+    textFieldsShort: { 
+        width: "100px", 
+        margin: '5px 10px 5px 10px', 
+    },
     textBox: { margin: "10px 10px 10px 0px", },
     productContainer: { borderStyle : "solid", borderWidth : "1.2px", borderColor : "lightgrey", borderRadius : "3px", margin : "5px"},
-    productTextFields: { display: "inline-block", },
-    deleteButton : { position: "absolute", right: "20px", margin: "10px 10px 0px 0px"},
+    productTextFields: { color: "grey", display: "inline-block", },
+    deleteButton : { 
+        position: "left", 
+        margin: "10px 10px 10px 10px",
+        position: "relative",
+        top: "35%",
+        transform: "translateY(-80%)",
+    },
+    deleteButtonProduct : { 
+        position: "left", 
+        margin: "10px 10px 10px 10px",
+        position: "relative",
+        top: "35%",
+        transform: "translateY(-30%)",
+    },
+    root: {
+        ...theme.typography.button,
+        backgroundColor: theme.palette.background.paper,
+        padding: theme.spacing(1),
+        fontWeight: "Bold",
+        color : "#51504E",
+      },
 }));
 
 function App() {
@@ -43,6 +75,7 @@ function App() {
     const [searchFieldValue, setSearchFieldValue] = React.useState([]);
     const [insertFieldValue, setInsertFieldValue] = React.useState({});
     const [additionalForm, setAdditionalForm] = React.useState([]);
+    const [inputTypeRadioValue, setInputTypeRadioValue] = React.useState("lisaa");
     
     const currentDateIso = (new Date()).toISOString().substring(0,10);
     const sopimustyyppiEnum = ["urakka", "tunti"];
@@ -50,8 +83,7 @@ function App() {
     const sopimusTilaEnum = ['luonnos', 'tarjous', 'hyvaksytty'];
     const relations = ['asiakas', 'tyokohde', 'tyosopimus', 'tyosuoritus', 'tyosuorituksentuntityo', 'lasku', 'tarvikeluettelo', 'tarvike', 'tuntityo'];
     const numericAttributeEnding = ['id', 'hinta', 'osamaksu', 'summa', 'prosentti', 'lkm', 'kulut', 'edeltavalasku', 'alv'];
-
-    
+    const keyAttributes = {'asiakas' : 'asiakasid', "tyokohde" : 'kohdeid', "tyosopimus" : 'sopimusid', "tyosuoritus" : 'suoritusid', "lasku" : 'laskuid', "tarvike" : 'tarvikeid'}
 
     // Hooks for R1
     const [quoteId, setQuoteId] = React.useState("");
@@ -109,12 +141,12 @@ function App() {
             let textFields = [];
             for (let i = 0; i < attributeNames.length; i++) {
                 // Sarakkeiden nimet
-                html.push(<TableCell key={tableName + "_" + attributeNames[i] + "_" + i + Math.random()}>{attributeNames[i]}</TableCell>);
+                html.push(<TableCell key={tableName + "_" + attributeNames[i] + "_" + i + Math.random()} style={{fontWeight : "bold"}}>{attributeNames[i] === keyAttributes[tableName] ? (attributeNames[i] + " (AVAIN)"): attributeNames[i]}</TableCell>);
                 // Input kentät
                 // PVM input
                 if (attributeNames[i].endsWith("pvm") || attributeNames[i].endsWith("paiva")) {
                     textFields.push(
-                        <TextField key={tableName + "_" + attributeNames[i] + Math.random()} label={attributeNames[i]} type="date" InputLabelProps={{ shrink: true, }}
+                        <TextField key={tableName + "_" + attributeNames[i] + Math.random()} className={classes.textFields} label={attributeNames[i]} type="date" InputLabelProps={{ shrink: true, }}
                             onChange={(e) => {updateInsertFieldValue(e, attributeNames[i])}}
                         />)
                 }
@@ -146,7 +178,10 @@ function App() {
                 else if (containsSubString(numericAttributeEnding, attributeNames[i])){
                     console.log("numeerinen")
                     textFields.push(
-                        <TextField type="number" className={classes.textFields} key={tableName + "_" + attributeNames[i] + Math.random()} label={attributeNames[i]} variant="outlined" 
+                        <TextField type="number" variant="outlined" className={classes.textFields} key={tableName + "_" + attributeNames[i] + Math.random()} 
+                            label={attributeNames[i]}
+                            style={{display: (inputTypeRadioValue === "lisaa" && attributeNames[i] === keyAttributes[tableName]) ? 'none' : "inline-block"}}
+                            //disabled={inputTypeRadioValue == "lisaa" && keyAttributes.includes(attributeNames[i]) && !keylessRelations.includes(tableName)}  
                             onChange={(e) => {updateInsertFieldValue(e, attributeNames[i])}}
                         />
                 )}
@@ -208,6 +243,11 @@ function App() {
         state[[label]] = event.target.value;
         console.log(state);
         setInsertFieldValue(state);
+    }
+    const handleInputTypeChange = async (event) => {
+        console.log(event.target.value);
+        await setInputTypeRadioValue(event.target.value);
+        formHtmlTable(activeTable);
     }
     // ADDITIONAL FORM
     const updateAdditionalForm = () => {
@@ -458,10 +498,10 @@ function App() {
     
     useEffect(() => {
         fetchTable(tableName)
-	}, [tableName, quoteProductsValue, quoteServicesValue]);
+	}, [tableName, quoteProductsValue, quoteServicesValue, inputTypeRadioValue]);
 
 	return (
-		<div className="App">
+		<div className={classes.app}>
 
         <AppBarCustom/>
         <AppBar position="static">
@@ -471,29 +511,52 @@ function App() {
           </AppBar>
 
         <Paper className={classes.textFields} elevation={2}>
-          <Typography className={classes.textFields}>Hae avaimella</Typography>
-          <TextField type="number" className={classes.textFields} id="searchByKey" label="Key" variant="outlined" value={searchFieldValue} onChange={updateSearchFieldValue}/>
-          <Button className={classes.textFields} variant="contained" color="primary" onClick={handleSearchClick}>Hae</Button>
+            <Typography className={classes.root}>Hae avaimella</Typography>
+            <TextField type="number" className={classes.textFields} id="searchByKey" label="Avain" variant="outlined" value={searchFieldValue} onChange={updateSearchFieldValue}/>
+            <Button className={classes.textFields} variant="contained" color="primary" onClick={handleSearchClick}>Hae</Button>
         </Paper>
+
+        {/* TABLE */ },
         <Paper className={classes.textFields} elevation={2}>
-          <Typography className={classes.textFields}>Lisää tai muokkaa entiteettiä</Typography>
+            <Typography className={classes.root}>Relaation tila:</Typography>
+            <TableContainer component={Paper}>
+                <Table aria-label="simple table" size="small">
+                    <TableHead>
+                        <TableRow>
+                            {htmlTableHead}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {htmlTable}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Paper>
+
+        <Paper className={classes.textFields} elevation={2}>
+            <Typography className={classes.root}>Lisää tai muokkaa entiteettiä</Typography>
+            <Typography className={classes.textFields}>Entiteetin avain luodaan tietokantaan lisätessä automaattisesti.</Typography>
+            <RadioGroup className={classes.textFields} aria-label="inputType" name="inputType" value={inputTypeRadioValue} onChange={handleInputTypeChange}>
+                <FormControlLabel value="lisaa" control={<Radio />} label="Lisää entiteetti"/>
+                <FormControlLabel value="muokkaa" control={<Radio />} label="Muokkaa entiteettiä" />
+            </RadioGroup>
           <form noValidate autoComplete="off">
               {insertFields}
             </form>
-          <Button className={classes.textFields}  variant="contained" color="primary" onClick={handleInsertClick}>Lisää</Button>
-          <Button className={classes.textFields}  variant="contained" color="primary" onClick={handleEditClick}>Muokkaa</Button>
+          <Button className={classes.textFields}  variant="contained" color="primary" onClick={handleInsertClick} disabled= {inputTypeRadioValue === "muokkaa"}>Lisää</Button>
+          <Button className={classes.textFields}  variant="contained" color="primary" onClick={handleEditClick} disabled= {inputTypeRadioValue === "lisaa"}>Muokkaa</Button>
         </Paper>
         <Paper className={classes.textFields} elevation={2}>
-            <Typography className={classes.textFields} >poista entiteetti</Typography>
+            <Typography className={classes.root} >poista entiteetti</Typography>
             <TextField type="number" className={classes.textFields}  id="deleteByKey" label="ID" variant="outlined" value={deleteFieldValue} onChange={updateDeleteFieldValue}/>
-            <Button className={classes.textFields}  variant="contained" color="secondary" onClick={handleDeleteClick}>Poista</Button>
+            <Button className={classes.textFields}  variant="contained" color="secondary" onClick={handleDeleteClick} startIcon={<DeleteIcon />}>Poista</Button>
         </Paper>
         
         {additionalForm}
 
         {/* R1 Hinta-arvio */}
         <Paper className={classes.textFields} elevation={2}>
-          <Typography className={classes.textFields} >Laske hinta-arvio kohteelle</Typography>
+          <Typography className={classes.root} >Laske hinta-arvio kohteelle</Typography>
           <form noValidate autoComplete="off"></form>
             <TextField type="number" className={classes.textFields} key="quoteIdTextField" label="kohdeid" variant="outlined" value={quoteId} onChange={(event) => {setQuoteId(event.target.value)}}></TextField>
             <Button className={classes.textFields} variant="contained" color="default" onClick={addProductRow}>Lisää tuote</Button>
@@ -503,6 +566,7 @@ function App() {
             {/* Hinta-arvion tuotteet */}
             {quoteProductsValue.map((item, index) =>
                         <div key={item.id} className={classes.productContainer}>
+                            <Button className={classes.deleteButton}  variant="contained" color="secondary" onClick={() => handleProductDeleteClick(item.id)}><DeleteIcon /></Button>
                             <TextField type="number" className={classes.textFieldsShort} key={"quoteProducts_tarvikeid_" + item.id} label="tarvikeid" variant="outlined" 
                                 onChange={ async (e) => {
                                     updateQuoteProductsValue(e, "tarvikeid", item.id)
@@ -516,7 +580,7 @@ function App() {
                                 <Typography className={classes.textFields}>{"Tuotteen yksikköhinta: " + (quoteProductsValue[item.id].tuote.myyntihinta) + " €"}</Typography>
                                 <Typography className={classes.textFields}>{"Tuotteen ALV: " + (quoteProductsValue[item.id].tuote.alv) + " %"}</Typography>
                             </div>
-                                <Button className={classes.deleteButton}  variant="contained" color="secondary" onClick={() => handleProductDeleteClick(item.id)}>Poista</Button>
+                                
                         </div>
                     
                 )
@@ -524,6 +588,7 @@ function App() {
             {/* Hinta-arvion työt */}
             {quoteServicesValue.map((item, index) =>
                         <div key={item.id} className={classes.productContainer}>
+                            <Button className={classes.deleteButtonProduct}  variant="contained" color="secondary" onClick={() => handleServiceDeleteClick(item.id)}><DeleteIcon /></Button>
                             <FormControl className={classes.formControl} variant="outlined" key={"ServiceName_select_" + item.id}>
                                 <InputLabel htmlFor="outlined-age-native-simple" key={"quote_inputLabel_" + item.id}>Työn tyyppi</InputLabel>
                                     <Select key={"select_" + item.id} native onChange={(e) => {updateQuoteServicesValue(e, "tyontyyppi", item.id)}} label="Työn tyyppi">
@@ -539,7 +604,7 @@ function App() {
                                 <Typography className={classes.textFields}>{"Työn tuntihinta: " + (quoteServicesValue[item.id].tyo.hinta) + " €"}</Typography>
                                 <Typography className={classes.textFields}>{"Tuotteen ALV: " + (quoteServicesValue[item.id].tyo.alv) + "%"}</Typography>
                             </div>
-                                <Button className={classes.deleteButton}  variant="contained" color="secondary" onClick={() => handleServiceDeleteClick(item.id)}>Poista</Button>
+                                
                         </div>
                     
                 )
@@ -551,21 +616,7 @@ function App() {
         </Paper>
 
 
-        {/* TABLE */ },
-        <Paper className={classes.textFields} elevation={2}>
-            <TableContainer component={Paper}>
-                <Table aria-label="simple table" size="small">
-                    <TableHead>
-                        <TableRow>
-                            {htmlTableHead}
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {htmlTable}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-        </Paper>
+        
     </div>
     );
 }
