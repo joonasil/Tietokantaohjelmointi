@@ -9,28 +9,32 @@ public class Tuntityolasku {
     private final String asiakas;
     private final String asiakasosoite;
     private final String kohdeosoite;
-    private final List<Tyosuoritus> tyosuoritukset;
-    private final List<TyosuorituksenTuntityo> tyontiedot;
+    private final List<Tuntityo> tyotyypit;
+    private final List<TyosuorituksenTuntityo> tyot;
     private final List<Tarvikeluettelo> tarvikkeet;
     private final List<Tarvike> tarviketiedot;
     private final Double summa;
 
     public Tuntityolasku(   @JsonProperty("asiakas") String asiakas, 
-                            @JsonProperty("asiakasosoite") String asiakasosoite, 
+                            @JsonProperty("asiakasosoite") String asiakasosoite,
                             @JsonProperty("kohdeosoite") String kohdeosoite,
-                            @JsonProperty("tyosuoritukset") List<Tyosuoritus> tyosuoritukset,
-                            @JsonProperty("tyontiedot") List<TyosuorituksenTuntityo> tyontiedot, 
+                            @JsonProperty("tyosuoritukset") List<Tuntityo> tyotyypit,
+                            @JsonProperty("tyontiedot") List<TyosuorituksenTuntityo> tyot,
                             @JsonProperty("tarvikkeet") List<Tarvikeluettelo> tarvikkeet,
-                            @JsonProperty("tarviketiedot") List<Tarvike> tarviketiedot,
+                            @JsonProperty("tarviketiedot") List<Tarvike> tarviketiedot, 
                             @JsonProperty("summa") Double summa) {
         this.asiakas = asiakas;
         this.asiakasosoite = asiakasosoite;
         this.kohdeosoite = kohdeosoite;
-        this.tyosuoritukset = tyosuoritukset;
-        this.tyontiedot = tyontiedot;
+        this.tyotyypit = tyotyypit;
+        this.tyot = tyot;
         this.tarvikkeet = tarvikkeet;
         this.tarviketiedot = tarviketiedot;
         this.summa = summa;
+    }
+
+    public List<Tarvike> getTarviketiedot() {
+        return tarviketiedot;
     }
 
     public String getAsiakas() {
@@ -45,12 +49,12 @@ public class Tuntityolasku {
         return kohdeosoite;
     }
 
-    public List<Tyosuoritus> getTyosuoritukset() {
-        return tyosuoritukset;
+    public List<Tuntityo> getTyotyypit() {
+        return tyotyypit;
     }
 
-    public List<TyosuorituksenTuntityo> getTyontiedot() {
-        return tyontiedot;
+    public List<TyosuorituksenTuntityo> getTyot() {
+        return tyot;
     }
 
     public List<Tarvikeluettelo> getTarvikkeet() {
