@@ -49,6 +49,7 @@ function App() {
     const yksikkoEnum = ['kpl', 'kg', 'm', 'cm', 'g', 'l', 'kela'];
     const sopimusTilaEnum = ['luonnos', 'tarjous', 'hyvaksytty'];
     const relations = ['asiakas', 'tyokohde', 'tyosopimus', 'tyosuoritus', 'tyosuorituksentuntityo', 'lasku', 'tarvikeluettelo', 'tarvike', 'tuntityo'];
+    const numericAttributeEnding = ['id', 'hinta', 'osamaksu', 'summa', 'prosentti', 'lkm', 'kulut', 'edeltavalasku', 'alv'];
 
     
 
@@ -140,6 +141,16 @@ function App() {
                                 </Select>
                         </FormControl>)
                 }
+                // Numeroiden rajoittamiset
+                // Testaa jos attribuutin nimestä löytyy numeerinen pääte (numericAttributeEndings)
+                else if (containsSubString(numericAttributeEnding, attributeNames[i])){
+                    console.log("numeerinen")
+                    textFields.push(
+                        <TextField type="number" className={classes.textFields} key={tableName + "_" + attributeNames[i] + Math.random()} label={attributeNames[i]} variant="outlined" 
+                            onChange={(e) => {updateInsertFieldValue(e, attributeNames[i])}}
+                        />
+                )}
+                // Kaikki loput attribuutit
                 else {
                     textFields.push(
                         <TextField className={classes.textFields} key={tableName + "_" + attributeNames[i] + Math.random()} label={attributeNames[i]} variant="outlined" 
@@ -174,6 +185,15 @@ function App() {
             setHtmlTable(html);
             updateAdditionalForm();
         }
+    }
+    // Check if given string contains any substring given in array
+    const containsSubString = (array, string) => {
+        for (let i = 0; i < array.length; i++) {
+            if (string.includes(array[i])) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // UI HANDLERIT
@@ -452,11 +472,11 @@ function App() {
 
         <Paper className={classes.textFields} elevation={2}>
           <Typography className={classes.textFields}>Hae avaimella</Typography>
-          <TextField  className={classes.textFields} id="searchByKey" label="Key" variant="outlined" value={searchFieldValue} onChange={updateSearchFieldValue}/>
+          <TextField type="number" className={classes.textFields} id="searchByKey" label="Key" variant="outlined" value={searchFieldValue} onChange={updateSearchFieldValue}/>
           <Button className={classes.textFields} variant="contained" color="primary" onClick={handleSearchClick}>Hae</Button>
         </Paper>
         <Paper className={classes.textFields} elevation={2}>
-          <Typography className={classes.textFields} >Lisää tai muokkaa entiteettiä</Typography>
+          <Typography className={classes.textFields}>Lisää tai muokkaa entiteettiä</Typography>
           <form noValidate autoComplete="off">
               {insertFields}
             </form>
@@ -465,7 +485,7 @@ function App() {
         </Paper>
         <Paper className={classes.textFields} elevation={2}>
             <Typography className={classes.textFields} >poista entiteetti</Typography>
-            <TextField className={classes.textFields}  id="deleteByKey" label="ID" variant="outlined" value={deleteFieldValue} onChange={updateDeleteFieldValue}/>
+            <TextField type="number" className={classes.textFields}  id="deleteByKey" label="ID" variant="outlined" value={deleteFieldValue} onChange={updateDeleteFieldValue}/>
             <Button className={classes.textFields}  variant="contained" color="secondary" onClick={handleDeleteClick}>Poista</Button>
         </Paper>
         
@@ -475,7 +495,7 @@ function App() {
         <Paper className={classes.textFields} elevation={2}>
           <Typography className={classes.textFields} >Laske hinta-arvio kohteelle</Typography>
           <form noValidate autoComplete="off"></form>
-            <TextField className={classes.textFields} key="quoteIdTextField" label="kohdeid" variant="outlined" value={quoteId} onChange={(event) => {setQuoteId(event.target.value)}}></TextField>
+            <TextField type="number" className={classes.textFields} key="quoteIdTextField" label="kohdeid" variant="outlined" value={quoteId} onChange={(event) => {setQuoteId(event.target.value)}}></TextField>
             <Button className={classes.textFields} variant="contained" color="default" onClick={addProductRow}>Lisää tuote</Button>
             <Button className={classes.textFields} variant="contained" color="default" onClick={addServiceRow}>Lisää palvelu</Button>
             <Button className={classes.textFields} variant="contained" color="default" onClick={formQuoteToContract}>Mudosta urakka-tarjous</Button>
