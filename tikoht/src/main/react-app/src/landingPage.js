@@ -20,19 +20,14 @@ import Typography from '@material-ui/core/Typography';
 import AppBarCustom from './components/AppBarCustom.js';
 
 const useStyles = makeStyles (theme => ({
-    formControl: {
-        margin: theme.spacing(1),
-        minWidth: 120,
-      },
-      selectEmpty: {
-        marginTop: theme.spacing(2),
-      },
-    textFields: {
-        margin: '5px 10px 5px 10px',
-    },
-    textBox: {
-        margin: "10px 10px 10px 0px",
-    },
+    formControl: { margin: theme.spacing(1), minWidth: 120, },
+    selectEmpty: { marginTop: theme.spacing(2), },
+    textFields: { margin: '5px 10px 5px 10px', },
+    textFieldsShort: { width: "100px", margin: '5px 10px 5px 10px', },
+    textBox: { margin: "10px 10px 10px 0px", },
+    productContainer: { borderStyle : "solid", borderWidth : "1.2px", borderColor : "lightgrey", borderRadius : "3px", margin : "5px"},
+    productTextFields: { display: "inline-block", },
+    deleteButton : { position: "absolute", right: "20px", margin: "10px 10px 0px 0px"},
 }));
 
 function App() {
@@ -48,18 +43,21 @@ function App() {
     const [searchFieldValue, setSearchFieldValue] = React.useState([]);
     const [insertFieldValue, setInsertFieldValue] = React.useState({});
     const [additionalForm, setAdditionalForm] = React.useState([]);
+    
     //const currentDateIso = (new Date()).toISOString().substring(0,10);
     const sopimustyyppiEnum = ["urakka", "tunti"];
     const yksikkoEnum = ['kpl', 'kg', 'm', 'cm', 'g', 'l', 'kela'];
     const sopimusTilaEnum = ['luonnos', 'tarjous', 'hyvaksytty'];
     const relations = ['asiakas', 'tyokohde', 'tyosopimus', 'tyosuoritus', 'tyosuorituksentuntityo', 'lasku', 'tarvikeluettelo', 'tarvike', 'tuntityo'];
+
     
 
     // Hooks for R1
     const [quoteId, setQuoteId] = React.useState("");
 
-    const [quoteProductsValue, setQuoteProductsValue] = React.useState([{ id : 0, tarvikeid : "", lkm : "", aleprosentti : "", tuote : {} }]);
+    const [quoteProductsValue, setQuoteProductsValue] = React.useState([{ id : 0, tarvikeid : "", lkm : "", aleprosentti : "", tuote : { nimi : "", hinta : "", alv : "" } }]);
     const [quoteServicesValue, setQuoteServicesValue] = React.useState([]);
+    const [quoteTotal, setQuoteTotal] = React.useState({total : 0, taxfreeTotal : 0, taxAmount : 0, workAmount : 0});
 
 
     const fetchTable = async (newTableName, newMetadataTableName) => {
@@ -289,16 +287,6 @@ function App() {
             .catch(console.log);
         fetchTable(tableName);
     }
-    // REFORMAT DATES IN INSEERT FIELD VALUES
-    /*const reformatDates = () => {
-        let keys = [];
-        for (let key in insertFieldValue) keys.push(key);
-        for (let keyName in keys) {
-            if (keys[keyName].endsWith("pvm")) {
-                insertFieldValue[[keyName]] = new Date(insertFieldValue[[keyName]]);
-            }
-        }
-    }*/
 
     // HANDLE TABS
     const handleTabChange = (event, newValue) => {
@@ -312,69 +300,126 @@ function App() {
     const updateQuoteProductsValue = async(event, label ,id) => {
         let state = quoteProductsValue;
         let object = state[id]
-        object[label] = event.target.value
-        console.log(state[id]);
-        //state[id] = event.target.value;
+        object[label] = (event.target.value) !== null ? parseInt(event.target.value) : "";
         if (label === "tarvikeid") {
-            object.tuote = await fetchProductPrice(event.target.value);
-            if (object.tuote !== null) {
-                console.log(object.tuote);
-            }
-            console.log("tuote on null");
+            object.tuote = await fetchProduct(event.target.value);
         }
         setQuoteProductsValue(state);
+        updateQuoteTotal();
+        formHtmlTable(activeTable);
+    }
+    const updateQuoteServicesValue = async(event, label ,id) => {
+        let state = quoteServicesValue;
+        let object = state[id]
+        object[label] = (event.target.value) !== null ? event.target.value : "";
+        console.log(state[id]);
+        if (label === "tyontyyppi") {
+            object.tyo = await fetchService(event.target.value);
+        }
+        setQuoteServicesValue(state);
+        updateQuoteTotal();
+        formHtmlTable(activeTable);
     }
     const addProductRow = () => {
         let tmpArray = quoteProductsValue;
         let length = tmpArray.length;
-        let json = { id : length, tarvikeid : "", lkm : "", aleprosentti : "" };
+        let json = { id : length, tarvikeid : "", lkm : "", aleprosentti : "", tuote : { nimi : "", hinta : "", alv : "" } };
+        tmpArray.push(json);
+        console.log(tmpArray)
+        setQuoteProductsValue(tmpArray);
+        fetchTable(tableName);
+    }
+    const addServiceRow = async () => {
+        let tmpArray = quoteServicesValue;
+        let length = tmpArray.length;
+        let tyoJson = await fetchService("asennustyo")
+        console.log(tyoJson)
+        let json = { id : length, tyontyyppi : "asennustyo", lkm : "", tyo : tyoJson };
         tmpArray.push(json);
         console.log(tmpArray);
-        setQuoteProductsValue(tmpArray);
-        console.log(quoteProductsValue);
-        fetchTable(tableName)
+        setQuoteServicesValue(tmpArray);
+        updateQuoteTotal();
+        fetchTable(tableName);
     }
-    const fetchProductPrice = async (id) => {
+    const handleProductDeleteClick = (id) => {
+        let tmpArray = quoteProductsValue;
+        if (id >= 0) { tmpArray.splice(id, 1)}
+        console.log("poiston jälkeen:")
+        console.log(tmpArray)
+        setQuoteProductsValue(reindexIdInJsonArray(tmpArray));
+        updateQuoteTotal(quoteProductsValue);
+        fetchTable(tableName);
+    }
+    const handleServiceDeleteClick = (id) => {
+        let tmpArray = quoteServicesValue;
+        if (id >= 0) { tmpArray.splice(id, 1)}
+        console.log("poiston jälkeen:")
+        console.log(tmpArray)
+        setQuoteServicesValue(reindexIdInJsonArray(tmpArray));
+        updateQuoteTotal();
+        fetchTable(tableName);
+    }
+    const reindexIdInJsonArray = (jsonArray) => {
+        if (jsonArray.length > 0) {
+            for (let i = 0; i < jsonArray.length; i++) {
+                let item = jsonArray[i];
+                if (item.hasOwnProperty("id")) {
+                    item.id = i;
+                }
+            }
+        }
+        console.log(jsonArray);
+        return jsonArray;
+    }
+    const fetchProduct = async (id) => {
         let fetchResult = {};
         await fetch('http://localhost:8080/api/v1/tarvike/' + id)
                 .then(res => res.json())
                 .then((data) => {(fetchResult = data )}).catch(console.log);
 
-        if (fetchResult !== null && fetchResult.hasOwnProperty("tarvikeID")) {
-            return fetchResult;
-        }
-        else {
-            console.log("ei ole kannassa")
-            return null;
-        }
+        if (fetchResult !== null && fetchResult.hasOwnProperty("tarvikeID")) { return fetchResult; }
+        else { console.log("ei ole kannassa")}
     }
-    /*const fetchProductPrice = async (id) => {
-        let statusCode = 0;
-        let hinta = "";
-        let alv = "";
-        await fetch("http://localhost:8080/api/v1/tarvike/" + id)
-            .then(response => {
-                statusCode = response.status
-                response.json()
-            })
-            .then((result) => {
-                console.log("status: " + statusCode)
-                if (statusCode == 200 ) {
-                    console.log(result.myyntihinta)
-                    console.log(result.alv)
-                    hinta = result.myyntihinta;
-                    alv = result.alv
-                    return [hinta, alv];
-                } else { 
-                    hinta = "Tuote ei ole kannassa!";
-                }
-            })
-            .catch(console.log);
-    }*/
-
+    const fetchService = async (name) => {
+        let fetchResult = {};
+        await fetch('http://localhost:8080/api/v1/tuntityo/' + name)
+                .then(res => res.json())
+                .then((data) => {(fetchResult = data )}).catch(console.log);
+        if (fetchResult !== null && fetchResult.hasOwnProperty("tyonTyyppi")) { return fetchResult; }
+        else { console.log("työtä ei ole kannassa") }
+    }
+    const updateQuoteTotal = () => {
+        let quote = {total : 0, taxfreeTotal : 0, taxAmount : 0, workAmount : 0};
+        let items = quoteProductsValue;
+        let item = null;
+        for (let i = 0; i < items.length; i++) {
+            item = items[i];
+            if (item.hasOwnProperty("tuote") && item.tuote.hasOwnProperty("tarvikeID") && item.tuote !== null) {
+                let factor = item.lkm * (1 - (item.aleprosentti / 100));
+                quote.total += Number((factor * (item.tuote.myyntihinta)).toFixed(2));
+                quote.taxAmount += Number((factor * (item.tuote.myyntihinta * (item.tuote.alv / 100))).toFixed(2));
+                quote.taxfreeTotal += Number((factor * ((item.tuote.myyntihinta - (item.tuote.myyntihinta * (item.tuote.alv / 100))))).toFixed(2));
+            }
+        }
+        items = quoteServicesValue;
+        for (let i = 0; i < items.length; i++) {
+            item = items[i];
+            if (item.hasOwnProperty("tyo") && item.tyo !== null) {
+                console.log("summataanTuotteita")
+                console.log(item)
+                quote.total += Number((item.lkm * item.tyo.hinta).toFixed(2));
+                quote.workAmount += Number((item.lkm * item.tyo.hinta).toFixed(2));
+                quote.taxAmount += Number((item.lkm * item.tyo.hinta * (item.tyo.alv / 100)).toFixed(2));
+                quote.taxfreeTotal += Number((item.lkm * (item.tyo.hinta - (item.tyo.hinta * (item.tyo.alv / 100)))).toFixed(2));
+            }
+        }
+        console.log(quote)
+        setQuoteTotal(quote);
+    }
+    
     useEffect(() => {
         fetchTable(tableName)
-	}, [tableName, quoteProductsValue]);
+	}, [tableName, quoteProductsValue, quoteServicesValue]);
 
 	return (
 		<div className="App">
@@ -400,41 +445,71 @@ function App() {
           <Button className={classes.textFields}  variant="contained" color="primary" onClick={handleEditClick}>Muokkaa</Button>
         </Paper>
         <Paper className={classes.textFields} elevation={2}>
-          <Typography className={classes.textFields} >poista entiteetti</Typography>
-          <form noValidate autoComplete="off">
+            <Typography className={classes.textFields} >poista entiteetti</Typography>
             <TextField className={classes.textFields}  id="deleteByKey" label="ID" variant="outlined" value={deleteFieldValue} onChange={updateDeleteFieldValue}/>
-          </form>
-          <Button className={classes.textFields}  variant="contained" color="secondary" onClick={handleDeleteClick}>Poista</Button>
+            <Button className={classes.textFields}  variant="contained" color="secondary" onClick={handleDeleteClick}>Poista</Button>
         </Paper>
         
         {additionalForm}
 
         {/* R1 Hinta-arvio */}
         <Paper className={classes.textFields} elevation={2}>
-          <Typography className={classes.textFields} >Muodosta hinta-arvio kohteelle</Typography>
+          <Typography className={classes.textFields} >Laske hinta-arvio kohteelle</Typography>
           <form noValidate autoComplete="off"></form>
             <TextField className={classes.textFields} key="quoteIdTextField" label="kohdeid" variant="outlined" value={quoteId} onChange={(event) => {setQuoteId(event.target.value)}}></TextField>
             <Button className={classes.textFields} variant="contained" color="default" onClick={addProductRow}>Lisää tuote</Button>
-            <Button className={classes.textFields} variant="contained" color="default" >Lisää palvelu</Button>
-            <Button className={classes.textFields} variant="contained" color="default" onClick={fetchProductPrice}>Mudosta hinta-arvio</Button>
-
+            <Button className={classes.textFields} variant="contained" color="default" onClick={addServiceRow}>Lisää palvelu</Button>
+            {/*
+                <Button className={classes.textFields} variant="contained" color="default" >Mudosta hinta-arvio</Button>
+            */}
+            {/* Hinta-arvion tuotteet */}
             {quoteProductsValue.map((item, index) =>
-                        <div key={item.id}>
-                            <TextField type="number" className={classes.textFields} key={"quoteProducts_tarvikeid_" + item.id} label="tarvikeid" variant="outlined" 
+                        <div key={item.id} className={classes.productContainer}>
+                            <TextField type="number" className={classes.textFieldsShort} key={"quoteProducts_tarvikeid_" + item.id} label="tarvikeid" variant="outlined" 
                                 onChange={ async (e) => {
                                     updateQuoteProductsValue(e, "tarvikeid", item.id)
                                     .then(console.log(quoteProductsValue[item.id].tuote.nimi))
                                     }}></TextField>
-                            <TextField type="number" className={classes.textFields} key={"quoteProducts_lkm" + item.id} label="lkm" variant="outlined" onChange={(e) => {updateQuoteProductsValue(e, "lkm", item.id)}}></TextField>
-                            <TextField type="number" className={classes.textFields} key={"quoteProducts_aleprosentti" + item.id} label="aleprosentti" variant="outlined" onChange={(e) => {updateQuoteProductsValue(e, "aleprosentti", item.id)}}></TextField>
-                            <Button className={classes.textFields}  variant="contained" color="secondary" onClick={handleDeleteClick}>Poista</Button>,
-                            <Typography className={classes.textFields}>{"Tuotteen nimi: " + (quoteProductsValue[item.id].tuote.nimi)}</Typography>
-                            <Typography className={classes.textFields}>{"Tuotteen yksikkö: " + (quoteProductsValue[item.id].tuote.hinta)}</Typography>
-                            <Typography className={classes.textFields}>{"Tuotteen alv%: " + (quoteProductsValue[item.id].tuote.alv)}</Typography>
+                            <TextField type="number" className={classes.textFieldsShort} key={"quoteProducts_lkm" + item.id} label="lkm" variant="outlined" onChange={(e) => {updateQuoteProductsValue(e, "lkm", item.id)}}></TextField>
+                            <TextField type="number" className={classes.textFieldsShort} key={"quoteProducts_aleprosentti" + item.id} label="ale%" variant="outlined" onChange={(e) => {updateQuoteProductsValue(e, "aleprosentti", item.id)}}></TextField>
+                            
+                            <div key={item.id + "_text"} className={classes.productTextFields}>
+                                <Typography className={classes.textFields}>{"Tuotteen nimi: " + (quoteProductsValue[item.id].tuote.nimi)}</Typography>
+                                <Typography className={classes.textFields}>{"Tuotteen yksikköhinta: " + (quoteProductsValue[item.id].tuote.myyntihinta) + " €"}</Typography>
+                                <Typography className={classes.textFields}>{"Tuotteen ALV: " + (quoteProductsValue[item.id].tuote.alv) + " %"}</Typography>
+                            </div>
+                                <Button className={classes.deleteButton}  variant="contained" color="secondary" onClick={() => handleProductDeleteClick(item.id)}>Poista</Button>
                         </div>
                     
                 )
             }
+            {/* Hinta-arvion työt */}
+            {quoteServicesValue.map((item, index) =>
+                        <div key={item.id} className={classes.productContainer}>
+                            <FormControl className={classes.formControl} variant="outlined" key={"ServiceName_select_" + item.id}>
+                                <InputLabel htmlFor="outlined-age-native-simple" key={"quote_inputLabel_" + item.id}>Työn tyyppi</InputLabel>
+                                    <Select key={"select_" + item.id} native onChange={(e) => {updateQuoteServicesValue(e, "tyontyyppi", item.id)}} label="Työn tyyppi">
+                                        <option key={"select_asennustyo_" + item.id}>asennustyo</option>
+                                        <option key={"select_suunnittelu_" + item.id}>suunnittelu</option>
+                                        <option key={"select_aputyo_" + item.id}>aputyo</option>
+                                        <option key={"select_matkakorvaus_" + item.id}>matkakorvaus</option>                 
+                                    </Select>
+                            </FormControl>
+                            <TextField type="number" className={classes.textFieldsShort} key={"quoteServices_lkm" + item.id} label="lkm" variant="outlined" onChange={(e) => {updateQuoteServicesValue(e, "lkm", item.id)}}></TextField>
+                            
+                            <div key={item.id + "_service_text"} className={classes.productTextFields}>
+                                <Typography className={classes.textFields}>{"Työn tuntihinta: " + (quoteServicesValue[item.id].tyo.hinta) + " €"}</Typography>
+                                <Typography className={classes.textFields}>{"Tuotteen ALV: " + (quoteServicesValue[item.id].tyo.alv) + "%"}</Typography>
+                            </div>
+                                <Button className={classes.deleteButton}  variant="contained" color="secondary" onClick={() => handleServiceDeleteClick(item.id)}>Poista</Button>
+                        </div>
+                    
+                )
+            }
+            <Typography className={classes.textFields}>{"Kokonaissumma (sis. ALV): " + quoteTotal.total + " €"}</Typography>
+            <Typography className={classes.textFields}>{"Kokonaissumma (ilman ALV): " + quoteTotal.taxfreeTotal + " €"}</Typography>
+            <Typography className={classes.textFields}>{"Arvonlisäveron määrä: " + quoteTotal.taxAmount + " €"}</Typography>
+            <Typography className={classes.textFields}>{"Kotivähennyskelpoinen osuus: " + quoteTotal.workAmount + " €"}</Typography>
         </Paper>
 
 
@@ -455,9 +530,6 @@ function App() {
         </Paper>
     </div>
     );
-
-
-
 }
 
 export default App;
