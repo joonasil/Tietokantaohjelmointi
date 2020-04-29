@@ -1,4 +1,4 @@
-import React, {useRef, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -13,14 +13,11 @@ import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import InputLabel from '@material-ui/core/InputLabel';
-import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
-import NativeSelect from '@material-ui/core/NativeSelect';
-
+import Typography from '@material-ui/core/Typography';
 
 import AppBarCustom from './components/AppBarCustom.js';
-import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles (theme => ({
     formControl: {
@@ -46,16 +43,17 @@ function App() {
     const [activeTable, setActiveTable] = React.useState([]);
     const [htmlTable, setHtmlTable] = React.useState([]);
     const [htmlTableHead, setHtmlTableHead] = React.useState([]);
-    const [relations, setRelations] = React.useState(['asiakas', 'tyokohde', 'tyosopimus', 'tyosuoritus', 'tyosuorituksentuntityo', 'lasku', 'tarvikeluettelo', 'tarvike', 'tuntityo']);
     const [insertFields, setInsertFields] = React.useState([]);
     const [deleteFieldValue, setDeleteFieldValue] = React.useState([]);
     const [searchFieldValue, setSearchFieldValue] = React.useState([]);
     const [insertFieldValue, setInsertFieldValue] = React.useState({});
     const [additionalForm, setAdditionalForm] = React.useState([]);
-    const currentDateIso = (new Date).toISOString().substring(0,10);
+    //const currentDateIso = (new Date()).toISOString().substring(0,10);
     const sopimustyyppiEnum = ["urakka", "tunti"];
     const yksikkoEnum = ['kpl', 'kg', 'm', 'cm', 'g', 'l', 'kela'];
     const sopimusTilaEnum = ['luonnos', 'tarjous', 'hyvaksytty'];
+    const relations = ['asiakas', 'tyokohde', 'tyosopimus', 'tyosuoritus', 'tyosuorituksentuntityo', 'lasku', 'tarvikeluettelo', 'tarvike', 'tuntityo'];
+    
 
     // Hooks for R1
     const [quoteId, setQuoteId] = React.useState("");
@@ -66,7 +64,7 @@ function App() {
 
     const fetchTable = async (newTableName, newMetadataTableName) => {
         let newTable = {};
-        if (/*!relations.includes(newMetadataTableName)*/ newMetadataTableName == undefined || newMetadataTableName == null) {
+        if (/*!relations.includes(newMetadataTableName)*/ newMetadataTableName === "" || newMetadataTableName === null) {
             newMetadataTableName = "metadata/" + newTableName;
         }
         if (newTableName !== "" && newTableName !== null) {
@@ -76,10 +74,10 @@ function App() {
                 .then(res => res.json())
                 .then((data) => {(newTable.table = data )}).catch(console.log);
 
-            await fetch('http://localhost:8080/api/v1/' + newMetadataTableName)
+            /*await fetch('http://localhost:8080/api/v1/' + newMetadataTableName)
                 .then(res => res.json())
                 .then((data) => {(newTable.metadata = data )}).catch(console.log);
-            
+            */
             await setActiveTable(newTable);
             await formHtmlTable(newTable);
             extractAttributeNames(newTable.table);
@@ -105,7 +103,7 @@ function App() {
         setHtmlTable([]);
         if (newTable.table != null) {
             let table = newTable.table;
-            let metadata = newTable.metadata; // NOT USEED ANYMORE
+            //let metadata = newTable.metadata; // NOT USEED ANYMORE
             let attributeNames = extractAttributeNames(table);
             let tableSize = Object.keys(table).length;
             let html = [];
@@ -122,24 +120,24 @@ function App() {
                         />)
                 }
                 // Selectorit
-                else if (attributeNames[i] == "sopimuksentila" || attributeNames[i] == "yksikko" || attributeNames[i] == "tyyppi") {
+                else if (attributeNames[i] === "sopimuksentila" || attributeNames[i] === "yksikko" || attributeNames[i] === "tyyppi") {
                     let selectorValues = [];
                     console.log(attributeNames[i]);
-                    if (attributeNames[i] == ("sopimuksentila")) {
+                    if (attributeNames[i] === ("sopimuksentila")) {
                         selectorValues = JSON.parse(JSON.stringify(sopimusTilaEnum))}
-                    if (attributeNames[i] == ("yksikko")) {
+                    if (attributeNames[i] === ("yksikko")) {
                         selectorValues = JSON.parse(JSON.stringify(yksikkoEnum))}
-                    if (attributeNames[i] == ("tyyppi")) {
+                    if (attributeNames[i] === ("tyyppi")) {
                         selectorValues = JSON.parse(JSON.stringify(sopimustyyppiEnum))}
                     console.log(selectorValues)
                     let options = [];
                     for (let i = 0; i < selectorValues.length; i++) {
-                        options.push(<option >{selectorValues[i]}</option>)
+                        options.push(<option key={"select_option_" + selectorValues[i]}>{selectorValues[i]}</option>)
                     }
                     textFields.push(
-                        <FormControl className={classes.formControl} variant="outlined">
-                            <InputLabel htmlFor="outlined-age-native-simple">{attributeNames[i]}</InputLabel>
-                                <Select native onChange={(e) => {updateInsertFieldValue(e, attributeNames[i])}} label={attributeNames[i]} inputProps={{ name: 'age', id: 'outlined-age-native-simple', }}>
+                        <FormControl className={classes.formControl} variant="outlined" key={"formControl_select_" + attributeNames[i]}>
+                            <InputLabel htmlFor="outlined-age-native-simple" key={"formControl_inputLavbel_" + attributeNames[i]}>{attributeNames[i]}</InputLabel>
+                                <Select key={"select_" + attributeNames[i]} native onChange={(e) => {updateInsertFieldValue(e, attributeNames[i])}} label={attributeNames[i]}>
                                     {options}                 
                                 </Select>
                         </FormControl>)
@@ -173,7 +171,7 @@ function App() {
         }
     }
     // This is only for customer table
-    function sortJSONByKey(array){
+    /*function sortJSONByKey(array){
         var sortedArray = [];
         // Push each JSON Object entry in array by [key, value]
         for(var i in array)
@@ -182,7 +180,7 @@ function App() {
         }
         // Run native sort function and returns sorted array.
         return sortedArray;
-    }
+    }*/
 
     // UI HANDLERIT
     const updateDeleteFieldValue = (event) => {
@@ -200,9 +198,9 @@ function App() {
     // ADDITIONAL FORM
     const updateAdditionalForm = () => {
         let formArray = [];
-        if (tableName == "lasku") {
+        if (tableName === "lasku") {
             formArray.push( 
-                <Paper key="invoiceButtonPaper" className={classes.textFields}  className={classes.textFields} elevation={2}>
+                <Paper key="invoiceButtonPaper" className={classes.textFields} elevation={2}>
                     <Typography key="heading" className={classes.textFields} >Hallitse Laskuja</Typography>
                     <Button key="all" className={classes.textFields}  variant="contained" color="default" onClick={(e) => fetchTable("lasku")}>Näytä kaikki laskut</Button>
                     <Button key="overdue" className={classes.textFields}  variant="contained" color="default" onClick={(e) => fetchTable("lasku/eraantyneet", "metadata/lasku")}>Näytä erääntyneet laskut</Button>
@@ -232,12 +230,12 @@ function App() {
     }
     // SEARCH HANDLER
     const handleSearchClick = async () => {
-        if (searchFieldValue != null && searchFieldValue != "") {
+        if (searchFieldValue !== null && searchFieldValue !== "") {
             console.log("http://localhost:8080/api/v1/" + tableName + "/" + searchFieldValue)
             await fetch("http://localhost:8080/api/v1/" + tableName + "/" + searchFieldValue).then((response) => {
             return response.json();
             }).then((result) => {
-                if (result.status == 200) {
+                if (result.status === 200) {
                     let newTable = {};
                     newTable.table = [result];
                     newTable.metadata = activeTable.metadata;
@@ -292,7 +290,7 @@ function App() {
         fetchTable(tableName);
     }
     // REFORMAT DATES IN INSEERT FIELD VALUES
-    const reformatDates = () => {
+    /*const reformatDates = () => {
         let keys = [];
         for (let key in insertFieldValue) keys.push(key);
         for (let keyName in keys) {
@@ -300,7 +298,7 @@ function App() {
                 insertFieldValue[[keyName]] = new Date(insertFieldValue[[keyName]]);
             }
         }
-    }
+    }*/
 
     // HANDLE TABS
     const handleTabChange = (event, newValue) => {
@@ -349,21 +347,21 @@ function App() {
 
         <Paper className={classes.textFields} elevation={2}>
           <Typography className={classes.textFields}>Hae avaimella</Typography>
-          <TextField  className={classes.textFields} id="outlined-basic" label="Key" variant="outlined" value={searchFieldValue} onChange={updateSearchFieldValue}/>
+          <TextField  className={classes.textFields} id="searchByKey" label="Key" variant="outlined" value={searchFieldValue} onChange={updateSearchFieldValue}/>
           <Button className={classes.textFields} variant="contained" color="primary" onClick={handleSearchClick}>Hae</Button>
         </Paper>
         <Paper className={classes.textFields} elevation={2}>
           <Typography className={classes.textFields} >Lisää tai muokkaa entiteettiä</Typography>
           <form noValidate autoComplete="off">
               {insertFields}
-        </form>
+            </form>
           <Button className={classes.textFields}  variant="contained" color="primary" onClick={handleInsertClick}>Lisää</Button>
           <Button className={classes.textFields}  variant="contained" color="primary" onClick={handleEditClick}>Muokkaa</Button>
         </Paper>
-        <Paper className={classes.textFields}  className={classes.textFields} elevation={2}>
+        <Paper className={classes.textFields} elevation={2}>
           <Typography className={classes.textFields} >poista entiteetti</Typography>
           <form noValidate autoComplete="off">
-            <TextField className={classes.textFields}  id="outlined-basic" label="ID" variant="outlined" value={deleteFieldValue} onChange={updateDeleteFieldValue}/>
+            <TextField className={classes.textFields}  id="deleteByKey" label="ID" variant="outlined" value={deleteFieldValue} onChange={updateDeleteFieldValue}/>
           </form>
           <Button className={classes.textFields}  variant="contained" color="secondary" onClick={handleDeleteClick}>Poista</Button>
         </Paper>
@@ -381,9 +379,9 @@ function App() {
 
             {quoteProductsValue.map((item, index) =>
                         <div key={item.id}>
-                            <TextField className={classes.textFields} key={"quoteProducts_" + item.id} label="tarvikeid" variant="outlined" onChange={(e) => {updateQuoteProductsValue(e, "tarvikeid", item.id)}}></TextField>
-                            <TextField className={classes.textFields} key={"quoteProducts_" + item.id} label="kpl" variant="outlined" onChange={(e) => {updateQuoteProductsValue(e, "kpl", item.id)}}></TextField>
-                            <TextField className={classes.textFields} key={"quoteProducts_" + item.id} label="aleProsentti" variant="outlined" onChange={(e) => {updateQuoteProductsValue(e, "aleprosentti", item.id)}}></TextField>
+                            <TextField className={classes.textFields} key={"quoteProducts_tarvikeid_" + item.id} label="tarvikeid" variant="outlined" onChange={(e) => {updateQuoteProductsValue(e, "tarvikeid", item.id)}}></TextField>
+                            <TextField className={classes.textFields} key={"quoteProducts_lkm" + item.id} label="lkm" variant="outlined" onChange={(e) => {updateQuoteProductsValue(e, "llkm", item.id)}}></TextField>
+                            <TextField className={classes.textFields} key={"quoteProducts_aleprosentti" + item.id} label="aleprosentti" variant="outlined" onChange={(e) => {updateQuoteProductsValue(e, "aleprosentti", item.id)}}></TextField>
                             <Button className={classes.textFields}  variant="contained" color="secondary" onClick={handleDeleteClick}>Poista</Button>,
                             <Typography className={classes.textFields}>ROW TOTAL</Typography>
                         </div>
@@ -393,20 +391,21 @@ function App() {
         </Paper>
 
 
-        {/* TABLE */ }
-        <TableContainer component={Paper}>
-        <Table aria-label="simple table" size="small">
-            <TableHead>
-                <TableRow>
-                    {htmlTableHead}
-                </TableRow>
-            </TableHead>
-            <TableBody>
-                {htmlTable}
-            </TableBody>
-        </Table>
-      </TableContainer>
-
+        {/* TABLE */ },
+        <Paper className={classes.textFields} elevation={2}>
+            <TableContainer component={Paper}>
+                <Table aria-label="simple table" size="small">
+                    <TableHead>
+                        <TableRow>
+                            {htmlTableHead}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {htmlTable}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Paper>
     </div>
     );
 
