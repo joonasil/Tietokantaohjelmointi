@@ -44,7 +44,7 @@ function App() {
     const [insertFieldValue, setInsertFieldValue] = React.useState({});
     const [additionalForm, setAdditionalForm] = React.useState([]);
     
-    //const currentDateIso = (new Date()).toISOString().substring(0,10);
+    const currentDateIso = (new Date()).toISOString().substring(0,10);
     const sopimustyyppiEnum = ["urakka", "tunti"];
     const yksikkoEnum = ['kpl', 'kg', 'm', 'cm', 'g', 'l', 'kela'];
     const sopimusTilaEnum = ['luonnos', 'tarjous', 'hyvaksytty'];
@@ -168,17 +168,6 @@ function App() {
             updateAdditionalForm();
         }
     }
-    // This is only for customer table
-    /*function sortJSONByKey(array){
-        var sortedArray = [];
-        // Push each JSON Object entry in array by [key, value]
-        for(var i in array)
-        {
-            sortedArray.push({asiakasID : [array[i].asiakasID], nimi : [array[i].nimi], osoite : [array[i].osoite]});
-        }
-        // Run native sort function and returns sorted array.
-        return sortedArray;
-    }*/
 
     // UI HANDLERIT
     const updateDeleteFieldValue = (event) => {
@@ -416,6 +405,29 @@ function App() {
         console.log(quote)
         setQuoteTotal(quote);
     }
+    const formQuoteToContract = async () => {
+        let contract = {kohdeid: quoteId, 
+                        tyyppi : "urakka", 
+                        osamaksu : "1", 
+                        pvm : currentDateIso, 
+                        sopimuksentila : "tarjous", 
+                        selite : ("Urakkatarjous kohteesta " + quoteId),
+                        tyonhinta : quoteTotal.workAmount,
+                        tarvikkeidenhinta : (quoteTotal.total - quoteTotal.workAmount),
+                        sopimuksensumma : (quoteTotal.total + quoteTotal.workAmount)
+                     };
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(contract)
+            };
+        console.log("http://localhost:8080/api/v1/tyosopimus/", requestOptions)
+        await fetch("http://localhost:8080/api/v1/tyosopimus/", requestOptions)
+            .then(response => response.json())
+            .then(result => console.log(result))
+            .catch(console.log);
+    fetchTable(tableName);
+    }
     
     useEffect(() => {
         fetchTable(tableName)
@@ -459,9 +471,8 @@ function App() {
             <TextField className={classes.textFields} key="quoteIdTextField" label="kohdeid" variant="outlined" value={quoteId} onChange={(event) => {setQuoteId(event.target.value)}}></TextField>
             <Button className={classes.textFields} variant="contained" color="default" onClick={addProductRow}>Lisää tuote</Button>
             <Button className={classes.textFields} variant="contained" color="default" onClick={addServiceRow}>Lisää palvelu</Button>
-            {/*
-                <Button className={classes.textFields} variant="contained" color="default" >Mudosta hinta-arvio</Button>
-            */}
+            <Button className={classes.textFields} variant="contained" color="default" onClick={formQuoteToContract}>Mudosta urakka-tarjous</Button>
+            
             {/* Hinta-arvion tuotteet */}
             {quoteProductsValue.map((item, index) =>
                         <div key={item.id} className={classes.productContainer}>
