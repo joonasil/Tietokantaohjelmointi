@@ -21,7 +21,12 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
 import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
+import AddIcon from '@material-ui/icons/Add';
 import IconButton from '@material-ui/core/IconButton';
+import SearchIcon from '@material-ui/icons/Search';
+import CloudUploadIcon from '@material-ui/icons/CloudUpload';
+import BuildIcon from '@material-ui/icons/Build';
 
 import AppBarCustom from './components/AppBarCustom.js';
 
@@ -513,7 +518,7 @@ function App() {
         <Paper className={classes.textFields} elevation={2}>
             <Typography className={classes.root}>Hae avaimella</Typography>
             <TextField type="number" className={classes.textFields} id="searchByKey" label="Avain" variant="outlined" value={searchFieldValue} onChange={updateSearchFieldValue}/>
-            <Button className={classes.textFields} variant="contained" color="primary" onClick={handleSearchClick}>Hae</Button>
+            <Button className={classes.textFields} variant="contained" color="primary" onClick={handleSearchClick} startIcon={<SearchIcon />}>Hae</Button>
         </Paper>
 
         {/* TABLE */ },
@@ -543,8 +548,8 @@ function App() {
           <form noValidate autoComplete="off">
               {insertFields}
             </form>
-          <Button className={classes.textFields}  variant="contained" color="primary" onClick={handleInsertClick} disabled= {inputTypeRadioValue === "muokkaa"}>Lisää</Button>
-          <Button className={classes.textFields}  variant="contained" color="primary" onClick={handleEditClick} disabled= {inputTypeRadioValue === "lisaa"}>Muokkaa</Button>
+          <Button className={classes.textFields}  variant="contained" color="primary" onClick={handleInsertClick} disabled= {inputTypeRadioValue === "muokkaa"} startIcon={<AddIcon />}>Lisää</Button>
+    <Button className={classes.textFields}  variant="contained" color="primary" onClick={handleEditClick} disabled= {inputTypeRadioValue === "lisaa"} startIcon={<EditIcon/>}>Muokkaa</Button>
         </Paper>
         <Paper className={classes.textFields} elevation={2}>
             <Typography className={classes.root} >poista entiteetti</Typography>
@@ -559,9 +564,9 @@ function App() {
           <Typography className={classes.root} >Laske hinta-arvio kohteelle</Typography>
           <form noValidate autoComplete="off"></form>
             <TextField type="number" className={classes.textFields} key="quoteIdTextField" label="kohdeid" variant="outlined" value={quoteId} onChange={(event) => {setQuoteId(event.target.value)}}></TextField>
-            <Button className={classes.textFields} variant="contained" color="default" onClick={addProductRow}>Lisää tuote</Button>
-            <Button className={classes.textFields} variant="contained" color="default" onClick={addServiceRow}>Lisää palvelu</Button>
-            <Button className={classes.textFields} variant="contained" color="default" onClick={formQuoteToContract}>Mudosta urakka-tarjous</Button>
+            <Button className={classes.textFields} variant="contained" color="primary" onClick={addProductRow} startIcon={<AddIcon />}>Lisää tuote</Button>
+            <Button className={classes.textFields} variant="contained" color="primary" onClick={addServiceRow} startIcon={<AddIcon />}>Lisää palvelu</Button>
+            <Button className={classes.textFields} variant="outlined" color="primary" onClick={formQuoteToContract} startIcon={<CloudUploadIcon />}>Mudosta urakka-tarjous</Button>
             
             {/* Hinta-arvion tuotteet */}
             {quoteProductsValue.map((item, index) =>
