@@ -1,4 +1,5 @@
 import React, {useEffect} from 'react';
+import './css/styles.css';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -97,6 +98,13 @@ function App() {
     const [additionalForm, setAdditionalForm] = React.useState([]);
     const [inputTypeRadioValue, setInputTypeRadioValue] = React.useState("lisaa");
     const [dateSelectorValues, setDateSelectorValues] = React.useState({});
+
+    // IVOICE
+    const [invoiceData, setInvoiceData] = React.useState([]);
+    const [invoiceProducts, setInvoiceProducts] = React.useState([]);
+    const [invoiceServices, setInvoiceServices] = React.useState([]);
+    const [invoiceTotals, setInvoiceTotals] = React.useState({});
+
     
     const currentDateIso = (new Date()).toISOString().substring(0,10);
     const sopimustyyppiEnum = ["urakka", "tunti"];
@@ -212,7 +220,6 @@ function App() {
                 // Numeroiden rajoittamiset
                 // Testaa jos attribuutin nimestä löytyy numeerinen pääte (numericAttributeEndings)
                 else if (containsSubString(numericAttributeEnding, attributeNames[i])){
-                    console.log("numeerinen")
                     textFields.push(
                         <TextField type="number" variant="outlined" className={classes.textFields} key={tableName + "_" + attributeNames[i] + Math.random()} 
                             label={attributeNames[i]}
@@ -252,7 +259,6 @@ function App() {
                 }
                 html.push(<TableRow key={i}>{cells}</TableRow>);
             }
-            console.log(activeTable)
             setHtmlTable(html);
             updateAdditionalForm();
         }
@@ -510,7 +516,10 @@ function App() {
         let item = null;
         for (let i = 0; i < items.length; i++) {
             item = items[i];
+            console.log(item)
             if (item.hasOwnProperty("tuote") && item.tuote.hasOwnProperty("tarvikeID") && item.tuote !== null) {
+                if (item.aleprosentti === "" || item.aleprosentti.isNaN) {item.aleprosentti = 0}
+                console.log(item.aleprosentti);
                 let factor = item.lkm * (1 - (item.aleprosentti / 100));
                 quote.total += Number((factor * (item.tuote.myyntihinta)).toFixed(2));
                 quote.taxAmount += Number((factor * (item.tuote.myyntihinta * (item.tuote.alv / 100))).toFixed(2));
@@ -559,6 +568,87 @@ function App() {
         else {
             window.alert("Virhe hinta-arviota luodessa. Hinta-arviolla annettava kohteen ID, joka numeerista tyyppiä.")
         }
+    }
+    const formPrintableInvoice = async (sopimusid) => {
+        let localData = {};
+        await fetch("http://localhost:8080/api/v1/tyosopimus/" + sopimusid + "/lasku")
+                .then(response => response.json())
+                .then(result => {
+                    console.log(result)
+                    result.sopimusid = sopimusid;
+                    localData = result;
+                    setInvoiceData(result);
+                })
+                .catch(console.log);
+        await calculatePrintableInvoice(localData);
+    }
+    const calculatePrintableInvoice = async (fetchData) => {
+        console.log(invoiceData);
+        let invoiceProducts = [];
+        let invoiceServices = [];
+        let sopimus = (fetchData === null) ? invoiceData : fetchData;
+        console.log(sopimus)
+        let invoiceTotals = {taxfree : 0, taxAmount : 0, total : 0,  workAmountWithoutTax : 0};
+        // Tarvikkeesta HALUTAAN
+        // nimi, kplHinta, ale%, aleHinta alv%, hintaAlvilla, kpl, yksikko, summaAlv0, summaAlvilla, alvinSumma
+        console.log(sopimus);
+        for (let i = 0; i < sopimus.tarvikkeet.length; i++) {
+            let tarvike = sopimus.tarvikkeet[i];
+            let tarviketieto = {};
+            let tuoterivi = {};
+            for (let j = 0; j < sopimus.tarviketiedot.length; j++) {
+                if (sopimus.tarviketiedot[j].tarvikeID == tarvike.tarvikeID) {
+                    tarviketieto = sopimus.tarviketiedot[j]
+                }
+            }
+            tuoterivi.nimi = tarviketieto.nimi;
+            tuoterivi.kplhinta = tarviketieto.myyntihinta;
+            tuoterivi.aleprosentti = tarvike.aleProsentti;
+            tuoterivi.aleHinta = Number((tarviketieto.myyntihinta * (1 - (tarvike.aleProsentti / 100))).toFixed(2));
+            tuoterivi.alvprosentti = tarviketieto.alv;
+            tuoterivi.kplhintaAlv = Number((tuoterivi.aleHinta * (tarviketieto.alv / 100)).toFixed(2));
+            tuoterivi.lkm = tarvike.lkm
+            tuoterivi.yksikko = tarviketieto.yksikko
+            tuoterivi.rivisumma = Number((tuoterivi.aleHinta * tarvike.lkm).toFixed(2));
+            invoiceTotals.taxfree += tuoterivi.rivisumma;
+            tuoterivi.rivisummaAlv = Number((tuoterivi.rivisumma * (1 + tarviketieto.alv / 100)).toFixed(2));
+            invoiceTotals.total += tuoterivi.rivisummaAlv;
+            tuoterivi.riviAlvSumma = Number((tuoterivi.rivisummaAlv - tuoterivi.rivisumma).toFixed(2));
+            invoiceTotals.taxAmount += tuoterivi.riviAlvSumma;
+            invoiceProducts.push(tuoterivi);
+        }
+        console.log(invoiceProducts);
+        setInvoiceProducts(invoiceProducts);
+        // SERVICET
+        for (let i = 0; i < sopimus.tyot.length; i++) {
+            let tyo = sopimus.tyot[i];
+            let tyotieto = {};
+            let tyorivi = {};
+            for (let j = 0; j < sopimus.tyot.length; j++) {
+                if (sopimus.tyotyypit[j].tyonTyyppi == tyo.tyonTyyppi) {
+                    tyotieto = sopimus.tyotyypit[j]
+                }
+            }
+            tyorivi.nimi = tyotieto.tyonTyyppi;
+            tyorivi.kplhinta = tyotieto.hinta;
+            tyorivi.aleprosentti = tyo.aleProsentti;
+            tyorivi.aleHinta = Number((tyotieto.hinta * (1 - (tyo.aleProsentti / 100))).toFixed(2));
+            tyorivi.alvprosentti = tyotieto.alv;
+            tyorivi.kplhintaAlv = Number((tyorivi.aleHinta * (tyotieto.alv / 100)).toFixed(2));
+            tyorivi.lkm = tyo.tuntiLkm;
+            tyorivi.yksikko = ("tuntia");
+            tyorivi.rivisumma = Number((tyorivi.aleHinta * tyorivi.lkm).toFixed(2));
+            invoiceTotals.workAmountWithoutTax += tyorivi.rivisumma;
+            invoiceTotals.taxfree += tyorivi.rivisumma;
+            tyorivi.rivisummaAlv = Number((tyorivi.rivisumma * (1 + tyotieto.alv / 100)).toFixed(2));
+            invoiceTotals.total += tyorivi.rivisumma;
+            tyorivi.riviAlvSumma = Number((tyorivi.rivisummaAlv - tyorivi.rivisumma).toFixed(2));
+            invoiceTotals.taxAmount += tyorivi.riviAlvSumma;
+            invoiceServices.push(tyorivi);
+        }
+        console.log(invoiceServices);
+        setInvoiceServices(invoiceServices);
+        setInvoiceTotals(invoiceTotals);
     }
     
     useEffect(() => {
@@ -679,6 +769,129 @@ function App() {
             <Typography className={classes.textFields}>{"Arvonlisäveron määrä: " + quoteTotal.taxAmount + " €"}</Typography>
             <Typography className={classes.textFields}>{"Kotivähennyskelpoinen osuus: " + quoteTotal.workAmount + " €"}</Typography>
         </Paper>
+
+
+
+
+
+
+
+        <Button className={classes.textFields} variant="outlined" color="primary" onClick={(event) => formPrintableInvoice(1)} startIcon={<CloudUploadIcon />}>Lasku sopparista 1</Button>
+
+
+
+
+        {/* R2 Hinta-arvio */}
+        <div id="invoicepreview">
+                <header>
+                    <h1 className="company">TMI SÄHKÖTÄRSKY</h1>
+                    <div className="sender">
+                        <div className="name">Pekka Tärsky</div>
+                        <div className="address">Varastokuja 3 B</div>
+                        <div className="city">33720 Tampere</div>
+                        <div className="phone">Puhelin: +358 12 345 6789</div>
+                        <div className="iban">IBAN: FI49 5000 9420 0287 30</div>
+                        <div className="bic">BIC/SWIFT: OKOYHIHH</div>
+                        <div className="companyId">Y-tunnus: 1234567-8</div>
+                    </div>
+                    <div className="extra">
+                        <div className="invoice">LASKU</div>
+                        <div className="date">{currentDateIso}</div>
+                        <div className="reference">#sopimus-{invoiceData.sopimusid}:{"1234567-8"}</div>
+                    </div>
+                </header>
+                <article>
+                    <div className="info">
+                        <div className="recipient">
+                            <div className="company">{"Yksityisasiakas"}</div>
+                            <div className="name">{invoiceData.asiakas}</div>
+                            <div className="address">{invoiceData.asiakasosoite}</div>
+                            <div className="city">Tampere, 33100</div>
+                            <div className="phone">+358 12 345 6789</div>
+                            <div className="companyId"></div>
+                        </div>
+                    </div>
+                    <table className="services">
+                        <thead>
+                            <tr>
+                                <th>Tuote</th>
+                                <th>€ (alv 0%) </th>
+                                <th>Ale %</th>
+                                <th>Ale€ (alv 0%)</th>
+                                <th>ALV %</th>
+                                <th>Lkm</th>
+                                <th>Yksikkö</th>
+                                <th>Summa (alv 0%)</th>
+                                <th>Rivi Alv</th>
+                                <th>Summa (sis. alv)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {invoiceProducts.map((product, i) => 
+                            <tr key={"product_" + i}>
+                                <th>{product.nimi}</th>
+                                <th>{product.kplhinta}</th>
+                                <th>{product.aleprosentti}</th>
+                                <th>{product.aleHinta}</th>
+                                <th>{product.alvprosentti}</th>
+                                <th>{product.lkm}</th>
+                                <th>{product.yksikko}</th>
+                                <th>{product.rivisumma}</th>
+                                <th>{product.riviAlvSumma}</th>
+                                <th>{product.rivisummaAlv}</th>
+                            </tr>
+                        )}
+                        </tbody>
+                        <br style={{height: "3em"}}></br>
+                    </table>
+                    <table className="services">
+                        <thead>
+                            <tr>
+                                <th>Työ</th>
+                                <th>€ (alv 0%) </th>
+                                <th>Ale %</th>
+                                <th>Ale€ (alv 0%)</th>
+                                <th>ALV %</th>
+                                <th>Lkm</th>
+                                <th>Yksikkö</th>
+                                <th>Summa (alv 0%)</th>
+                                <th>Rivi Alv</th>
+                                <th>Summa (sis. alv)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {invoiceServices.map((service, i) =>
+                             <tr key={"service_" + i}>
+                                <td>{service.nimi}</td>
+                                <td>{service.kplhinta}</td>
+                                <td>{service.aleprosentti}</td>
+                                <td>{service.aleHinta}</td>
+                                <td>{service.alvprosentti}</td>
+                                <td>{service.lkm}</td>
+                                <td>{service.yksikko}</td>
+                                <td>{service.rivisumma}</td>
+                                <td>{service.rivisummaAlv}</td>
+                                <td>{service.riviAlvSumma}</td>
+                            </tr>
+                        )}
+                        </tbody>
+                    </table>
+                    <br style={{height: "3em"}}></br>
+                        {/* TOTALS*/}
+                    <table className="services" className="totals">
+                        <h1>Lasku Yhteensä</h1>
+                        <tbody>
+                            <tr>Laskun alv 0% summa: {invoiceTotals.taxfree} €</tr>
+                            <tr>Laskun alv määrä: {invoiceTotals.taxAmount} €</tr>
+                            <tr>Laskun työn määrä (Kotivähennyskelpoista): {invoiceTotals.workAmountWithoutTax} €</tr>
+                            <tr>Laskun kokonaissumma: {invoiceTotals.total} €</tr>
+                        </tbody>
+                    </table>
+                </article>
+                <footer>
+                    <div className="companyDetails"></div>
+                </footer>
+            </div>
 
 
         

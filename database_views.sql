@@ -48,12 +48,14 @@ Select
 	s.sopimusid
 	from 
 
--- Kaikki Sopimukseen kirjatut työt kirjattu
+-- Kaikki Sopimukseen kirjatut työt
 SELECT s.sopimusid, s.suoritusid, s.suorituspvm, tt.tyontyyppi, tstt.tuntilkm, tt.hinta, tstt.aleprosentti, (tstt.tuntilkm * tt.hinta * (100 - tstt.aleprosentti) / 100) AS rivisumma
 FROM tyosuoritus s LEFT OUTER JOIN tyosuorituksentuntityo tstt ON s.suoritusid = tstt.suoritusid
 	LEFT OUTER JOIN tuntityo tt ON tstt.tyontyyppi = tt.tyontyyppi
 	WHERE s.sopimusid = 1
 	;
+	
+-- Työsuoritukset, tuntityöt ja tarvikkeet
 	
 -- Testi
 SELECT DISTINCT *
