@@ -104,11 +104,11 @@ public class TyosopimusDao implements GenericDao<Tyosopimus, Integer> {
     }
 
     public Tuntityolasku getHourInvoice(Integer sopimusId) {
-        final String sql =  "SELECT nimi, asiakas.osoite AS aosoite, tyokohde.osoite AS tosoite, " +
+        final String sql =  "SELECT nimi, asiakas.osoite AS aosoite, tyokohde.osoite AS tosoite " +
                             "FROM asiakas, tyokohde, tyosopimus " +
                             "WHERE sopimusid = ? " +
                             "AND tyosopimus.kohdeid = tyokohde.kohdeid " +
-                            "AND tyokohde.asiakasid = asiakas.asiakasid";
+                            "AND tyokohde.omistajaid = asiakas.asiakasid";
         Tuntityolasku osa1 = jdbcTemplate.queryForObject(sql, new Object[]{sopimusId}, (rs, i) -> {
             String asiakas = rs.getString("nimi");
             String asiakasosoite = rs.getString("aosoite");

@@ -8,11 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import group32.tikoht.dao.TarvikeDao;
 import group32.tikoht.dao.TarvikeluetteloDao;
 import group32.tikoht.dao.TuntityoDao;
 import group32.tikoht.dao.TyosopimusDao;
 import group32.tikoht.dao.TyosuorituksenTuntityoDao;
 import group32.tikoht.dao.TyosuoritusDao;
+import group32.tikoht.model.Tarvike;
 import group32.tikoht.model.Tarvikeluettelo;
 import group32.tikoht.model.Tuntityo;
 import group32.tikoht.model.Tuntityolasku;
@@ -27,20 +29,23 @@ public class TyosopimusService {
     private final TyosopimusDao tyosopimusDao;
     private final TyosuoritusDao suoritusDao;
     private final TyosuorituksenTuntityoDao tuntisuoritusDao;
-    private final TarvikeluetteloDao tarvikeDao;
+    private final TarvikeluetteloDao tarvikeluetteloDao;
     private final TuntityoDao tuntityoDao;
+    private final TarvikeDao tarvikeDao;
 
     @Autowired
     public TyosopimusService(   @Qualifier("tyosopimusPSQL") TyosopimusDao tyosopimusDao,
                                 @Qualifier("tyosuoritusPSQL") TyosuoritusDao suoritusDao,
                                 @Qualifier("tyotPSQL") TyosuorituksenTuntityoDao tuntisuoritusDao,
-                                @Qualifier("luetteloPSQL") TarvikeluetteloDao tarvikeDao,
-                                @Qualifier("tuntityoPSQL") TuntityoDao tuntityoDao) {
+                                @Qualifier("luetteloPSQL") TarvikeluetteloDao tarvikeluetteloDao,
+                                @Qualifier("tuntityoPSQL") TuntityoDao tuntityoDao,
+                                @Qualifier("tarvikePSQL") TarvikeDao tarvikeDao) {
         this.tyosopimusDao = tyosopimusDao;
         this.suoritusDao = suoritusDao;
         this.tuntisuoritusDao = tuntisuoritusDao;
-        this.tarvikeDao = tarvikeDao;
+        this.tarvikeluetteloDao = tarvikeluetteloDao;
         this.tuntityoDao = tuntityoDao;
+        this.tarvikeDao = tarvikeDao;
     }
 
     public int addTyosopimus(Tyosopimus sopimus) {
@@ -76,7 +81,7 @@ public class TyosopimusService {
         final List<Tarvikeluettelo> tarvikkeet = new ArrayList<>();
         for (Tyosuoritus suoritus : tyosuoritukset) {
             tyontiedot.addAll(tuntisuoritusDao.selectAllBySuoritusId(suoritus.getSuoritusid()));
-            tarvikkeet.addAll(tarvikeDao.selectAllBySuoritusId(suoritus.getSuoritusid()));
+            tarvikkeet.addAll(tarvikeluetteloDao.selectAllBySuoritusId(suoritus.getSuoritusid()));
         }
         Double sum = 0.0;
         for (TyosuorituksenTuntityo tyo : tyontiedot) {
@@ -94,7 +99,9 @@ public class TyosopimusService {
         Tuntityolasku o1 = tyosopimusDao.getHourInvoice(sopimusId);
         List<Tuntityo> tyotyypit = tuntityoDao.selectAllBySopimus(sopimusId);
         List<TyosuorituksenTuntityo> tyot = tuntisuoritusDao.selectAllBySopimusIdGrouped(sopimusId);
-        return new Tuntityolasku(o1.getAsiakas(), o1.getAsiakasosoite(), o1.getKohdeosoite(), tyotyypit, tyot, null, null, null);
+        List<Tarvikeluettelo> tarvikkeet = tarvikeluetteloDao.selectAllBySopimusIdGrouped(sopimusId);
+        List<Tarvike> tarviketiedot = tarvikeDao.selectAllBySopimus(sopimusId);
+        return new Tuntityolasku(o1.getAsiakas(), o1.getAsiakasosoite(), o1.getKohdeosoite(), tyotyypit, tyot, tarvikkeet, tarviketiedot, getHourWorkTotalSum(sopimusId));
     }
 
 }

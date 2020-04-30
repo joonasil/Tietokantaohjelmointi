@@ -76,7 +76,7 @@ public class TyosuoritusDao implements GenericDao<Tyosuoritus, Integer> {
 
     public List<Tyosuoritus> selectAllBySopimus(Integer id) {
         final String sql =  "SELECT suoritusid, sopimusid, suorituspvm " +
-                            "FROM tyosuoritus" +
+                            "FROM tyosuoritus " +
                             "WHERE sopimusid = ?";
         return jdbcTemplate.query(sql, new Object[]{id}, (rs, i) -> {
             Integer suoritusid = rs.getInt("suoritusid");

@@ -80,7 +80,7 @@ public class TyosuorituksenTuntityoDao implements GenericDao<TyosuorituksenTunti
 
     public List<TyosuorituksenTuntityo> selectAllBySuoritusId(Integer key) {
         final String sql =  "SELECT suoritusid, tyontyyppi, tuntilkm, aleprosentti " +
-                            "FROM tyosuorituksenTuntityo" +
+                            "FROM tyosuorituksenTuntityo " +
                             "WHERE suoritusid = ?";
         return jdbcTemplate.query(sql, new Object[]{key}, (rs, i) -> {
             Integer suoritusid = rs.getInt("suoritusid");
@@ -92,14 +92,16 @@ public class TyosuorituksenTuntityoDao implements GenericDao<TyosuorituksenTunti
     }
 
     public List<TyosuorituksenTuntityo> selectAllBySopimusIdGrouped(Integer key) {
-        final String sql =  "SELECT suoritusid, tyontyyppi, SUM(tuntilkm), aleprosentti " +
-                            "FROM tyosuorituksenTuntityo, tyosuoritus, tyosopimus" +
-                            "WHERE tyosopimus.sopimusid = ?" +
-                            "AND tyosopimus.sopimusid = tyosuoritus.sopimusid" +
-                            "AND tyosuoritus.suoritusid = tyosuorituksenTuntityo.suoritusid" +
-                            "GROUP BY tyontyyppi, aleprosentti";
+        final String sql =  "SELECT tyontyyppi, SUM(tuntilkm) AS tuntilkm, aleprosentti " +
+                            "FROM ( " +
+                                "SELECT * " +
+                                "FROM tyosuorituksenTuntityo, tyosuoritus " +
+                                "WHERE tyosuoritus.suoritusid = tyosuorituksenTuntityo.suoritusid " +
+                                "AND  tyosuoritus.sopimusid = ?" +
+                                ") ttt " +
+                            "GROUP BY tyontyyppi, aleprosentti ";
         return jdbcTemplate.query(sql, new Object[]{key}, (rs, i) -> {
-            Integer suoritusid = rs.getInt("suoritusid");
+            Integer suoritusid = null;
             String tyontyyppi = rs.getString("tyontyyppi");
             Double tuntilkm = rs.getDouble("tuntilkm");
             Double aleprosentti = rs.getDouble("aleprosentti");
