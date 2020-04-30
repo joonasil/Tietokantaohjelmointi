@@ -96,12 +96,22 @@ public class TyosopimusService {
     }
 
     public Tuntityolasku getHourInvoice(Integer sopimusId) {
-        Tuntityolasku o1 = tyosopimusDao.getHourInvoice(sopimusId);
-        List<Tuntityo> tyotyypit = tuntityoDao.selectAllBySopimus(sopimusId);
-        List<TyosuorituksenTuntityo> tyot = tuntisuoritusDao.selectAllBySopimusIdGrouped(sopimusId);
-        List<Tarvikeluettelo> tarvikkeet = tarvikeluetteloDao.selectAllBySopimusIdGrouped(sopimusId);
-        List<Tarvike> tarviketiedot = tarvikeDao.selectAllBySopimus(sopimusId);
-        return new Tuntityolasku(o1.getAsiakas(), o1.getAsiakasosoite(), o1.getKohdeosoite(), tyotyypit, tyot, tarvikkeet, tarviketiedot, getHourWorkTotalSum(sopimusId));
+        Tyosopimus sopimus = tyosopimusDao.selectById(sopimusId).get();
+        Tuntityolasku o1 = tyosopimusDao.getContractDetails(sopimusId);
+        if (sopimus.getTyyppi() == "tunti") {
+            List<Tuntityo> tyotyypit = tuntityoDao.selectAllBySopimus(sopimusId);
+            List<TyosuorituksenTuntityo> tyot = tuntisuoritusDao.selectAllBySopimusIdGrouped(sopimusId);
+            List<Tarvikeluettelo> tarvikkeet = tarvikeluetteloDao.selectAllBySopimusIdGrouped(sopimusId);
+            List<Tarvike> tarviketiedot = tarvikeDao.selectAllBySopimus(sopimusId);
+            return new Tuntityolasku(o1.getAsiakas(), o1.getAsiakasosoite(), o1.getKohdeosoite(), tyotyypit, tyot, tarvikkeet, tarviketiedot, getHourWorkTotalSum(sopimusId));
+        } else {
+            List<Tarvike> tarviketiedot = new ArrayList<>();
+            List<TyosuorituksenTuntityo> tyot = new ArrayList<>();
+            tyot.add(new TyosuorituksenTuntityo(null, null, sopimus.getTyonHinta(), null));
+            tarviketiedot.add(new Tarvike(null, null, null, sopimus.getTarvikkeidenhinta(), null, null, null));
+            return new Tuntityolasku(o1.getAsiakas(), o1.getAsiakasosoite(), o1.getKohdeosoite(), null, tyot, null, tarviketiedot, sopimus.getSopimuksenSumma());
+        }
+        
     }
 
 }

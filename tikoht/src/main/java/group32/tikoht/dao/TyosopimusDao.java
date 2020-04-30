@@ -103,7 +103,7 @@ public class TyosopimusDao implements GenericDao<Tyosopimus, Integer> {
         return sopimus.getTyonHinta() + sopimus.getTarvikkeidenhinta() / sopimus.getOsamaksu();
     }
 
-    public Tuntityolasku getHourInvoice(Integer sopimusId) {
+    public Tuntityolasku getContractDetails(Integer sopimusId) {
         final String sql =  "SELECT nimi, asiakas.osoite AS aosoite, tyokohde.osoite AS tosoite " +
                             "FROM asiakas, tyokohde, tyosopimus " +
                             "WHERE sopimusid = ? " +
