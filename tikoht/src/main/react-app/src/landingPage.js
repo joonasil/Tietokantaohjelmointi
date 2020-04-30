@@ -30,6 +30,17 @@ import BuildIcon from '@material-ui/icons/Build';
 
 import AppBarCustom from './components/AppBarCustom.js';
 
+/* HIENOMMAT PÄIVÄN VALITSIJAT
+import 'date-fns';
+import DateFnsUtils from '@date-io/date-fns';
+import {
+  MuiPickersUtilsProvider,
+  KeyboardTimePicker,
+  KeyboardDatePicker,
+  DatePicker,
+} from '@material-ui/pickers';
+*/
+
 const useStyles = makeStyles (theme => ({
     app: {
         color: "#2C3539",
@@ -65,6 +76,10 @@ const useStyles = makeStyles (theme => ({
         fontWeight: "Bold",
         color : "#51504E",
       },
+    datePicker: {
+        borderStyle : "solid", borderWidth : "1.2px", borderColor : "lightgrey", borderRadius : "3px",
+        padding: "5px 5px",
+    },
 }));
 
 function App() {
@@ -81,6 +96,7 @@ function App() {
     const [insertFieldValue, setInsertFieldValue] = React.useState({});
     const [additionalForm, setAdditionalForm] = React.useState([]);
     const [inputTypeRadioValue, setInputTypeRadioValue] = React.useState("lisaa");
+    const [dateSelectorValues, setDateSelectorValues] = React.useState({});
     
     const currentDateIso = (new Date()).toISOString().substring(0,10);
     const sopimustyyppiEnum = ["urakka", "tunti"];
@@ -151,9 +167,23 @@ function App() {
                 // PVM input
                 if (attributeNames[i].endsWith("pvm") || attributeNames[i].endsWith("paiva")) {
                     textFields.push(
-                        <TextField key={tableName + "_" + attributeNames[i] + Math.random()} className={classes.textFields} label={attributeNames[i]} type="date" InputLabelProps={{ shrink: true, }}
+                        <TextField key={tableName + "_" + attributeNames[i] + Math.random()} className={classes.datePicker} label={attributeNames[i]} type="date" InputLabelProps={{ shrink: true, }}
                             onChange={(e) => {updateInsertFieldValue(e, attributeNames[i])}}
                         />)
+                    /*textFields.push(
+                        <MuiPickersUtilsProvider key={"muiPicker_" + attributeNames[i]} utils={DateFnsUtils}>
+                            <DatePicker key={"datePicker_" + attributeNames[i]} style={{width : "223px"}} disableToolbar inputVariant="outlined" variant="inline" format="yyyy-MM-dd" margin="normal" label={attributeNames[i]} InputAdornmentProps={{ position: "start" }}
+                                onChange={date => {handleDateChange(date, attributeNames[i])}} 
+                                value={dateSelectorValues[attributeNames[i]]}
+                                />
+                                <DatePicker
+                                    variant="inline"
+                                    label="Basic example"
+                                    value={dateSelectorValues[attributeNames[i]]}
+                                    onChange={setDateSelectorValues}
+                                />
+                            
+                        </MuiPickersUtilsProvider>)*/
                 }
                 // Selectorit
                 else if (attributeNames[i] === "sopimuksentila" || attributeNames[i] === "yksikko" || attributeNames[i] === "tyyppi") {
@@ -171,12 +201,13 @@ function App() {
                         options.push(<option key={"select_option_" + selectorValues[i]}>{selectorValues[i]}</option>)
                     }
                     textFields.push(
-                        <FormControl className={classes.formControl} variant="outlined" key={"formControl_select_" + attributeNames[i]}>
+                        <FormControl value={selectorValues[0]} className={classes.formControl} variant="outlined" key={"formControl_select_" + attributeNames[i]}>
                             <InputLabel htmlFor="outlined-age-native-simple" key={"formControl_inputLavbel_" + attributeNames[i]}>{attributeNames[i]}</InputLabel>
                                 <Select key={"select_" + attributeNames[i]} native onChange={(e) => {updateInsertFieldValue(e, attributeNames[i])}} label={attributeNames[i]}>
                                     {options}                 
                                 </Select>
                         </FormControl>)
+                    updateInsertFieldValue(null, attributeNames[i], selectorValues[0]);
                 }
                 // Numeroiden rajoittamiset
                 // Testaa jos attribuutin nimestä löytyy numeerinen pääte (numericAttributeEndings)
@@ -243,9 +274,14 @@ function App() {
     const updateSearchFieldValue = (event) => {
         setSearchFieldValue(event.target.value);
     }
-    const updateInsertFieldValue = (event, label) => {
+    const updateInsertFieldValue = (event, label, newValue) => {
         let state = insertFieldValue;
-        state[[label]] = event.target.value;
+        if (event != null) {
+            state[[label]] = event.target.value;
+        }
+        else if (newValue != null && newValue != "") {
+            state[[label]] = newValue;
+        }
         console.log(state);
         setInsertFieldValue(state);
     }
@@ -253,6 +289,25 @@ function App() {
         console.log(event.target.value);
         await setInputTypeRadioValue(event.target.value);
         formHtmlTable(activeTable);
+        
+    }
+    const handleDateChange = async (date, attribute) => {
+        let dates = dateSelectorValues;
+        dates[attribute] = date;
+        console.log(dates)
+        console.log(date.toISOString())
+
+        if (Object.prototype.toString.call(date) === "[object Date]") {
+            if (isNaN(date.getTime())) {
+              console.log("not valid")
+            } else {
+                console.log("valid date")
+                let state = insertFieldValue;
+                state[[attribute]] = date.toISOString().substring(0,10);
+                console.log(state);
+                setInsertFieldValue(state);
+            }
+          }
     }
     // ADDITIONAL FORM
     const updateAdditionalForm = () => {
@@ -478,27 +533,32 @@ function App() {
         setQuoteTotal(quote);
     }
     const formQuoteToContract = async () => {
-        let contract = {kohdeid: quoteId, 
-                        tyyppi : "urakka", 
-                        osamaksu : "1", 
-                        pvm : currentDateIso, 
-                        sopimuksentila : "tarjous", 
-                        selite : ("Urakkatarjous kohteesta " + quoteId),
-                        tyonhinta : quoteTotal.workAmount,
-                        tarvikkeidenhinta : (quoteTotal.total - quoteTotal.workAmount),
-                        sopimuksensumma : (quoteTotal.total + quoteTotal.workAmount)
-                     };
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(contract)
-            };
-        console.log("http://localhost:8080/api/v1/tyosopimus/", requestOptions)
-        await fetch("http://localhost:8080/api/v1/tyosopimus/", requestOptions)
-            .then(response => response.json())
-            .then(result => console.log(result))
-            .catch(console.log);
-    fetchTable(tableName);
+        if (quoteId !== null && quoteId !== "") {
+            let contract = {kohdeid: quoteId, 
+                            tyyppi : "urakka", 
+                            osamaksu : "1", 
+                            pvm : currentDateIso, 
+                            sopimuksentila : "tarjous", 
+                            selite : ("Urakkatarjous kohteesta " + quoteId),
+                            tyonhinta : quoteTotal.workAmount,
+                            tarvikkeidenhinta : (quoteTotal.total - quoteTotal.workAmount),
+                            sopimuksensumma : (quoteTotal.total + quoteTotal.workAmount)
+                        };
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(contract)
+                };
+            console.log("http://localhost:8080/api/v1/tyosopimus/", requestOptions)
+            await fetch("http://localhost:8080/api/v1/tyosopimus/", requestOptions)
+                .then(response => response.json())
+                .then(result => console.log(result))
+                .catch(console.log);
+            fetchTable(tableName);
+        }
+        else {
+            window.alert("Virhe hinta-arviota luodessa. Hinta-arviolla annettava kohteen ID, joka numeerista tyyppiä.")
+        }
     }
     
     useEffect(() => {
@@ -553,7 +613,7 @@ function App() {
         </Paper>
         <Paper className={classes.textFields} elevation={2}>
             <Typography className={classes.root} >poista entiteetti</Typography>
-            <TextField type="number" className={classes.textFields}  id="deleteByKey" label="ID" variant="outlined" value={deleteFieldValue} onChange={updateDeleteFieldValue}/>
+            <TextField type="number" className={classes.textFields}  id="deleteByKey" label="Avain" variant="outlined" value={deleteFieldValue} onChange={updateDeleteFieldValue}/>
             <Button className={classes.textFields}  variant="contained" color="secondary" onClick={handleDeleteClick} startIcon={<DeleteIcon />}>Poista</Button>
         </Paper>
         
