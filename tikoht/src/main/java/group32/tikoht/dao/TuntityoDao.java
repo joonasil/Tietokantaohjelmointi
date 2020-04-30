@@ -74,13 +74,13 @@ public class TuntityoDao implements GenericDao<Tuntityo, String> {
     }
 
     public List<Tuntityo> selectAllBySopimus(Integer sopimusId) {
-        final String sql =  "SELECT tyontyyppi, hinta, alv " +
-                            "FROM tuntityo, tyosuorituksenTuntityo, tyosuoritus, tyosopimus" +
-                            "WHERE tyosopimus.sopimusid = ?" +
-                            "AND tyosopimus.sopimusid = tyosuoritus.sopimusid" +
-                            "AND tyosuoritus.suoritusid = tyosuorituksenTuntityo.suoritusid" +
+        final String sql =  "SELECT DISTINCT(tuntityo.tyontyyppi), hinta, alv " +
+                            "FROM tuntityo, tyosuorituksenTuntityo, tyosuoritus, tyosopimus " +
+                            "WHERE tyosopimus.sopimusid = ? " +
+                            "AND tyosopimus.sopimusid = tyosuoritus.sopimusid " +
+                            "AND tyosuoritus.suoritusid = tyosuorituksenTuntityo.suoritusid " +
                             "AND tyosuorituksenTuntityo.tyontyyppi = tuntityo.tyontyyppi";
-        return jdbcTemplate.query(sql, (rs, i) -> {
+        return jdbcTemplate.query(sql, new Object[]{sopimusId}, (rs, i) -> {
             String tyonTyyppi = rs.getString("tyontyyppi");
             Double hinta = rs.getDouble("hinta");
             Integer alv = rs.getInt("alv");
