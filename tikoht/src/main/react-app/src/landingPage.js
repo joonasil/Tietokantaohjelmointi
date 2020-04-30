@@ -120,7 +120,8 @@ function App() {
     const [quoteProductsValue, setQuoteProductsValue] = React.useState([{ id : 0, tarvikeid : "", lkm : "", aleprosentti : "", tuote : { nimi : "", hinta : "", alv : "" } }]);
     const [quoteServicesValue, setQuoteServicesValue] = React.useState([]);
     const [quoteTotal, setQuoteTotal] = React.useState({total : 0, taxfreeTotal : 0, taxAmount : 0, workAmount : 0});
-
+    
+    let laskuValinta = 1;
 
     const fetchTable = async (newTableName, newMetadataTableName) => {
         let newTable = {};
@@ -624,7 +625,7 @@ function App() {
             let tyo = sopimus.tyot[i];
             let tyotieto = {};
             let tyorivi = {};
-            for (let j = 0; j < sopimus.tyot.length; j++) {
+            for (let j = 0; j < sopimus.tyotyypit.length; j++) {
                 if (sopimus.tyotyypit[j].tyonTyyppi == tyo.tyonTyyppi) {
                     tyotieto = sopimus.tyotyypit[j]
                 }
@@ -774,10 +775,13 @@ function App() {
 
 
 
-
-
-        <Button className={classes.textFields} variant="outlined" color="primary" onClick={(event) => formPrintableInvoice(1)} startIcon={<CloudUploadIcon />}>Lasku sopparista 1</Button>
-
+        {/* TÄÄLLÄ JOONAKSEN TESTAILUJA KATTOO MITEN KÄY */}
+        <TextField type="number" className={classes.textFieldsShort} key={"laskunvalinta"} label="sopimusId" variant="outlined" onChange={(e) => {
+                                                                                                                                            laskuValinta = parseInt(e.target.value)
+                                                                                                                                            console.log(laskuValinta)}}></TextField>
+                                                                                                                {/* Tähän \/ pitäis saada toi id tosta TextField kentästä jotenkin tulee vaan objectina niin path kusee*/}
+        <Button className={classes.textFields} variant="outlined" color="primary" onClick={(event) => formPrintableInvoice(1)} startIcon={<CloudUploadIcon />}>Lasku sopparista {laskuValinta}</Button>
+                                                                                                                                                                            {/* Tää /\ ei myöskään päivity :D */}
 
 
 

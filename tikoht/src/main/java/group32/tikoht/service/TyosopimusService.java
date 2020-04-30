@@ -98,18 +98,34 @@ public class TyosopimusService {
     public Tuntityolasku getHourInvoice(Integer sopimusId) {
         Tyosopimus sopimus = tyosopimusDao.selectById(sopimusId).get();
         Tuntityolasku o1 = tyosopimusDao.getContractDetails(sopimusId);
-        if (sopimus.getTyyppi() == "tunti") {
+        if (sopimus.getTyyppi().equals("tunti")) {
             List<Tuntityo> tyotyypit = tuntityoDao.selectAllBySopimus(sopimusId);
             List<TyosuorituksenTuntityo> tyot = tuntisuoritusDao.selectAllBySopimusIdGrouped(sopimusId);
             List<Tarvikeluettelo> tarvikkeet = tarvikeluetteloDao.selectAllBySopimusIdGrouped(sopimusId);
             List<Tarvike> tarviketiedot = tarvikeDao.selectAllBySopimus(sopimusId);
+            if (tyotyypit.isEmpty()) {
+                tyotyypit.add(new Tuntityo(null, null, null));
+            }
+            if (tyot.isEmpty()) {
+                tyot.add(new TyosuorituksenTuntityo(null, null, null, null));
+            }
+            if (tarvikkeet.isEmpty()) {
+                tarvikkeet.add(new Tarvikeluettelo(null, null, null, null));
+            }
+            if (tarviketiedot.isEmpty()) {
+                tarviketiedot.add(new Tarvike(null, null, null, null, null, null, null));
+            }
             return new Tuntityolasku(o1.getAsiakas(), o1.getAsiakasosoite(), o1.getKohdeosoite(), tyotyypit, tyot, tarvikkeet, tarviketiedot, getHourWorkTotalSum(sopimusId));
         } else {
-            List<Tarvike> tarviketiedot = new ArrayList<>();
+            List<Tuntityo> tyotyypit = new ArrayList<>();
             List<TyosuorituksenTuntityo> tyot = new ArrayList<>();
-            tyot.add(new TyosuorituksenTuntityo(null, null, sopimus.getTyonHinta(), null));
-            tarviketiedot.add(new Tarvike(null, null, null, sopimus.getTarvikkeidenhinta(), null, null, null));
-            return new Tuntityolasku(o1.getAsiakas(), o1.getAsiakasosoite(), o1.getKohdeosoite(), null, tyot, null, tarviketiedot, sopimus.getSopimuksenSumma());
+            List<Tarvikeluettelo> tarvikkeet = new ArrayList<>();
+            List<Tarvike> tarviketiedot = new ArrayList<>();
+            tyot.add(new TyosuorituksenTuntityo(null, "Urakan tyot", 1.0, 0.0));
+            tarviketiedot.add(new Tarvike(99999, "Urakan tarvikkeet", sopimus.getTarvikkeidenhinta(), sopimus.getTarvikkeidenhinta(), "kpl", null, 24));
+            tyotyypit.add(new Tuntityo("Urakan tyot", sopimus.getTyonHinta(), 24));
+            tarvikkeet.add(new Tarvikeluettelo(null, 99999, 1, 0));
+            return new Tuntityolasku(o1.getAsiakas(), o1.getAsiakasosoite(), o1.getKohdeosoite(), tyotyypit, tyot, tarvikkeet, tarviketiedot, sopimus.getSopimuksenSumma());
         }
         
     }
