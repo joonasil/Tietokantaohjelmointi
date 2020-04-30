@@ -80,7 +80,7 @@ public class TyosuorituksenTuntityoDao implements GenericDao<TyosuorituksenTunti
 
     public List<TyosuorituksenTuntityo> selectAllBySuoritusId(Integer key) {
         final String sql =  "SELECT suoritusid, tyontyyppi, tuntilkm, aleprosentti " +
-                            "FROM tyosuorituksenTuntityo" +
+                            "FROM tyosuorituksenTuntityo " +
                             "WHERE suoritusid = ?";
         return jdbcTemplate.query(sql, new Object[]{key}, (rs, i) -> {
             Integer suoritusid = rs.getInt("suoritusid");
@@ -95,10 +95,9 @@ public class TyosuorituksenTuntityoDao implements GenericDao<TyosuorituksenTunti
         final String sql =  "SELECT tyontyyppi, SUM(tuntilkm) AS tuntilkm, aleprosentti " +
                             "FROM ( " +
                                 "SELECT * " +
-                                "FROM tyosuorituksenTuntityo ttt " +
-                                "JOIN tyosuoritus tsr ON ttt.suoritusid = tsr.suoritusid " +
-                                "JOIN tyosopimus tsp ON tsr.sopimusid = tsp.sopimusid " +
-                                "WHERE tsp.sopimusid = ? " +
+                                "FROM tyosuorituksenTuntityo, tyosuoritus " +
+                                "WHERE tyosuoritus.suoritusid = tyosuorituksenTuntityo.suoritusid " +
+                                "AND  tyosuoritus.sopimusid = ?" +
                                 ") ttt " +
                             "GROUP BY tyontyyppi, aleprosentti ";
         return jdbcTemplate.query(sql, new Object[]{key}, (rs, i) -> {

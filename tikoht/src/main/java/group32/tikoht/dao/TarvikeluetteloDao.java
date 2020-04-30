@@ -80,10 +80,28 @@ public class TarvikeluetteloDao implements GenericDao<Tarvikeluettelo, Integer> 
 
     public List<Tarvikeluettelo> selectAllBySuoritusId(Integer key) {
         final String sql =  "SELECT suoritusid, tarvikeid, lkm, aleprosentti " +
-                            "FROM tarvikeluettelo" +
+                            "FROM tarvikeluettelo " +
                             "WHERE suoritusid = ?";
         return jdbcTemplate.query(sql, new Object[]{key}, (rs, i) -> {
             Integer suoritusid = rs.getInt("suoritusid");
+            Integer tarvikeid = rs.getInt("tarvikeid");
+            Integer lkm = rs.getInt("lkm");
+            Integer aleprosentti = rs.getInt("aleprosentti");
+            return new Tarvikeluettelo(suoritusid, tarvikeid, lkm, aleprosentti);
+        });
+    }
+
+    public List<Tarvikeluettelo> selectAllBySopimusIdGrouped(Integer key) {
+        final String sql =  "SELECT tarvikeid, sum(lkm) as lkm, aleprosentti " +
+                            "FROM ( " +
+                                "SELECT * " +
+                                "FROM tarvikeluettelo, tyosuoritus " +
+                                "WHERE tarvikeluettelo.suoritusid = tyosuoritus.suoritusid " +
+                                "AND tyosuoritus.sopimusid = ? " +
+                                ") trvk " +
+                            "GROUP BY tarvikeid, aleprosentti";
+        return jdbcTemplate.query(sql, new Object[]{key}, (rs, i) -> {
+            Integer suoritusid = null;
             Integer tarvikeid = rs.getInt("tarvikeid");
             Integer lkm = rs.getInt("lkm");
             Integer aleprosentti = rs.getInt("aleprosentti");
