@@ -514,10 +514,12 @@ function App() {
         let fetchResult = {};
         await fetch('http://localhost:8080/api/v1/tarvike/' + id)
                 .then(res => res.json())
-                .then((data) => {(fetchResult = data )}).catch(console.log);
-
+                .then(data => {fetchResult = data}).catch(console.log);
         if (fetchResult !== null && fetchResult.hasOwnProperty("tarvikeID")) { return fetchResult; }
-        else { console.log("ei ole kannassa")}
+        else { 
+            alert("Antamaasi tarvikeid:tä ei ole tietokannassa.") 
+            return ({ nimi : "", hinta : "", alv : "" });
+        }
     }
     const fetchService = async (name) => {
         let fetchResult = {};
@@ -589,17 +591,20 @@ function App() {
         }
     }
     const formPrintableInvoice = async (sopimusid) => {
-        let localData = {};
         await fetch("http://localhost:8080/api/v1/tyosopimus/" + sopimusid + "/lasku")
                 .then(response => response.json())
                 .then(result => {
                     console.log(result)
-                    result.sopimusid = sopimusid;
-                    localData = result;
-                    setInvoiceData(result);
+                    if (result.hasOwnProperty("status") && result.status === 200) {
+                        result.sopimusid = sopimusid;
+                        setInvoiceData(result);
+                        calculatePrintableInvoice(result);
+                    }
+                    else {
+                        alert("Annettua sopimustunnusta ei ole tietokannassa");
+                    }
                 })
                 .catch(console.log);
-        await calculatePrintableInvoice(localData);
     }
     const calculatePrintableInvoice = async (fetchData) => {
         console.log(invoiceData);
@@ -677,7 +682,6 @@ function App() {
 	return (
 		<div className={classes.app}>
 
-        <AppBarCustom/>
         <AppBar position="static">
               <Tabs value={tableName} onChange={handleTabChange}>
                   <Tab label={relations[0]} value={relations[0]}/><Tab label={relations[1]} value={relations[1]}/><Tab label={relations[2]} value={relations[2]}/><Tab label={relations[3]} value={relations[3]}/><Tab label={relations[4]} value={relations[4]}/><Tab label={relations[5]} value={relations[5]}/><Tab label={relations[6]} value={relations[6]}/><Tab label={relations[7]} value={relations[7]}/><Tab label={relations[8]} value={relations[8]}/><Tab label={relations[9]} value={relations[9]}/>
