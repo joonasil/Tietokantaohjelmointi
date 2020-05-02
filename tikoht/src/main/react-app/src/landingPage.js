@@ -327,7 +327,7 @@ function App() {
         if (tableName === "lasku") {
             formArray.push( 
                 <Paper key="invoiceButtonPaper" className={classes.textFields} elevation={2}>
-                    <Typography key="heading" className={classes.textFields} >Hallitse Laskuja</Typography>
+                    <Typography key="heading" className={classes.root} >Hallitse Laskuja</Typography>
                     <Button key="all" className={classes.textFields}  variant="contained" color="default" onClick={(e) => fetchTable("lasku")}>Näytä kaikki laskut</Button>
                     <Button key="overdue" className={classes.textFields}  variant="contained" color="default" onClick={(e) => fetchTable("lasku/eraantyneet" /*, "metadata/lasku" */)}>Näytä erääntyneet laskut</Button>
                     <Button key="generates"className={classes.textFields}  variant="contained" color="default" onClick={generateOverdueInvoices}>Luo muistutuslaskut erääntyneistä</Button>
@@ -684,7 +684,7 @@ function App() {
 
         <AppBar position="static">
               <Tabs value={tableName} onChange={handleTabChange}>
-                  <Tab label={relations[0]} value={relations[0]}/><Tab label={relations[1]} value={relations[1]}/><Tab label={relations[2]} value={relations[2]}/><Tab label={relations[3]} value={relations[3]}/><Tab label={relations[4]} value={relations[4]}/><Tab label={relations[5]} value={relations[5]}/><Tab label={relations[6]} value={relations[6]}/><Tab label={relations[7]} value={relations[7]}/><Tab label={relations[8]} value={relations[8]}/><Tab label={relations[9]} value={relations[9]}/>
+                  <Tab label={"Asiakkaat"} value={relations[0]}/><Tab label={"Työkohteet"} value={relations[1]}/><Tab label={"Työsopimukset"} value={relations[2]}/><Tab label={"Työsuoritukset"} value={relations[3]}/><Tab label={"Työsuoritusten tuntityöt"} value={relations[4]}/><Tab label={"Laskut"} value={relations[5]}/><Tab label={"Tarvikeluettelot"} value={relations[6]}/><Tab label={"Tarvikkeet"} value={relations[7]}/><Tab label={"Tuntityöt"} value={relations[8]}/>
               </Tabs>
           </AppBar>
 
