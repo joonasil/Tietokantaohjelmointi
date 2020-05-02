@@ -1,15 +1,20 @@
 package group32.tikoht.dao;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import group32.tikoht.model.Tyosopimus;
+import group32.tikoht.service.TyosopimusService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import group32.tikoht.model.Lasku;
 
+import static java.time.temporal.ChronoUnit.DAYS;
 
 @Repository("laskuPSQL")
 public class LaskuDao implements GenericDao<Lasku, Integer> {
@@ -115,4 +120,47 @@ public class LaskuDao implements GenericDao<Lasku, Integer> {
         });
     }
 
+    public int generateOverdueInvoices() {
+        List<Lasku> overdueInveoices = selectAllOverdue();
+        List<Integer> unremaindedInvoices = new ArrayList<Integer>();
+
+        for (Lasku formerInvoice : overdueInveoices) {
+           unremaindedInvoices.add(formerInvoice.getLaskuID());
+           if (unremaindedInvoices.contains(formerInvoice.getEdeltavaLasku())) {
+               unremaindedInvoices.remove(formerInvoice.getEdeltavaLasku());
+           }
+        }
+        System.out.println(unremaindedInvoices);
+
+        LocalDate localDate = java.time.LocalDate.now();
+        int inserted = 0;
+        for (Lasku formerInvoice : overdueInveoices) {
+            if (unremaindedInvoices.contains(formerInvoice.getLaskuID())) {
+
+                Integer laskuID = null;
+                Integer sopimusID = formerInvoice.getSopimusID();
+                LocalDate pvm = localDate;
+                LocalDate erapaiva = localDate.plusDays(30);
+                LocalDate maksettuPvm = null;
+                Integer edeltavaLasku = formerInvoice.getLaskuID();
+                Integer muistutusLkm = formerInvoice.getMuistutusLkm() == null ? 1 : formerInvoice.getMuistutusLkm() + 1;
+                Double viivastyskulut, viivastyskorko;
+                if (muistutusLkm >= 2) {
+                    Double summa = jdbcTemplate.query("SELECT (tyonHinta + tarvikkeidenHinta) AS summa FROM tyosopimus WHERE sopimusID = ?", new Object[]{formerInvoice.getSopimusID()}, (rs, i) -> {return rs.getDouble("summa");}).get(0);
+                    System.out.println("edellinen: " + formerInvoice.getSopimusID() + " : summa " + summa);
+                    viivastyskorko = (0.16 * (DAYS.between(localDate, formerInvoice.getErapaiva()) / 365) * summa);
+                    viivastyskulut = formerInvoice.getViivastyskulut() + 5 + viivastyskorko;
+                }
+                else {
+                    viivastyskulut = formerInvoice.getViivastyskulut() + 5;
+                }
+
+                Lasku reminder = new Lasku(laskuID, sopimusID, pvm, erapaiva, maksettuPvm, edeltavaLasku, muistutusLkm, viivastyskulut);
+                if (insert(reminder) == 1) {
+                    inserted++;
+                }
+            }
+        }
+        return inserted;
+    }
 }

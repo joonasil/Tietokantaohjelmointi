@@ -41,8 +41,4 @@ public class TyosuorituksenTuntityoService {
         return tyosuorituksenTuntityoDao.updateById(suoritusID, tyot);
     }
 
-    public List<TyosuorituksenTuntityo> getAllBySuoritusId(Integer suoritusId) {
-        return tyosuorituksenTuntityoDao.selectAllBySuoritusId(suoritusId);
-    }
-
 }
