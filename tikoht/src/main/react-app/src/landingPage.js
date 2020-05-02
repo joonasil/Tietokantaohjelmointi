@@ -30,6 +30,7 @@ import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import BuildIcon from '@material-ui/icons/Build';
 
 import AppBarCustom from './components/AppBarCustom.js';
+// For prettier pdf
 
 /* HIENOMMAT PÄIVÄN VALITSIJAT
 import 'date-fns';
@@ -76,6 +77,7 @@ const useStyles = makeStyles (theme => ({
         padding: theme.spacing(1),
         fontWeight: "Bold",
         color : "#51504E",
+        fontSize: "1.5rem",
       },
     datePicker: {
         borderStyle : "solid", borderWidth : "1.2px", borderColor : "lightgrey", borderRadius : "3px",
@@ -116,12 +118,14 @@ function App() {
 
     // Hooks for R1
     const [quoteId, setQuoteId] = React.useState("");
-
-    const [quoteProductsValue, setQuoteProductsValue] = React.useState([{ id : 0, tarvikeid : "", lkm : "", aleprosentti : "", tuote : { nimi : "", hinta : "", alv : "" } }]);
+    const [quoteProductsValue, setQuoteProductsValue] = React.useState([]);
     const [quoteServicesValue, setQuoteServicesValue] = React.useState([]);
     const [quoteTotal, setQuoteTotal] = React.useState({total : 0, taxfreeTotal : 0, taxAmount : 0, workAmount : 0});
     
-    let laskuValinta = 1;
+    // Hooks for R2
+    const [selectedInvoice, setSelectedInvoice] = React.useState();
+    const [showInvoice, setShowInvoice] = React.useState(false);
+
 
     const fetchTable = async (newTableName, newMetadataTableName) => {
         let newTable = {};
@@ -225,6 +229,7 @@ function App() {
                         <TextField type="number" variant="outlined" className={classes.textFields} key={tableName + "_" + attributeNames[i] + Math.random()} 
                             label={attributeNames[i]}
                             style={{display: (inputTypeRadioValue === "lisaa" && attributeNames[i] === keyAttributes[tableName]) ? 'none' : "inline-block"}}
+                            helperText={attributeNames[i] === keyAttributes[tableName] ? ("AVAIN ATTRIBUUTTI"): ""}
                             //disabled={inputTypeRadioValue == "lisaa" && keyAttributes.includes(attributeNames[i]) && !keylessRelations.includes(tableName)}  
                             onChange={(e) => {updateInsertFieldValue(e, attributeNames[i])}}
                         />
@@ -417,13 +422,24 @@ function App() {
         setDeleteFieldValue([]);
         setInsertFieldValue([]);
         setTableName(newValue);
+        setSelectedInvoice(null);
+        if (newValue !== "tyosopimus" || newValue !== "lasku") {
+            setSelectedInvoice(null);
+            setShowInvoice(false);
+        }
+        if (newValue !== "tyokohde" || newValue !== "tyosopimus" || newValue !== "lasku" || newValue !== "tarvike") {
+            setQuoteId("");
+            setQuoteProductsValue([]);
+            setQuoteServicesValue([]);
+            setQuoteTotal({total : 0, taxfreeTotal : 0, taxAmount : 0, workAmount : 0});
+        }
     };
 
     // FOR QUOTE GENERATE
     const updateQuoteProductsValue = async(event, label ,id) => {
         let state = quoteProductsValue;
         let object = state[id]
-        object[label] = (event.target.value) !== null ? parseInt(event.target.value) : "";
+        object[label] = (event.target.value) !== null ? (event.target.value) : 0;
         if (label === "tarvikeid") {
             object.tuote = await fetchProduct(event.target.value);
         }
@@ -434,7 +450,7 @@ function App() {
     const updateQuoteServicesValue = async(event, label ,id) => {
         let state = quoteServicesValue;
         let object = state[id]
-        object[label] = (event.target.value) !== null ? event.target.value : "";
+        object[label] = (event.target.value) !== null ? event.target.value : 0;
         console.log(state[id]);
         if (label === "tyontyyppi") {
             object.tyo = await fetchService(event.target.value);
@@ -457,7 +473,7 @@ function App() {
         let length = tmpArray.length;
         let tyoJson = await fetchService("asennustyo")
         console.log(tyoJson)
-        let json = { id : length, tyontyyppi : "asennustyo", lkm : "", tyo : tyoJson };
+        let json = { id : length, tyontyyppi : "asennustyo", lkm : "", tyo : tyoJson , aleprosentti : ""};
         tmpArray.push(json);
         console.log(tmpArray);
         setQuoteServicesValue(tmpArray);
@@ -531,12 +547,14 @@ function App() {
         for (let i = 0; i < items.length; i++) {
             item = items[i];
             if (item.hasOwnProperty("tyo") && item.tyo !== null) {
+                if (item.aleprosentti === "" || item.aleprosentti.isNaN) {item.aleprosentti = 0}
                 console.log("summataanTuotteita")
                 console.log(item)
-                quote.total += Number((item.lkm * item.tyo.hinta).toFixed(2));
-                quote.workAmount += Number((item.lkm * item.tyo.hinta).toFixed(2));
-                quote.taxAmount += Number((item.lkm * item.tyo.hinta * (item.tyo.alv / 100)).toFixed(2));
-                quote.taxfreeTotal += Number((item.lkm * (item.tyo.hinta - (item.tyo.hinta * (item.tyo.alv / 100)))).toFixed(2));
+                let factor  = item.lkm * (1 - (item.aleprosentti / 100));
+                quote.total += Number((factor * item.tyo.hinta).toFixed(2));
+                quote.workAmount += Number((factor * item.tyo.hinta).toFixed(2));
+                quote.taxAmount += Number((factor * item.tyo.hinta * (item.tyo.alv / 100)).toFixed(2));
+                quote.taxfreeTotal += Number((factor * (item.tyo.hinta - (item.tyo.hinta * (item.tyo.alv / 100)))).toFixed(2));
             }
         }
         console.log(quote)
@@ -711,7 +729,8 @@ function App() {
         {additionalForm}
 
         {/* R1 Hinta-arvio */}
-        <Paper className={classes.textFields} elevation={2}>
+        <Paper className={classes.textFields} elevation={2}
+            style={{ display : ((tableName === "tyosopimus" || tableName === "lasku" || tableName === "tyokohde" || tableName === "tarvike") ? "block" : "none")}}>
           <Typography className={classes.root} >Laske hinta-arvio kohteelle</Typography>
           <form noValidate autoComplete="off"></form>
             <TextField type="number" className={classes.textFields} key="quoteIdTextField" label="kohdeid" variant="outlined" value={quoteId} onChange={(event) => {setQuoteId(event.target.value)}}></TextField>
@@ -738,7 +757,6 @@ function App() {
                             </div>
                                 
                         </div>
-                    
                 )
             }
             {/* Hinta-arvion työt */}
@@ -755,6 +773,7 @@ function App() {
                                     </Select>
                             </FormControl>
                             <TextField type="number" className={classes.textFieldsShort} key={"quoteServices_lkm" + item.id} label="lkm" variant="outlined" onChange={(e) => {updateQuoteServicesValue(e, "lkm", item.id)}}></TextField>
+                            <TextField type="number" className={classes.textFieldsShort} key={"quoteServices_aleprosentti" + item.id} label="ale%" variant="outlined" onChange={(e) => {updateQuoteServicesValue(e, "aleprosentti", item.id)}}></TextField>
                             
                             <div key={item.id + "_service_text"} className={classes.productTextFields}>
                                 <Typography className={classes.textFields}>{"Työn tuntihinta: " + (quoteServicesValue[item.id].tyo.hinta) + " €"}</Typography>
@@ -774,132 +793,137 @@ function App() {
 
 
 
-
-        {/* TÄÄLLÄ JOONAKSEN TESTAILUJA KATTOO MITEN KÄY */}
-        <TextField type="number" className={classes.textFieldsShort} key={"laskunvalinta"} label="sopimusId" variant="outlined" onChange={(e) => {
-                                                                                                                                            laskuValinta = parseInt(e.target.value)
-                                                                                                                                            console.log(laskuValinta)}}></TextField>
-                                                                                                                {/* Tähän \/ pitäis saada toi id tosta TextField kentästä jotenkin tulee vaan objectina niin path kusee*/}
-        <Button className={classes.textFields} variant="outlined" color="primary" onClick={(event) => formPrintableInvoice(1)} startIcon={<CloudUploadIcon />}>Lasku sopparista {laskuValinta}</Button>
-                                                                                                                                                                            {/* Tää /\ ei myöskään päivity :D */}
-
-
-
-        {/* R2 Hinta-arvio */}
-        <div id="invoicepreview">
-                <header>
-                    <h1 className="company">TMI SÄHKÖTÄRSKY</h1>
-                    <div className="sender">
-                        <div className="name">Pekka Tärsky</div>
-                        <div className="address">Varastokuja 3 B</div>
-                        <div className="city">33720 Tampere</div>
-                        <div className="phone">Puhelin: +358 12 345 6789</div>
-                        <div className="iban">IBAN: FI49 5000 9420 0287 30</div>
-                        <div className="bic">BIC/SWIFT: OKOYHIHH</div>
-                        <div className="companyId">Y-tunnus: 1234567-8</div>
-                    </div>
-                    <div className="extra">
-                        <div className="invoice">LASKU</div>
-                        <div className="date">{currentDateIso}</div>
-                        <div className="reference">#sopimus-{invoiceData.sopimusid}:{"1234567-8"}</div>
-                    </div>
-                </header>
-                <article>
-                    <div className="info">
-                        <div className="recipient">
-                            <div className="company">{"Yksityisasiakas"}</div>
-                            <div className="name">{invoiceData.asiakas}</div>
-                            <div className="address">{invoiceData.asiakasosoite}</div>
-                            <div className="city">Tampere, 33100</div>
-                            <div className="phone">+358 12 345 6789</div>
-                            <div className="companyId"></div>
-                        </div>
-                    </div>
-                    <table className="services">
-                        <thead>
-                            <tr>
-                                <th>Tuote</th>
-                                <th>€ (alv 0%) </th>
-                                <th>Ale %</th>
-                                <th>Ale€ (alv 0%)</th>
-                                <th>ALV %</th>
-                                <th>Lkm</th>
-                                <th>Yksikkö</th>
-                                <th>Summa (alv 0%)</th>
-                                <th>Rivi Alv</th>
-                                <th>Summa (sis. alv)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {invoiceProducts.map((product, i) => 
-                            <tr key={"product_" + i}>
-                                <th>{product.nimi}</th>
-                                <th>{product.kplhinta}</th>
-                                <th>{product.aleprosentti}</th>
-                                <th>{product.aleHinta}</th>
-                                <th>{product.alvprosentti}</th>
-                                <th>{product.lkm}</th>
-                                <th>{product.yksikko}</th>
-                                <th>{product.rivisumma}</th>
-                                <th>{product.riviAlvSumma}</th>
-                                <th>{product.rivisummaAlv}</th>
-                            </tr>
-                        )}
-                        </tbody>
-                        <br style={{height: "3em"}}></br>
-                    </table>
-                    <table className="services">
-                        <thead>
-                            <tr>
-                                <th>Työ</th>
-                                <th>€ (alv 0%) </th>
-                                <th>Ale %</th>
-                                <th>Ale€ (alv 0%)</th>
-                                <th>ALV %</th>
-                                <th>Lkm</th>
-                                <th>Yksikkö</th>
-                                <th>Summa (alv 0%)</th>
-                                <th>Rivi Alv</th>
-                                <th>Summa (sis. alv)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {invoiceServices.map((service, i) =>
-                             <tr key={"service_" + i}>
-                                <td>{service.nimi}</td>
-                                <td>{service.kplhinta}</td>
-                                <td>{service.aleprosentti}</td>
-                                <td>{service.aleHinta}</td>
-                                <td>{service.alvprosentti}</td>
-                                <td>{service.lkm}</td>
-                                <td>{service.yksikko}</td>
-                                <td>{service.rivisumma}</td>
-                                <td>{service.rivisummaAlv}</td>
-                                <td>{service.riviAlvSumma}</td>
-                            </tr>
-                        )}
-                        </tbody>
-                    </table>
-                    <br style={{height: "3em"}}></br>
-                        {/* TOTALS*/}
-                    <table className="services" className="totals">
-                        <h1>Lasku Yhteensä</h1>
-                        <tbody>
-                            <tr>Laskun alv 0% summa: {invoiceTotals.taxfree} €</tr>
-                            <tr>Laskun alv määrä: {invoiceTotals.taxAmount} €</tr>
-                            <tr>Laskun työn määrä (Kotivähennyskelpoista): {invoiceTotals.workAmountWithoutTax} €</tr>
-                            <tr>Laskun kokonaissumma: {invoiceTotals.total} €</tr>
-                        </tbody>
-                    </table>
-                </article>
-                <footer>
-                    <div className="companyDetails"></div>
-                </footer>
-            </div>
-
-
         
+        <Paper className={classes.textFields} elevation={2}
+            style={{ display : ((tableName === "tyosopimus" || tableName === "lasku") ? "block" : "none")}}
+        >
+            <Typography className={classes.root} >Muodosta lasku sopimuksesta</Typography>
+            <TextField type="number" className={classes.textFieldsShort} key={"laskunvalinta"} label="sopimusId" variant="outlined" 
+                onChange={(event) => {setSelectedInvoice(event.target.value)}}></TextField>
+            <Button className={classes.textFields} variant="outlined" color="primary"
+                onClick={(event) => {
+                    formPrintableInvoice(selectedInvoice)
+                    setShowInvoice(true)}}
+                    >
+                    {"Lasku sopimuksesta nro. " + (selectedInvoice != null ? selectedInvoice : "")}
+            </Button>
+        
+            {/* R2 Hinta-arvio */}
+            <div id="invoicepreview"
+                style={{ display : ((showInvoice) ? "block" : "none")}}
+            >
+                    <header>
+                        <h1 className="company">TMI SÄHKÖTÄRSKY</h1>
+                        <div className="sender">
+                            <div className="name">Pekka Tärsky</div>
+                            <div className="address">Varastokuja 3 B</div>
+                            <div className="city">33720 Tampere</div>
+                            <div className="phone">Puhelin: +358 12 345 6789</div>
+                            <div className="iban">IBAN: FI49 5000 9420 0287 30</div>
+                            <div className="bic">BIC/SWIFT: OKOYHIHH</div>
+                            <div className="companyId">Y-tunnus: 1234567-8</div>
+                        </div>
+                        <div className="extra">
+                            <div className="invoice">LASKU</div>
+                            <div className="date">{currentDateIso}</div>
+                            <div className="reference">#sopimus-{invoiceData.sopimusid}:{"1234567-8"}</div>
+                        </div>
+                    </header>
+                    <article>
+                        <div className="info">
+                            <div className="recipient">
+                                <div className="company">{"Yksityisasiakas"}</div>
+                                <div className="name">{invoiceData.asiakas}</div>
+                                <div className="address">{invoiceData.asiakasosoite}</div>
+                                <div className="city">Tampere, 33100</div>
+                                <div className="phone">+358 12 345 6789</div>
+                                <div className="companyId"></div>
+                            </div>
+                        </div>
+                        <table className="services">
+                            <thead>
+                                <tr>
+                                    <th>Tuote</th>
+                                    <th>€ (alv 0%) </th>
+                                    <th>Ale %</th>
+                                    <th>Ale€ (alv 0%)</th>
+                                    <th>ALV %</th>
+                                    <th>Lkm</th>
+                                    <th>Yksikkö</th>
+                                    <th>Summa (alv 0%)</th>
+                                    <th>Rivi Alv</th>
+                                    <th>Summa (sis. alv)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {invoiceProducts.map((product, i) => 
+                                <tr key={"product_" + i}>
+                                    <th>{product.nimi}</th>
+                                    <th>{product.kplhinta}</th>
+                                    <th>{product.aleprosentti}</th>
+                                    <th>{product.aleHinta}</th>
+                                    <th>{product.alvprosentti}</th>
+                                    <th>{product.lkm}</th>
+                                    <th>{product.yksikko}</th>
+                                    <th>{product.rivisumma}</th>
+                                    <th>{product.riviAlvSumma}</th>
+                                    <th>{product.rivisummaAlv}</th>
+                                </tr>
+                            )}
+                            </tbody>
+                        </table>
+                        <br style={{height: "3em"}}></br>
+                        <table className="services">
+                            <thead>
+                                <tr>
+                                    <th>Työ</th>
+                                    <th>€ (alv 0%) </th>
+                                    <th>Ale %</th>
+                                    <th>Ale€ (alv 0%)</th>
+                                    <th>ALV %</th>
+                                    <th>Lkm</th>
+                                    <th>Yksikkö</th>
+                                    <th>Summa (alv 0%)</th>
+                                    <th>Rivi Alv</th>
+                                    <th>Summa (sis. alv)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {invoiceServices.map((service, i) =>
+                                <tr key={"service_" + i}>
+                                    <td>{service.nimi}</td>
+                                    <td>{service.kplhinta}</td>
+                                    <td>{service.aleprosentti}</td>
+                                    <td>{service.aleHinta}</td>
+                                    <td>{service.alvprosentti}</td>
+                                    <td>{service.lkm}</td>
+                                    <td>{service.yksikko}</td>
+                                    <td>{service.rivisumma}</td>
+                                    <td>{service.rivisummaAlv}</td>
+                                    <td>{service.riviAlvSumma}</td>
+                                </tr>
+                            )}
+                            </tbody>
+                        </table>
+                        <br style={{height: "3em"}}></br>
+                            {/* TOTALS*/}
+                        <h2>Lasku Yhteensä:</h2>
+                        <table className="services" className="totals">
+                            <tbody>
+                                <tr><td>Laskun alv 0% summa: {invoiceTotals.taxfree} €</td></tr>
+                                <tr><td>Laskun alv määrä: {invoiceTotals.taxAmount} €</td></tr>
+                                <tr><td>Laskun työn määrä (Kotivähennyskelpoista): {invoiceTotals.workAmountWithoutTax} €</td></tr>
+                                <tr><td>Laskun kokonaissumma: {invoiceTotals.total} €</td></tr>
+                            </tbody>
+                        </table>
+                    </article>
+                    <footer>
+                        <div className="companyDetails"></div>
+                    </footer>
+            </div>
+        </Paper>
     </div>
+    
     );
 }
 
