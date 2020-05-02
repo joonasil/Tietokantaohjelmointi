@@ -24,7 +24,7 @@ public class TyosuoritusController {
 
     @CrossOrigin
     @PostMapping
-    public void addTyosuoritus(@Valid @NotNull @RequestBody Tyosuoritus tyosuoritus) {
+    public void addTyosuoritus(/*@Valid @NotNull*/ @RequestBody Tyosuoritus tyosuoritus) {
         tyosuoritusService.addTyosuoritus(tyosuoritus);
     }
 
@@ -49,7 +49,7 @@ public class TyosuoritusController {
 
     @CrossOrigin
     @PutMapping(path = "{suoritusID}")
-    public void updateTyosuoritus(@PathVariable("suoritusID") Integer suoritusID,@Valid @NotNull @RequestBody Tyosuoritus tyosuoritusToUpdate) {
+    public void updateTyosuoritus(@PathVariable("suoritusID") Integer suoritusID,/*@Valid @NotNull*/ @RequestBody Tyosuoritus tyosuoritusToUpdate) {
         tyosuoritusService.updateTyosuoritus(suoritusID, tyosuoritusToUpdate);
     }
 }

@@ -74,16 +74,6 @@ public class TyosuoritusDao implements GenericDao<Tyosuoritus, Integer> {
         return jdbcTemplate.update(sql, new Object[]{sopimusid, suorituspvm, id});
     }
 
-    public List<Tyosuoritus> selectAllBySopimus(Integer id) {
-        final String sql =  "SELECT suoritusid, sopimusid, suorituspvm " +
-                            "FROM tyosuoritus " +
-                            "WHERE sopimusid = ?";
-        return jdbcTemplate.query(sql, new Object[]{id}, (rs, i) -> {
-            Integer suoritusid = rs.getInt("suoritusid");
-            Integer sopimusid = rs.getInt("sopimusid");
-            LocalDate suorituspvm = rs.getObject("suorituspvm", LocalDate.class);
-            return new Tyosuoritus(suoritusid, sopimusid, suorituspvm);
-        });
-    }
+
 
 }

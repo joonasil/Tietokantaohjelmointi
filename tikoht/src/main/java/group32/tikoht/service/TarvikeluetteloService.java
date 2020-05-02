@@ -41,8 +41,4 @@ public class TarvikeluetteloService {
         return luetteloDao.updateById(suoritusID, luettelo);
     }
 
-    public List<Tarvikeluettelo> getAllBySuoritusId(Integer suoritusId) {
-        return luetteloDao.selectAllBySuoritusId(suoritusId);
-    }
-
 }

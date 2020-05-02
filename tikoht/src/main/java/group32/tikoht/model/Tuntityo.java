@@ -8,12 +8,12 @@ public class Tuntityo {
 
     private final String tyontyyppi;
     @NotBlank
-    private final Double hinta;
+    private final Integer hinta;
     @NotBlank
     private final Integer alv;
 
     public Tuntityo( @JsonProperty("tyontyyppi") String tyontyyppi,
-                    @JsonProperty("hinta") Double hinta,
+                    @JsonProperty("hinta") Integer hinta,
                     @JsonProperty("alv") Integer alv) {
         this.tyontyyppi = tyontyyppi;
         this.hinta = hinta;
@@ -24,7 +24,7 @@ public class Tuntityo {
         return tyontyyppi;
     }
 
-    public Double getHinta() {
+    public Integer getHinta() {
         return hinta;
     }
 
