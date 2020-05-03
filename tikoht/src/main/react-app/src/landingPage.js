@@ -595,13 +595,15 @@ function App() {
                 .then(response => response.json())
                 .then(result => {
                     console.log(result)
-                    if (result.hasOwnProperty("status") && result.status === 200) {
+                    if (result.hasOwnProperty("asiakas")) {
                         result.sopimusid = sopimusid;
                         setInvoiceData(result);
                         calculatePrintableInvoice(result);
+                        setShowInvoice(true);
                     }
                     else {
                         alert("Annettua sopimustunnusta ei ole tietokannassa");
+                        setShowInvoice(false);
                     }
                 })
                 .catch(console.log);
@@ -806,8 +808,7 @@ function App() {
                 onChange={(event) => {setSelectedInvoice(event.target.value)}}></TextField>
             <Button className={classes.textFields} variant="outlined" color="primary"
                 onClick={(event) => {
-                    formPrintableInvoice(selectedInvoice)
-                    setShowInvoice(true)}}
+                    formPrintableInvoice(selectedInvoice)}}
                     >
                     {"Lasku sopimuksesta nro. " + (selectedInvoice != null ? selectedInvoice : "")}
             </Button>
