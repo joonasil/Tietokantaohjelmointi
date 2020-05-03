@@ -418,13 +418,12 @@ function App() {
 
     // HANDLE TABS
     const handleTabChange = (event, newValue) => {
+        setSelectedInvoice("");
         setSearchFieldValue([]);
         setDeleteFieldValue([]);
         setInsertFieldValue([]);
         setTableName(newValue);
-        setSelectedInvoice(null);
         if (newValue !== "tyosopimus" || newValue !== "lasku") {
-            setSelectedInvoice(null);
             setShowInvoice(false);
         }
         if (newValue !== "tyokohde" || newValue !== "tyosopimus" || newValue !== "lasku" || newValue !== "tarvike") {
@@ -804,11 +803,13 @@ function App() {
             style={{ display : ((tableName === "tyosopimus" || tableName === "lasku") ? "block" : "none")}}
         >
             <Typography className={classes.root} >Muodosta lasku sopimuksesta</Typography>
-            <TextField type="number" className={classes.textFieldsShort} key={"laskunvalinta"} label="sopimusId" variant="outlined" 
+            <TextField type="number" className={classes.textFieldsShort} value={selectedInvoice} key={"laskunvalinta"} label="sopimusId" variant="outlined" 
                 onChange={(event) => {setSelectedInvoice(event.target.value)}}></TextField>
             <Button className={classes.textFields} variant="outlined" color="primary"
                 onClick={(event) => {
-                    formPrintableInvoice(selectedInvoice)}}
+                    formPrintableInvoice(selectedInvoice)
+                    console.log(selectedInvoice)
+                }}
                     >
                     {"Lasku sopimuksesta nro. " + (selectedInvoice != null ? selectedInvoice : "")}
             </Button>
