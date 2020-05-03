@@ -1,5 +1,6 @@
 package group32.tikoht.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import group32.tikoht.dao.TyosuoritusDao;
+import group32.tikoht.model.TyosuorituksenTuntityo;
 import group32.tikoht.model.Tyosuoritus;
 
 // Mahdollinen tarvittava serverilogiikka tähän
@@ -39,6 +41,10 @@ public class TyosuoritusService {
 
     public int updateTyosuoritus(Integer suoritusID, Tyosuoritus tyosuoritus) {
         return tyosuoritusDao.updateById(suoritusID, tyosuoritus);
+    }
+
+    public List<Tyosuoritus> getAllBySopimus(Integer id) {
+        return tyosuoritusDao.selectAllBySopimus(id);
     }
 
 }

@@ -50,7 +50,8 @@ public class Tyosopimus {
     public String getSelite() {
         return selite;
     }
-
+    
+    @JsonFormat(pattern = "yyyy-MM-dd")
     public LocalDate getPvm() {
         return pvm;
     }
