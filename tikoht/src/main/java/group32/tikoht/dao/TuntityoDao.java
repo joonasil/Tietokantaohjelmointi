@@ -23,7 +23,7 @@ public class TuntityoDao implements GenericDao<Tuntityo, String> {
     @Override
     public int insert(Tuntityo tuntityo) {
         String tyonTyyppi = tuntityo.getTyonTyyppi();
-        Integer hinta = tuntityo.getHinta();
+        Double hinta = tuntityo.getHinta();
         Integer alv = tuntityo.getAlv();
         final String sql =  "INSERT INTO tuntityo " +
                             "VALUES (?, ?, ?)";
@@ -32,11 +32,11 @@ public class TuntityoDao implements GenericDao<Tuntityo, String> {
 
     @Override
     public List<Tuntityo> selectAll() {
-        final String sql =  "SELECT tyonTyyppi, hinta, alv " +
+        final String sql =  "SELECT tyontyyppi, hinta, alv " +
                             "FROM tuntityo";
         return jdbcTemplate.query(sql, (rs, i) -> {
-            String tyonTyyppi = rs.getString("tyonTyyppi");
-            Integer hinta = rs.getInt("hinta");
+            String tyonTyyppi = rs.getString("tyontyyppi");
+            Double hinta = rs.getDouble("hinta");
             Integer alv = rs.getInt("alv");
             return new Tuntityo(tyonTyyppi, hinta, alv);
         });
@@ -44,12 +44,12 @@ public class TuntityoDao implements GenericDao<Tuntityo, String> {
 
     @Override
     public Optional<Tuntityo> selectById(String id) {
-        final String sql =  "SELECT tyonTyyppi, hinta, alv " +
+        final String sql =  "SELECT tyontyyppi, hinta, alv " +
                             "FROM tuntityo " +
-                            "WHERE tyonTyyppi = ?";
+                            "WHERE tyontyyppi = ?";
         Tuntityo tuntityo = jdbcTemplate.queryForObject(sql, new Object[]{id}, (rs, i) -> {
-            String tyonTyyppi = rs.getString("tyonTyyppi");
-            Integer hinta = rs.getInt("hinta");
+            String tyonTyyppi = rs.getString("tyontyyppi");
+            Double hinta = rs.getDouble("hinta");
             Integer alv = rs.getInt("alv");
             return new Tuntityo(tyonTyyppi, hinta, alv);
         });
@@ -59,18 +59,33 @@ public class TuntityoDao implements GenericDao<Tuntityo, String> {
     @Override
     public int deleteById(String id) {
         final String sql =  "DELETE FROM tuntityo " +
-                            "WHERE tyonTyyppi = ?";
+                            "WHERE tyontyyppi = ?";
         return jdbcTemplate.update(sql, new Object[]{id});
     }
 
     @Override
     public int updateById(String id, Tuntityo tuntityo) {
-        Integer hinta = tuntityo.getHinta();
+        Double hinta = tuntityo.getHinta();
         Integer alv = tuntityo.getAlv();
         final String sql =  "UPDATE tuntityo " +
                             "SET hinta = ?, alv = ? " +
-                            "WHERE tyonTyyppi = ?";
+                            "WHERE tyontyyppi = ?";
         return jdbcTemplate.update(sql, new Object[]{hinta, alv, id});
+    }
+
+    public List<Tuntityo> selectAllBySopimus(Integer sopimusId) {
+        final String sql =  "SELECT DISTINCT(tuntityo.tyontyyppi), hinta, alv " +
+                            "FROM tuntityo, tyosuorituksenTuntityo, tyosuoritus, tyosopimus " +
+                            "WHERE tyosopimus.sopimusid = ? " +
+                            "AND tyosopimus.sopimusid = tyosuoritus.sopimusid " +
+                            "AND tyosuoritus.suoritusid = tyosuorituksenTuntityo.suoritusid " +
+                            "AND tyosuorituksenTuntityo.tyontyyppi = tuntityo.tyontyyppi";
+        return jdbcTemplate.query(sql, new Object[]{sopimusId}, (rs, i) -> {
+            String tyonTyyppi = rs.getString("tyontyyppi");
+            Double hinta = rs.getDouble("hinta");
+            Integer alv = rs.getInt("alv");
+            return new Tuntityo(tyonTyyppi, hinta, alv);
+        });
     }
     
 }

@@ -88,4 +88,23 @@ public class TarvikeDao implements GenericDao<Tarvike, Integer> {
         return jdbcTemplate.update(sql, new Object[]{nimi, sisaanostohinta, myyntihinta, yksikko, varastoLkm, alv, key});
     }
 
+    public List<Tarvike> selectAllBySopimus(Integer sopimusId) {
+        final String sql =  "SELECT DISTINCT(tarvike.tarvikeid), nimi, sisaanostohinta, myyntihinta, yksikko, varastoLkm, alv " +
+                            "FROM tarvike, tarvikeluettelo, tyosuoritus, tyosopimus " +
+                            "WHERE tyosopimus.sopimusid = ? " +
+                            "AND tyosopimus.sopimusid = tyosuoritus.sopimusid " +
+                            "AND tyosuoritus.suoritusid = tarvikeluettelo.suoritusid " +
+                            "AND tarvikeluettelo.tarvikeid = tarvike.tarvikeid";
+        return jdbcTemplate.query(sql, new Object[]{sopimusId}, (rs, i) -> {
+            Integer tarvikeID = rs.getInt("tarvikeID");
+            String nimi = rs.getString("nimi");
+            Double sisaanostohinta = rs.getDouble("sisaanostohinta");
+            Double myyntihinta = rs.getDouble("myyntihinta");
+            String yksikko = rs.getString("yksikko");
+            Integer varastoLkm = rs.getInt("varastoLkm");
+            Integer alv = rs.getInt("alv");
+            return new Tarvike(tarvikeID, nimi, sisaanostohinta, myyntihinta, yksikko, varastoLkm, alv);
+        });
+    }
+
 }
